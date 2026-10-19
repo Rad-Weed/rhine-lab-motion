@@ -24,6 +24,12 @@
 
 > **非官方同人声明 / Unofficial fan work.** 本项目与 Hypergryph / 鹰角网络无隶属、未获认可。Not affiliated with or endorsed by Hypergryph / Hypergryph Network.
 
+## 🌐 在线演示 / Live Demo（GitHub Pages）
+
+- **演示索引 / Demo index**: https://rad-weed.github.io/rhine-lab-motion/
+- **全要素演示 / Full demo**: https://rad-weed.github.io/rhine-lab-motion/assets/starter/index.html
+- **3D 档案阵列 / 3D archive array**: https://rad-weed.github.io/rhine-lab-motion/assets/starter/scene3d.html
+
 ## 🖼 效果预览 / Preview
 
 | Demo | 内容 |
@@ -36,6 +42,8 @@
 Both pages are **self-contained** (CSS/JS inlined) — just open them in a browser. The 3D page needs network access for the three.js CDN.
 
 ## 🚀 快速开始 / Quick Start
+
+> 💡 **不想克隆？直接看在线演示 / Prefer a live look?** → https://rad-weed.github.io/rhine-lab-motion/
 
 ```bash
 # 1. 克隆 / clone
