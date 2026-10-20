@@ -853,6 +853,7 @@ const RL_SFX = {
 };
 function rlAC() { return (window._rlAC ??= new (window.AudioContext || window.webkitAudioContext)()); }
 function rlSfx(kind = "glass", ctx = null) {
+  if (performance.now() < (window._rlMuteUntil || 0)) return;   // 滚动静音窗口
   try {
     ctx ??= rlAC();
     if (ctx.state === "suspended") ctx.resume();
@@ -1469,6 +1470,25 @@ function rlSfxLab(grid) {
   });
 }
 
+/* ── 精确滚动：逐帧重算目标位置（抵消入场动画引起的布局位移），滚动期间静音 hover 音效 ── */
+let _rlScrollRAF = null;
+function rlScrollToEl(el, done) {
+  const margin = 96;
+  const startT = performance.now(), dur = 750;
+  const startY = window.scrollY;
+  if (_rlScrollRAF) cancelAnimationFrame(_rlScrollRAF);
+  window._rlMuteUntil = startT + dur + 450;
+  (function step(now) {
+    const p = Math.min(1, (now - startT) / dur);
+    const e = 1 - Math.pow(1 - p, 3);
+    const target = el.getBoundingClientRect().top + window.scrollY - margin;
+    window.scrollTo({ top: startY + (target - startY) * e, behavior: "instant" });
+    if (p < 1) _rlScrollRAF = requestAnimationFrame(step);
+    else { window._rlMuteUntil = performance.now() + 350; if (done) done(); }
+  })(startT);
+}
+
+/* ── 自动巡演 v2：不与用户抢滚动 ──
 /* ── 自动巡演 v2：不与用户抢滚动 ──
    闲置 15s 启动（角标有倒计时预告）；每页 10s；
    空格/↓ 下一页、↑ 上一页、Esc 暂停；
@@ -1494,7 +1514,7 @@ function rlTour() {
   };
   const go = (i) => {
     idx = ((i % pages.length) + pages.length) % pages.length;
-    pages[idx].scrollIntoView({ behavior: "smooth", block: "start" });
+    rlScrollToEl(pages[idx]);
     show();
   };
   const startTimer = () => { clearInterval(timer); if (playing) timer = setInterval(() => go(idx + 1), 10000); };
@@ -1542,10 +1562,18 @@ function rlTour() {
 badge.addEventListener("click", () => { play(!playing); rlSfx(playing ? "ui" : "thump"); });
 
   armIdle();
+  // 顶部导航：接入精确滚动（默认锚点跳转会被入场动画的布局位移带偏）
+  document.querySelectorAll('.demo-nav a[href^="#"]').forEach((a) =>
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const el = document.querySelector(a.getAttribute("href"));
+      if (el) rlScrollToEl(el);
+    }));
 }
 
 /* ── 色板音阶：色块按序播放对应音高 ── */
 function rlNote(freq) {
+  if (performance.now() < (window._rlMuteUntil || 0)) return;
   try {
     const ctx = rlAC(); if (ctx.state === "suspended") ctx.resume();
     const t = ctx.currentTime;
@@ -1589,11 +1617,6 @@ function rlRadar(el) {
   })(performance.now());
 }
 
-/* ── 页面编排：进入视口时触发 ── */
-/* ── 页面编排：进入视口时触发 ── */
-/* ── 页面编排：进入视口时触发 ── */
-/* ── 页面编排：进入视口时触发 ── */
-/* ── 页面编排：进入视口时触发 ── */
 /* ── 页面编排：进入视口时触发 ── */
 function rlActivate() {
   if (window._rlActive) return; // 防重复初始化
