@@ -6,7 +6,7 @@
 
 *Science-fiction archive-terminal aesthetics for the web — paper white, ink black, warning orange.*
 
-[![Version](https://img.shields.io/badge/version-0.11.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
+[![Version](https://img.shields.io/badge/version-0.12.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
 
 一个蒸馏自官方 PV、开源同人项目与电影级 FUI 方法论的**完整设计语言**：
 设计 token · 12+ 动效模式 · Three.js 3D 档案阵列 · 17 种合成音效 · 终端登录开场。
@@ -74,6 +74,16 @@ Then just say *"generate a Rhine Lab style …"* in a WorkBuddy conversation, or
 <script src="assets/starter/rhinelab.js"></script>
 ```
 
+## 🔌 跨 Harness 兼容 / Cross-harness compatibility
+
+| Harness | 安装方式 / How to use |
+|---|---|
+| WorkBuddy | 自动加载 / auto-loaded |
+| Claude Code / agent-skills 系 | 整个文件夹放入 `~/.claude/skills/rhine-lab-motion/` |
+| Codex / Cursor / Qwen Code / Gemini CLI | 保留根目录 `AGENTS.md`，自动读取 |
+| 千问 / Kimi 桌面端（聊天形态） | 粘贴 `integrations/SKILL-PROMPT.txt` 全文到系统提示 |
+| DSH 等自研 harness | 注入 `SKILL-PROMPT.txt` 或把包路径挂进上下文配置 |
+
 ## 🎨 设计语言速览 / Design Language at a Glance
 
 | Token | 值 | 语义 |
@@ -120,7 +130,7 @@ rhine-lab-motion/
 ## 📋 版本 / Versions
 
 遵循 `0.x.0` 语义：新功能进位 x，小修进位末位。详见技能包内 `版本说明` 或 git 历史。
-SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.11.0** — deep-dive research round (FUI methodology, Arwes guidelines, Arknights UI analyses).
+SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.12.0** — cross-harness adapters (`AGENTS.md`, `integrations/SKILL-PROMPT.txt`) so the kit works beyond WorkBuddy.
 
 ## 📜 许可与出处 / License & Credits
 

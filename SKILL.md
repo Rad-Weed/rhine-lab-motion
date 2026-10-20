@@ -1,6 +1,6 @@
 ---
 name: rhine-lab-motion
-version: 0.11.0
+version: 0.12.0
 description: 莱茵生命（明日方舟 Rhine Lab）动效与 UI 风格技能。一句话触发："生成莱茵生命风格"、"莱茵生命风格"、"莱茵生命动效"、"Rhine Lab 风格"、"科研档案风 UI"、"磁带盒未来主义"、"白橙科技感动效"，或任何提到莱茵生命/明日方舟视觉风格的网页、小程序、PPT、视频制作请求。涵盖：设计 token（色板/字体/缓动）、12 种基础动效模式（乱码解码/打字机/里程计/HUD/警告板）、进阶 3D 档案阵列（波浪选中/相机/材质）、解密动画、三轨 BGM 与交互音效体系、终端登录开场、Multiplane 视频渲染管线；附全部参考出处与开源许可表。
 agent_created: true
 ---
@@ -52,3 +52,6 @@ agent_created: true
 | `references/sources.md` | **全部参考出处与许可表**（开源项目+作者 B 站+官方素材边界+文章/方法论/FUI 资源，开源发布前必读） |
 | `references/style-deep-dive.md` | 深度风格剖析：舟味配方、CRT 语义、孤星 PV 拆解、方舟 UI/UX 六角度、UX 交互模式、FUI 通用语法 14 条、Arwes 框架准则、CSS-only HUD 技法、莱茵转译指南 |
 | `assets/starter/` | **自包含演示**：`index.html`（主页，零 WebGL：boot 开场 + 全部基础动效 + 17 个板块，CSS/JS 内联）；`scene3d.html`（独立 3D 档案阵列页，含 importmap，重渲染隔离以保证主页流畅）；`rhinelab.css` + `rhinelab.js` 为可复用资源对 |
+| `AGENTS.md` | 跨 harness 指令（Codex/Cursor/Qwen Code/Gemini CLI 等自动读取；含规则速查与兼容性表） |
+| `integrations/SKILL-PROMPT.txt` | 自包含风格提示词（千问/Kimi/DSH 等聊天桌面端粘贴用，token+铁律+配方全内嵌） |
+| `integrations/README.md` | 各 harness 安装适配矩阵与使用说明 |
