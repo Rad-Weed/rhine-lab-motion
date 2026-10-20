@@ -115,14 +115,14 @@ const RL_SFX = {
   beep:   { f: 1200, type: "sine",   dur: 0.06,  g: 0.06, drop: 0.9 },
   chime:  { notes: [659.25, 880], type: "sine", dur: 0.16, g: 0.07, gap: 0.09 },
   alarm:  { notes: [880, 660, 880, 660, 880, 660], type: "square", dur: 0.09, g: 0.045, gap: 0.1 },
-  scan:   { sweep: [400, 1600], type: "sawtooth", dur: 1.2, g: 0.09 },
+  scan:   { sweep: [400, 1600], type: "sawtooth", dur: 1.2, g: 0.12 },
   whoosh: { noise: true, dur: 0.32, g: 0.09, sweepFilter: [3200, 260] },
   step:   { f: 1400, type: "triangle", dur: 0.012, g: 0.05, drop: 0.7 },
   unlock: { notes: [523.25, 783.99], type: "sine", dur: 0.13, g: 0.07, gap: 0.09 },
   lock:   { notes: [392, 246.94], type: "square", dur: 0.1, g: 0.05, gap: 0.11 },
-  power:  { sweep: [70, 320], type: "sawtooth", dur: 0.5, g: 0.1 },
-  extract:{ noise: true, dur: 0.28, g: 0.14, sweepFilter: [400, 2600] },
-  insert: { noise: true, dur: 0.26, g: 0.11, sweepFilter: [2400, 260] },
+  power:  { sweep: [120, 480], type: "sawtooth", dur: 0.5, g: 0.13 },
+  extract:{ noise: true, dur: 0.28, g: 0.16, sweepFilter: [500, 3000] },
+  insert: { noise: true, dur: 0.26, g: 0.13, sweepFilter: [2800, 300] },
   glitch: { notes: [820, 320, 1650, 520, 1230, 410], type: "square", dur: 0.012, g: 0.04, gap: 0.022 },
   error:  { notes: [220, 220], type: "square", dur: 0.12, g: 0.06, gap: 0.16 },
 };
@@ -150,15 +150,16 @@ function rlSfx(kind = "glass", ctx = null) {
     const play = (f, t) => {
       const o = ctx.createOscillator(), g = ctx.createGain();
       o.type = P.type; o.frequency.setValueAtTime(f, t);
-      if (P.drop) o.frequency.exponentialRampToValueAtTime(f * P.drop, t + P.dur * 4);
-      if (P.sweep) o.frequency.setValueAtTime(P.sweep[0], t), o.frequency.exponentialRampToValueAtTime(P.sweep[1], t + P.dur);
+      if (P.sweep) o.frequency.exponentialRampToValueAtTime(P.sweep[1], t + P.dur);
+      else if (P.drop) o.frequency.exponentialRampToValueAtTime(f * P.drop, t + P.dur * 4);
+      const stopAt = P.sweep ? P.dur : P.dur * 4;   // 扫频随包络收尾，不长鸣
       g.gain.setValueAtTime(P.g, t);
       g.gain.setValueAtTime(P.g, t + P.dur * 0.6);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + P.dur * 4);
-      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + P.dur * 4 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + stopAt);
+      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + stopAt + 0.02);
     };
     if (P.notes) P.notes.forEach((f, i) => play(f, t0 + i * (P.gap ?? 0)));
-    else play(P.f, t0);
+    else play(P.sweep ? P.sweep[0] : P.f, t0);   // sweep 型从起始频率起振
   } catch (e) { /* 无音频环境时静默降级 */ }
 }
 /* 悬停音限流（>=70ms 一次） */
