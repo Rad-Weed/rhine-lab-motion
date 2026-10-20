@@ -1904,6 +1904,26 @@ function rlTour() {
   document.body.appendChild(badge);
   const label = badge.querySelector("span");
 
+  // 双语字幕板：跟随当前板块实时更新（替代静态的"正在合成信息"）
+  const plate = document.querySelector(".subtitle-plate");
+  const subCn = plate ? plate.querySelector(".cn") : null;
+  const subEn = plate ? plate.querySelector(".en") : null;
+  let subTimer = null;
+  const updateSubtitle = () => {
+    if (!subCn || !subEn) return;
+    let cur = pages[0], best = Infinity;
+    pages.forEach((p2) => {
+      const t = p2.getBoundingClientRect().top;
+      if (t >= -120 && t < best) { best = t; cur = p2; }
+    });
+    const h = cur.querySelector(".demo-h");
+    subCn.textContent = h ? h.textContent : "RHINE LAB";
+    subEn.textContent = "SECTION " + String(pages.indexOf(cur) + 1).padStart(2, "0") + " / " + String(pages.length).padStart(2, "0") + " · RHINE LAB OS";
+  };
+  const queueSubtitle = () => { clearTimeout(subTimer); subTimer = setTimeout(updateSubtitle, 160); };
+  window.addEventListener("scroll", queueSubtitle, { passive: true });
+  updateSubtitle();
+
   const show = () => {
     if (playing) label.textContent = String(idx + 1).padStart(2, "0") + " / " + pages.length + " · 10s";
     else if (idleLeft > 0) label.textContent = "IDLE " + idleLeft + "s → TOUR";
@@ -1913,6 +1933,7 @@ function rlTour() {
   const go = (i) => {
     idx = ((i % pages.length) + pages.length) % pages.length;
     rlScrollToEl(pages[idx]);
+    updateSubtitle();
     show();
   };
   const startTimer = () => { clearInterval(timer); if (playing) timer = setInterval(() => go(idx + 1), 10000); };
