@@ -242,7 +242,7 @@ async function rlBoot(overlay) {
     delete overlay.dataset.running;
     return;
   }
-  overlay.classList.remove("off", "scanning", "flashing");
+  overlay.classList.remove("off", "scanning", "flashing", "standby");
   const lines = [...overlay.querySelectorAll(".b-line")];
   const ring = overlay.querySelector(".b-ring-wrap");
   const welcome = overlay.querySelector(".b-welcome");
@@ -799,7 +799,8 @@ function rlTour() {
     subLast = i;
     const h = cur.querySelector(".demo-h");
     const cnText = h ? h.textContent : "RHINE LAB";
-    rlCjkReveal(subCn, { duration: Math.min(700, 90 * [...cnText].length) });   // 中文逐字滑入
+    subCn.textContent = cnText;                     // ★ 先更新文本，再让动画播"新内容"
+    rlCjkReveal(subCn, { duration: Math.min(700, 90 * [...cnText].length) });
     subEn.dataset.text = "SECTION " + String(i).padStart(2, "0") + " / " + String(pages.length).padStart(2, "0") + " · RHINE LAB OS";
     rlScramble(subEn, { duration: 420 });           // 英文乱码解码
   };
@@ -843,6 +844,7 @@ function rlTour() {
   document.addEventListener("pointermove", armIdle, { passive: true });
 
   window.addEventListener("keydown", (e) => {
+    if (document.querySelector(".boot:not(.off)")) return;   // 开场遮罩期间不响应翻页
     const paging = e.code === "Space" || e.code === "ArrowDown" || e.code === "ArrowUp";
     if (e.target.closest("input,textarea")) {
       if (playing) pause();          // 输入框打字 = 接管，暂停巡演
@@ -958,21 +960,29 @@ function rlActivate() {
   rlTour();
   // 音频解锁：浏览器要求首次用户手势后才能出声
   document.addEventListener("pointerdown", () => { try { rlAC().resume(); } catch (e) {} }, { once: true });
-  // 终端登录开场：载入即播；REPLAY BOOT 按钮重播
+  // 终端登录开场：standby 显示 ENTER SYSTEM，点击/回车 = 解锁音频并播放完整开场（含音效）
   const boot = document.querySelector(".boot[data-boot]");
   if (boot) {
-    // 兜底 1：无论发生什么，12s 后强制放行（重播时 running 标记保护）
     setTimeout(() => {
       if (!boot.classList.contains("off") && !boot.dataset.running) boot.classList.add("off");
-    }, 12000);
-    const start = () => setTimeout(() => rlBoot(boot).catch(() => boot.classList.add("off")), 250);
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
-    else start();
+    }, 20000);
+    const enter = () => {
+      if (boot.dataset.running || boot.classList.contains("off")) return;
+      try { rlAC().resume(); } catch (err) {}          // ★ 用户手势解锁音频，开场全程有声
+      rlBoot(boot).catch(() => boot.classList.add("off"));
+    };
+    boot.classList.add("standby");
+    boot.querySelector(".b-enter")?.addEventListener("click", enter);
+    boot.addEventListener("keydown", (e) => {
+      if (e.code === "Enter" || e.code === "Space") { e.preventDefault(); enter(); }
+    });
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) boot.classList.add("off");
     document.querySelector("#boot-replay")?.addEventListener("click", () => {
       window.scrollTo({ top: 0, behavior: "instant" });
+      try { rlAC().resume(); } catch (err) {}
       rlBoot(boot);
     });
-    window.rlBoot = () => rlBoot(boot); // 控制台可手动重播
+    window.rlBoot = () => rlBoot(boot);
   }
 }
 document.addEventListener("DOMContentLoaded", rlActivate);

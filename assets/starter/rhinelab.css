@@ -463,7 +463,22 @@ body::before {
 .boot .b-welcome .w1 { font-size: 12px; letter-spacing: 4px; color: #a6b0b1; }
 .boot .b-welcome .w2 { font-size: clamp(26px, 4.5vw, 40px); font-weight: 700; letter-spacing: 1px; color: #e0e3dc; margin: 8px 0; }
 .boot .b-welcome .w2 .amp { color: #c5a16b; }
-.boot .b-skip {
+.boot .b-enter {
+  display: none;
+  text-align: center;
+  margin-top: 26px;
+  font-family: var(--rl-font-mono);
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #c5a16b;
+  border: 1px solid #536166;
+  padding: 12px 30px;
+  cursor: pointer;
+  animation: rl-enter-pulse 2.2s ease-in-out infinite;
+}
+.boot.standby .b-enter { display: inline-block; }
+@keyframes rl-enter-pulse { 50% { border-color: #c5a16b; color: #e0e3dc; } }
+.b-skip {
   position: absolute; right: 28px; bottom: 24px;
   background: none; border: 1px solid #536166; color: #a6b0b1;
   font-family: var(--rl-font-mono); font-size: 10px; letter-spacing: 2px;
