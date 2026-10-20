@@ -759,7 +759,7 @@ function rlScrollToEl(el, done) {
     const target = el.getBoundingClientRect().top + window.scrollY - margin;
     window.scrollTo({ top: startY + (target - startY) * e, behavior: "instant" });
     if (p < 1) _rlScrollRAF = requestAnimationFrame(step);
-    else { window._rlMuteUntil = performance.now() + 350; if (done) done(); }
+    else { if (done) done(); window._rlMuteUntil = performance.now() + 350; }
   })(startT);
 }
 
@@ -786,6 +786,7 @@ function rlTour() {
   const subCn = plate ? plate.querySelector(".cn") : null;
   const subEn = plate ? plate.querySelector(".en") : null;
   let subTimer = null;
+  let subLast = -1;
   const updateSubtitle = () => {
     if (!subCn || !subEn) return;
     let cur = pages[0], best = Infinity;
@@ -793,9 +794,14 @@ function rlTour() {
       const t = p2.getBoundingClientRect().top;
       if (t >= -120 && t < best) { best = t; cur = p2; }
     });
+    const i = pages.indexOf(cur) + 1;
+    if (i === subLast) return;                      // 同板块不重复动画
+    subLast = i;
     const h = cur.querySelector(".demo-h");
-    subCn.textContent = h ? h.textContent : "RHINE LAB";
-    subEn.textContent = "SECTION " + String(pages.indexOf(cur) + 1).padStart(2, "0") + " / " + String(pages.length).padStart(2, "0") + " · RHINE LAB OS";
+    const cnText = h ? h.textContent : "RHINE LAB";
+    rlCjkReveal(subCn, { duration: Math.min(700, 90 * [...cnText].length) });   // 中文逐字滑入
+    subEn.dataset.text = "SECTION " + String(i).padStart(2, "0") + " / " + String(pages.length).padStart(2, "0") + " · RHINE LAB OS";
+    rlScramble(subEn, { duration: 420 });           // 英文乱码解码
   };
   const queueSubtitle = () => { clearTimeout(subTimer); subTimer = setTimeout(updateSubtitle, 160); };
   window.addEventListener("scroll", queueSubtitle, { passive: true });
@@ -809,7 +815,7 @@ function rlTour() {
   };
   const go = (i) => {
     idx = ((i % pages.length) + pages.length) % pages.length;
-    rlScrollToEl(pages[idx]);
+    rlScrollToEl(pages[idx], () => rlSfx("beep"));
     updateSubtitle();
     show();
   };
@@ -863,7 +869,7 @@ badge.addEventListener("click", () => { play(!playing); rlSfx(playing ? "ui" : "
     a.addEventListener("click", (e) => {
       e.preventDefault();
       const el = document.querySelector(a.getAttribute("href"));
-      if (el) rlScrollToEl(el);
+      if (el) rlScrollToEl(el, () => rlSfx("beep"));
     }));
 }
 
