@@ -659,12 +659,14 @@ body::before {
 .scanlines { position: relative; }
 .scanlines::after { content: ""; position: absolute; inset: 0; pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(17, 18, 20, 0.035) 0 1px, transparent 1px 3px); }
-.radar { position: relative; width: 110px; height: 110px; margin: 8px auto; border: 1px solid var(--rl-mute); border-radius: 50%; cursor: pointer; }
+.radar { position: relative; width: 110px; height: 110px; margin: 8px auto; border: 1px solid var(--rl-mute); border-radius: 50%; overflow: hidden; }
 .radar::before { content: ""; position: absolute; inset: 18%; border: 1px solid var(--rl-faint); border-radius: 50%; }
-.radar::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+.radar .sweep { position: absolute; inset: 0; border-radius: 50%;
   background: conic-gradient(from 0deg, rgba(255, 123, 0, 0.3), transparent 70deg);
-  animation: rl-spin 3.6s linear infinite; }
+  will-change: transform; }
 .radar .blip { position: absolute; width: 6px; height: 6px; background: var(--rl-ink); border-radius: 50%; top: 26%; left: 62%; }
+.radar .blip.ping { animation: rl-blip-flash 0.6s ease-out; }
+@keyframes rl-blip-flash { 0% { background: var(--rl-orange); box-shadow: 0 0 10px var(--rl-orange); transform: scale(1.8); } }
 .grid-bg { position: relative; }
 .grid-bg::before { content: ""; position: absolute; inset: 0;
   background-image: linear-gradient(rgba(17, 18, 20, 0.07) 1px, transparent 1px),

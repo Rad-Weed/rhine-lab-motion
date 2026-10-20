@@ -665,12 +665,14 @@ body::before {
 .scanlines { position: relative; }
 .scanlines::after { content: ""; position: absolute; inset: 0; pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(17, 18, 20, 0.035) 0 1px, transparent 1px 3px); }
-.radar { position: relative; width: 110px; height: 110px; margin: 8px auto; border: 1px solid var(--rl-mute); border-radius: 50%; cursor: pointer; }
+.radar { position: relative; width: 110px; height: 110px; margin: 8px auto; border: 1px solid var(--rl-mute); border-radius: 50%; overflow: hidden; }
 .radar::before { content: ""; position: absolute; inset: 18%; border: 1px solid var(--rl-faint); border-radius: 50%; }
-.radar::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+.radar .sweep { position: absolute; inset: 0; border-radius: 50%;
   background: conic-gradient(from 0deg, rgba(255, 123, 0, 0.3), transparent 70deg);
-  animation: rl-spin 3.6s linear infinite; }
+  will-change: transform; }
 .radar .blip { position: absolute; width: 6px; height: 6px; background: var(--rl-ink); border-radius: 50%; top: 26%; left: 62%; }
+.radar .blip.ping { animation: rl-blip-flash 0.6s ease-out; }
+@keyframes rl-blip-flash { 0% { background: var(--rl-orange); box-shadow: 0 0 10px var(--rl-orange); transform: scale(1.8); } }
 .grid-bg { position: relative; }
 .grid-bg::before { content: ""; position: absolute; inset: 0;
   background-image: linear-gradient(rgba(17, 18, 20, 0.07) 1px, transparent 1px),
@@ -1067,7 +1069,7 @@ setTimeout(function () { var b = document.querySelector(".boot"); if (b && !b.da
       </div>
       <div class="hud-panel grid-bg" style="text-align:center">
         <div class="tag" style="text-align:left">RADAR SWEEP / conic-gradient</div>
-        <div class="radar" data-radar><i class="blip"></i></div>
+        <div class="radar" data-radar><i class="sweep"></i><i class="blip"></i></div>
         <div style="font-size:10px;letter-spacing:1.5px;color:var(--rl-mute)">扫描属采样相，脉冲属告警相——环要有语义</div>
       </div>
       <div class="hud-panel">
@@ -1915,9 +1917,31 @@ function rlPalette(el) {
     sw.addEventListener("mouseenter", () => rlSfx("step"));
   });
 }
-/* ── 雷达：点击播放扫频 ── */
+/* ── 雷达：扫掠自动触发——扫线每扫过目标点一次，播放一声 BEEP 并闪亮目标 ── */
 function rlRadar(el) {
-  el.addEventListener("click", () => rlSfx("scan"));
+  if (el.dataset.radarOn) return;
+  el.dataset.radarOn = "1";
+  const sweep = el.querySelector(".sweep");
+  const blip = el.querySelector(".blip");
+  const PERIOD = 3600;                 // ms/圈（与 CSS 3.6s 同步）
+  const BLIP_ANGLE = 19;               // 目标点方位角：顶部顺时针约 19°
+  let visible = false, prev = null;
+  new IntersectionObserver((es) => es.forEach((e) => (visible = e.isIntersecting)), { threshold: 0.2 }).observe(el);
+  let last = performance.now();
+  (function loop(now) {
+    requestAnimationFrame(loop);
+    if (!visible) { prev = null; return; }
+    const ang = ((now % PERIOD) / PERIOD) * 360;
+    if (sweep) sweep.style.transform = "rotate(" + ang + "deg)";
+    const crossed = prev !== null && (
+      (prev < BLIP_ANGLE && ang >= BLIP_ANGLE) ||
+      (ang < prev && (BLIP_ANGLE <= ang || BLIP_ANGLE > prev)));
+    if (crossed) {
+      rlSfx("beep");
+      if (blip) { blip.classList.remove("ping"); void blip.offsetWidth; blip.classList.add("ping"); }
+    }
+    prev = ang;
+  })(performance.now());
 }
 
 /* ── 页面编排：进入视口时触发 ── */

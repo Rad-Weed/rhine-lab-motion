@@ -797,9 +797,31 @@ function rlPalette(el) {
     sw.addEventListener("mouseenter", () => rlSfx("step"));
   });
 }
-/* ── 雷达：点击播放扫频 ── */
+/* ── 雷达：扫掠自动触发——扫线每扫过目标点一次，播放一声 BEEP 并闪亮目标 ── */
 function rlRadar(el) {
-  el.addEventListener("click", () => rlSfx("scan"));
+  if (el.dataset.radarOn) return;
+  el.dataset.radarOn = "1";
+  const sweep = el.querySelector(".sweep");
+  const blip = el.querySelector(".blip");
+  const PERIOD = 3600;                 // ms/圈（与 CSS 3.6s 同步）
+  const BLIP_ANGLE = 19;               // 目标点方位角：顶部顺时针约 19°
+  let visible = false, prev = null;
+  new IntersectionObserver((es) => es.forEach((e) => (visible = e.isIntersecting)), { threshold: 0.2 }).observe(el);
+  let last = performance.now();
+  (function loop(now) {
+    requestAnimationFrame(loop);
+    if (!visible) { prev = null; return; }
+    const ang = ((now % PERIOD) / PERIOD) * 360;
+    if (sweep) sweep.style.transform = "rotate(" + ang + "deg)";
+    const crossed = prev !== null && (
+      (prev < BLIP_ANGLE && ang >= BLIP_ANGLE) ||
+      (ang < prev && (BLIP_ANGLE <= ang || BLIP_ANGLE > prev)));
+    if (crossed) {
+      rlSfx("beep");
+      if (blip) { blip.classList.remove("ping"); void blip.offsetWidth; blip.classList.add("ping"); }
+    }
+    prev = ang;
+  })(performance.now());
 }
 
 /* ── 页面编排：进入视口时触发 ── */
