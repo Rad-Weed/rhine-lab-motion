@@ -31,8 +31,10 @@ function rlScramble(el, { duration = 800, tail = 3, tick = 32 } = {}) {
     if (p < 1) raf = requestAnimationFrame(frame);
     else el.textContent = target;
   };
+  if (el._rlCancel) el._rlCancel();            // 重播时打断上一次
+  el._rlCancel = () => cancelAnimationFrame(raf);
   raf = requestAnimationFrame(frame);
-  return () => cancelAnimationFrame(raf);
+  return el._rlCancel;
 }
 
 /* ── 模式 2：打字机 + 块状光标（逐字音效，最短间隔 24ms） ── */
@@ -40,17 +42,19 @@ function rlType(el, { duration = 900 } = {}) {
   const target = el.dataset.text ?? el.textContent;
   el.dataset.text = target;
   const t0 = performance.now();
-  let lastN = -1, lastTick = 0;
+  let lastN = -1, lastTick = 0, raf;
   const frame = (now) => {
     const p = clamp01((now - t0) / duration);
     const n = Math.floor(EASE.outCubic(p) * target.length);
     if (n > lastN && now - lastTick >= 24) { rlSfx("type"); lastTick = now; }
     lastN = n;
     el.innerHTML = target.slice(0, n) + '<span style="display:inline-block;width:0.55em;height:0.95em;background:var(--rl-lime);vertical-align:-0.12em;margin-left:2px"></span>';
-    if (p < 1) requestAnimationFrame(frame);
+    if (p < 1) raf = requestAnimationFrame(frame);
     else el.textContent = target;
   };
-  requestAnimationFrame(frame);
+  if (el._rlCancel) el._rlCancel();
+  el._rlCancel = () => cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(frame);
 }
 
 /* ── 模式 3：中文字符逐个滑入 ── */
@@ -75,12 +79,15 @@ function rlOdometer(el, { to = 99999, duration = 1600 } = {}) {
   const from = 0;
   const t0 = performance.now();
   const fmt = (n) => Math.floor(n).toLocaleString("en-US");
+  let raf;
   const frame = (now) => {
     const p = clamp01((now - t0) / duration);
     el.textContent = fmt(from + (to - from) * EASE.outExpo(p));
-    if (p < 1) requestAnimationFrame(frame);
+    if (p < 1) raf = requestAnimationFrame(frame);
   };
-  requestAnimationFrame(frame);
+  if (el._rlCancel) el._rlCancel();
+  el._rlCancel = () => cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(frame);
 }
 
 /* ── 模式 4：分级入场（staggered） ── */
@@ -96,8 +103,10 @@ function rlMark(svg, { duration = 1400 } = {}) {
   const paths = svg.querySelectorAll("path");
   paths.forEach((p) => {
     const len = p.getTotalLength();
+    p.style.transition = "none";
     p.style.strokeDasharray = len;
     p.style.strokeDashoffset = len;
+    void p.getBoundingClientRect();          // 重播：先无过渡归零，避免反向动画
     p.style.transition = `stroke-dashoffset ${duration}ms cubic-bezier(0.33,1,0.68,1)`;
     requestAnimationFrame(() => requestAnimationFrame(() => (p.style.strokeDashoffset = 0)));
   });
@@ -956,33 +965,49 @@ function rlRadar(el) {
 function rlActivate() {
   if (window._rlActive) return; // 防重复初始化
   window._rlActive = 1;
+  // 板块动画触发：可重播类（乱码/打字/CJK/里程计/警告/进度条/∞/数据行）
+  // 完全离场后再次进入会重播一次；一次性类（终端/时钟/交互接线/3D 等）仅首次触发
+  const ONCE_ATTRS = ["data-terminal","data-clock","data-decrypt","data-glitch","data-scene3d","data-search","data-sfx-lab","data-palette","data-radar","data-cards"];
+  const fire = (el) => {
+    if (el.hasAttribute("data-scramble")) rlScramble(el);
+    if (el.hasAttribute("data-type")) rlType(el);
+    if (el.hasAttribute("data-cjk")) rlCjkReveal(el);
+    if (el.hasAttribute("data-odometer")) rlOdometer(el, { to: +el.dataset.odometer });
+    if (el.hasAttribute("data-warning")) { el.classList.remove("on"); void el.offsetWidth; el.classList.add("on"); rlSfx("alarm"); }
+    if (el.hasAttribute("data-bar")) { el.classList.remove("on"); void el.offsetWidth; el.classList.add("on"); }
+    if (el.hasAttribute("data-mark")) rlMark(el);
+    if (el.hasAttribute("data-rows")) { el.querySelectorAll(".row").forEach((r) => r.classList.remove("show")); void el.offsetWidth; rlStagger([...el.querySelectorAll(".row")]); }
+    if (el.hasAttribute("data-cards")) rlArchiveCards(el);
+    if (el.hasAttribute("data-clock")) rlClock(el);
+    if (el.hasAttribute("data-decrypt")) rlDecrypt(el);
+    if (el.hasAttribute("data-glitch")) rlGlitch(el, document.querySelector(el.dataset.glitch ? el.dataset.glitch : "#glitch-btn") || null);
+    if (el.hasAttribute("data-scene3d")) rlScene3D(el);
+    if (el.hasAttribute("data-terminal")) rlTerminal(el);
+    if (el.hasAttribute("data-search")) rlSearch(el, document.querySelector(el.dataset.target), document.querySelector(el.dataset.count));
+    if (el.hasAttribute("data-sfx-lab")) rlSfxLab(el);
+    if (el.hasAttribute("data-palette")) rlPalette(el);
+    if (el.hasAttribute("data-radar")) rlRadar(el);
+  };
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
-      if (!e.isIntersecting || e.target.dataset.done) return;
-      e.target.dataset.done = "1";
       const el = e.target;
-      if (el.hasAttribute("data-scramble")) rlScramble(el);
-      if (el.hasAttribute("data-type")) rlType(el);
-      if (el.hasAttribute("data-cjk")) rlCjkReveal(el);
-      if (el.hasAttribute("data-odometer")) rlOdometer(el, { to: +el.dataset.odometer });
-      if (el.hasAttribute("data-warning")) { el.classList.add("on"); rlSfx("alarm"); }
-      if (el.hasAttribute("data-bar")) el.classList.add("on");
-      if (el.hasAttribute("data-mark")) rlMark(el);
-      if (el.hasAttribute("data-rows")) rlStagger([...el.querySelectorAll(".row")]);
-      if (el.hasAttribute("data-cards")) rlArchiveCards(el);
-      if (el.hasAttribute("data-clock")) rlClock(el);
-      if (el.hasAttribute("data-decrypt")) rlDecrypt(el);
-      if (el.hasAttribute("data-glitch")) rlGlitch(el, document.querySelector(el.dataset.glitch ? el.dataset.glitch : "#glitch-btn") || null);
-      if (el.hasAttribute("data-scene3d")) rlScene3D(el);
-      if (el.hasAttribute("data-terminal")) rlTerminal(el);
-      if (el.hasAttribute("data-search")) rlSearch(el, document.querySelector(el.dataset.target), document.querySelector(el.dataset.count));
-      if (el.hasAttribute("data-sfx-lab")) rlSfxLab(el);
-      if (el.hasAttribute("data-palette")) rlPalette(el);
-      if (el.hasAttribute("data-radar")) rlRadar(el);
+      if (ONCE_ATTRS.some((a) => el.hasAttribute(a))) {
+        if (!e.isIntersecting || el.dataset.done) return;
+        el.dataset.done = "1";
+        fire(el);
+        return;
+      }
+      if (e.isIntersecting) {
+        if (el.dataset.armed !== "1") return;   // 须先完全离场，才允许重播
+        el.dataset.armed = "";
+        fire(el);
+      } else {
+        el.dataset.armed = "1";
+      }
     });
   }, { threshold: 0.3 });
   document.querySelectorAll("[data-scramble],[data-type],[data-cjk],[data-odometer],[data-warning],[data-bar],[data-mark],[data-rows],[data-cards],[data-clock],[data-decrypt],[data-glitch],[data-scene3d],[data-terminal],[data-search],[data-sfx-lab],[data-palette],[data-radar]")
-    .forEach((el) => io.observe(el));
+    .forEach((el) => { el.dataset.armed = "1"; io.observe(el); });
   // 所有 .rl-btn 附加电子反馈音
   document.querySelectorAll(".rl-btn").forEach((b) => {
     if (b.id === "glitch-btn") return;
