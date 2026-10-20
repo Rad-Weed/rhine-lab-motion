@@ -695,3 +695,10 @@ body::before {
   -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 78%);
   mask-image: radial-gradient(ellipse at center, #000 35%, transparent 78%); }
 .grid-bg > * { position: relative; z-index: 1; }
+
+/* 键盘焦点描边（可访问性） */
+.sfx:focus-visible, .sw:focus-visible, .rl-card:focus-visible, .decrypt:focus-visible,
+.search-bar:focus-within, .tour-badge:focus-visible {
+  outline: 2px solid var(--rl-orange);
+  outline-offset: 2px;
+}

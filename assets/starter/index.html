@@ -701,6 +701,13 @@ body::before {
   -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 78%);
   mask-image: radial-gradient(ellipse at center, #000 35%, transparent 78%); }
 .grid-bg > * { position: relative; z-index: 1; }
+
+/* 键盘焦点描边（可访问性） */
+.sfx:focus-visible, .sw:focus-visible, .rl-card:focus-visible, .decrypt:focus-visible,
+.search-bar:focus-within, .tour-badge:focus-visible {
+  outline: 2px solid var(--rl-orange);
+  outline-offset: 2px;
+}
 </style>
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
 <script>
@@ -1323,6 +1330,8 @@ function rlSfxGlass() { const n = performance.now(); if (n - _lastGlass > 70) { 
 function rlArchiveCards(container) {
   const cards = [...container.querySelectorAll(".rl-card")];
   cards.forEach((card, idx) => {
+    card.tabIndex = 0;
+    card.addEventListener("keydown", (e) => { if (e.code === "Enter") { e.preventDefault(); card.click(); } });
     card.addEventListener("mouseenter", () => { card.classList.add("hover"); rlSfx("glass"); });
     card.addEventListener("mouseleave", () => card.classList.remove("hover"));
     card.addEventListener("click", () => {
@@ -1377,6 +1386,8 @@ function rlGlitch(el, btn) {
 
 /* ── 解密动画开关：对角线合拢 → 遮挡条退开 → 磨砂变清晰 ── */
 function rlDecrypt(el) {
+  el.tabIndex = 0;
+  el.addEventListener("keydown", (e) => { if (e.code === "Enter") { e.preventDefault(); el.click(); } });
   el.addEventListener("click", () => {
     const open = el.classList.toggle("open");
     rlSfx(open ? "ui" : "thump");
@@ -1879,10 +1890,13 @@ function rlSfxLab(grid) {
     d.className = "sfx";
     d.dataset.sfx = key;
     d.innerHTML = "<b>" + en + "</b><span>" + cn + "</span><i>▸ PLAY</i>";
-    d.addEventListener("click", () => {
+    d.tabIndex = 0;
+    const hit = () => {
       rlSfx(key);
       d.classList.remove("hit"); void d.offsetWidth; d.classList.add("hit");
-    });
+    };
+    d.addEventListener("click", hit);
+    d.addEventListener("keydown", (e) => { if (e.code === "Enter" || e.code === "Space") { e.preventDefault(); hit(); } });
     grid.appendChild(d);
   });
   const all = document.querySelector("[data-sfx-all]");
@@ -1903,7 +1917,11 @@ function rlScrollToEl(el, done) {
   const margin = 96;
   const startT = performance.now(), dur = 750;
   const startY = window.scrollY;
-  if (_rlScrollRAF) cancelAnimationFrame(_rlScrollRAF);
+  if (_rlScrollRAF) {                                     // 打断上一次飞行 → 轻反馈音，保证每次按键有声
+    cancelAnimationFrame(_rlScrollRAF);
+    if (performance.now() - (window._rlScrollStart || 0) > 150) { window._rlMuteUntil = 0; rlSfx("step"); }
+  }
+  window._rlScrollStart = startT;
   window._rlMuteUntil = startT + dur;                    // 静音仅覆盖飞行段
   (function step(now) {
     const p = Math.min(1, (now - startT) / dur);
@@ -2049,7 +2067,9 @@ function rlNote(freq) {
 }
 function rlPalette(el) {
   [...el.querySelectorAll(".sw")].forEach((sw, i) => {
+    sw.tabIndex = 0;
     sw.addEventListener("click", () => rlNote(320 * Math.pow(2, i / 12)));
+    sw.addEventListener("keydown", (e) => { if (e.code === "Enter" || e.code === "Space") { e.preventDefault(); rlNote(320 * Math.pow(2, i / 12)); } });
     sw.addEventListener("mouseenter", () => rlSfx("step"));
   });
 }
