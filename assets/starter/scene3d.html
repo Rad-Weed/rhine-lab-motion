@@ -850,25 +850,36 @@ function rlMark(svg, { duration = 1400 } = {}) {
    alarm=警告双音 scan=扫描扫频 whoosh=转场噪声 step=步进刻度 unlock=解锁 lock=落锁
    power=上电 extract=档案抽出 insert=档案归位 glitch=数据故障 error=拒绝 */
 const RL_SFX = {
-  glass:  { f: 3200, type: "sine",   dur: 0.02,  g: 0.12, drop: 0.6 },
-  ui:     { f: 640,  type: "square", dur: 0.045, g: 0.05, drop: 0.6 },
-  thump:  { f: 190,  type: "sine",   dur: 0.05,  g: 0.2,  drop: 0.6 },
-  type:   { f: 2200, type: "square", dur: 0.008, g: 0.028, drop: 0.5 },
-  beep:   { f: 1200, type: "sine",   dur: 0.06,  g: 0.06, drop: 0.9 },
-  chime:  { notes: [659.25, 880], type: "sine", dur: 0.16, g: 0.07, gap: 0.09 },
-  alarm:  { notes: [880, 660, 880, 660, 880, 660], type: "square", dur: 0.09, g: 0.045, gap: 0.1 },
-  scan:   { sweep: [400, 1600], type: "sawtooth", dur: 1.2, g: 0.12 },
-  whoosh: { noise: true, dur: 0.32, g: 0.09, sweepFilter: [3200, 260] },
-  step:   { f: 1400, type: "triangle", dur: 0.012, g: 0.05, drop: 0.7 },
-  unlock: { notes: [523.25, 783.99], type: "sine", dur: 0.13, g: 0.07, gap: 0.09 },
-  lock:   { notes: [392, 246.94], type: "square", dur: 0.1, g: 0.05, gap: 0.11 },
-  power:  { sweep: [120, 480], type: "sawtooth", dur: 0.5, g: 0.13 },
-  extract:{ noise: true, dur: 0.28, g: 0.16, sweepFilter: [500, 3000] },
-  insert: { noise: true, dur: 0.26, g: 0.13, sweepFilter: [2800, 300] },
-  glitch: { notes: [820, 320, 1650, 520, 1230, 410], type: "square", dur: 0.012, g: 0.04, gap: 0.022 },
-  error:  { notes: [220, 220], type: "square", dur: 0.12, g: 0.06, gap: 0.16 },
+  glass:  { f: 3200, type: "sine",   dur: 0.02,  g: 0.25, drop: 0.6 },
+  ui:     { f: 640,  type: "square", dur: 0.045, g: 0.16, drop: 0.6 },
+  thump:  { f: 190,  type: "sine",   dur: 0.05,  g: 0.35, drop: 0.6 },
+  type:   { f: 2200, type: "square", dur: 0.02,  g: 0.16, drop: 0.5 },
+  beep:   { f: 1200, type: "sine",   dur: 0.06,  g: 0.22, drop: 0.9 },
+  chime:  { notes: [659.25, 880], type: "sine", dur: 0.16, g: 0.2, gap: 0.09 },
+  alarm:  { notes: [880, 660, 880, 660, 880, 660], type: "square", dur: 0.09, g: 0.15, gap: 0.1 },
+  scan:   { sweep: [400, 1600], type: "sawtooth", dur: 1.2, g: 0.3 },
+  whoosh: { noise: true, dur: 0.32, g: 0.22, sweepFilter: [3200, 260] },
+  step:   { f: 1400, type: "triangle", dur: 0.012, g: 0.15, drop: 0.7 },
+  unlock: { notes: [523.25, 783.99], type: "sine", dur: 0.13, g: 0.2, gap: 0.09 },
+  lock:   { notes: [392, 246.94], type: "square", dur: 0.1, g: 0.16, gap: 0.11 },
+  power:  { sweep: [120, 480], type: "sawtooth", dur: 0.5, g: 0.26 },
+  extract:{ noise: true, dur: 0.28, g: 0.3, sweepFilter: [500, 3000] },
+  insert: { noise: true, dur: 0.26, g: 0.27, sweepFilter: [2800, 300] },
+  glitch: { notes: [820, 320, 1650, 520, 1230, 410], type: "square", dur: 0.012, g: 0.12, gap: 0.022 },
+  error:  { notes: [220, 220], type: "square", dur: 0.12, g: 0.2, gap: 0.16 },
 };
-function rlAC() { return (window._rlAC ??= new (window.AudioContext || window.webkitAudioContext)()); }
+function rlAC() {
+  if (!window._rlAC) {
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    const c = new Ctor();
+    const master = c.createGain();               // 主增益总线：后续可做全局音量滑杆
+    master.gain.value = 1;
+    master.connect(c.destination);
+    window._rlMaster = master;
+    window._rlAC = c;
+  }
+  return window._rlAC;
+}
 function rlSfx(kind = "glass", ctx = null) {
   if (performance.now() < (window._rlMuteUntil || 0)) return;   // 滚动静音窗口
   try {
@@ -887,7 +898,7 @@ function rlSfx(kind = "glass", ctx = null) {
       flt.frequency.exponentialRampToValueAtTime(P.sweepFilter[1], t0 + P.dur);
       const g = ctx.createGain();
       g.gain.setValueAtTime(P.g, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + P.dur);
-      src.connect(flt).connect(g).connect(ctx.destination); src.start(t0); src.stop(t0 + P.dur);
+      src.connect(flt).connect(g).connect(window._rlMaster); src.start(t0); src.stop(t0 + P.dur);
       return;
     }
     const play = (f, t) => {
@@ -899,7 +910,7 @@ function rlSfx(kind = "glass", ctx = null) {
       g.gain.setValueAtTime(P.g, t);
       g.gain.setValueAtTime(P.g, t + P.dur * 0.6);
       g.gain.exponentialRampToValueAtTime(0.0001, t + stopAt);
-      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + stopAt + 0.02);
+      o.connect(g).connect(window._rlMaster); o.start(t); o.stop(t + stopAt + 0.02);
     };
     if (P.notes) P.notes.forEach((f, i) => play(f, t0 + i * (P.gap ?? 0)));
     else play(P.sweep ? P.sweep[0] : P.f, t0);   // sweep 型从起始频率起振
@@ -1715,9 +1726,11 @@ function rlActivate() {
     };
     boot.classList.add("standby");
     boot.querySelector(".b-enter")?.addEventListener("click", enter);
-    boot.addEventListener("keydown", (e) => {
+    const gate = (e) => {
+      if (boot.classList.contains("off")) { window.removeEventListener("keydown", gate); return; }
       if (e.code === "Enter" || e.code === "Space") { e.preventDefault(); enter(); }
-    });
+    };
+    window.addEventListener("keydown", gate);
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) boot.classList.add("off");
     document.querySelector("#boot-replay")?.addEventListener("click", () => {
       window.scrollTo({ top: 0, behavior: "instant" });
