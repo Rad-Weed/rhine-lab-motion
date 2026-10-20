@@ -796,10 +796,22 @@ function rlTour() {
   document.addEventListener("pointermove", armIdle, { passive: true });
 
   window.addEventListener("keydown", (e) => {
-    if (e.target.closest("input,textarea")) return;
-    if (e.code === "Space" || e.code === "ArrowDown") { e.preventDefault(); next(); }
-    else if (e.code === "ArrowUp") { e.preventDefault(); go(idx - 1); }
-    else if (playing) pause();
+    const paging = e.code === "Space" || e.code === "ArrowDown" || e.code === "ArrowUp";
+    if (e.target.closest("input,textarea")) {
+      if (playing) pause();          // 输入框打字 = 接管，暂停巡演
+      armIdle();                     // ★ 打键也重置空闲倒计时（0.12.1 丢失的监听）
+      return;
+    }
+    if (paging) {
+      e.preventDefault();
+      go(e.code === "ArrowUp" ? idx - 1 : idx + 1);
+      if (playing) startTimer();     // 巡演中翻页 → 重置 10s 计时并继续；暂停中则保持暂停
+      armIdle();
+      return;
+    }
+    if (e.code === "Escape") { play(false); armIdle(); return; }
+    if (playing) pause();
+    armIdle();
   });
   badge.addEventListener("pointerdown", (e) => e.stopPropagation());  // 防止文档层抢先 pause 破坏 toggle
 badge.addEventListener("click", () => { play(!playing); rlSfx(playing ? "ui" : "thump"); });
