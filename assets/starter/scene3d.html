@@ -1505,14 +1505,14 @@ function rlScrollToEl(el, done) {
   const startT = performance.now(), dur = 750;
   const startY = window.scrollY;
   if (_rlScrollRAF) cancelAnimationFrame(_rlScrollRAF);
-  window._rlMuteUntil = startT + dur + 450;
+  window._rlMuteUntil = startT + dur;                    // 静音仅覆盖飞行段
   (function step(now) {
     const p = Math.min(1, (now - startT) / dur);
     const e = 1 - Math.pow(1 - p, 3);
     const target = el.getBoundingClientRect().top + window.scrollY - margin;
     window.scrollTo({ top: startY + (target - startY) * e, behavior: "instant" });
     if (p < 1) _rlScrollRAF = requestAnimationFrame(step);
-    else { if (done) done(); window._rlMuteUntil = performance.now() + 350; }
+    else { window._rlMuteUntil = 0; if (done) done(); }   // 落地：解除静音 → 触发确认音
   })(startT);
 }
 
@@ -1560,6 +1560,12 @@ function rlTour() {
   const queueSubtitle = () => { clearTimeout(subTimer); subTimer = setTimeout(updateSubtitle, 160); };
   window.addEventListener("scroll", queueSubtitle, { passive: true });
   updateSubtitle();
+  // 以视口实际位置反推当前板块（自由滚动后 idx 不再漂移）
+  const currentIdx = () => {
+    let cur = 0;
+    pages.forEach((p2, i2) => { if (p2.getBoundingClientRect().top <= 140) cur = i2; });
+    return cur;
+  };
 
   const show = () => {
     if (playing) label.textContent = String(idx + 1).padStart(2, "0") + " / " + pages.length + " · 10s";
@@ -1606,7 +1612,8 @@ function rlTour() {
     }
     if (paging) {
       e.preventDefault();
-      go(e.code === "ArrowUp" ? idx - 1 : idx + 1);
+      const base = currentIdx();     // ★ 翻页基准 = 视口实际位置
+      go(e.code === "ArrowUp" ? base - 1 : base + 1);
       if (playing) startTimer();     // 巡演中翻页 → 重置 10s 计时并继续；暂停中则保持暂停
       armIdle();
       return;
