@@ -115,14 +115,14 @@ const RL_SFX = {
   beep:   { f: 1200, type: "sine",   dur: 0.06,  g: 0.06, drop: 0.9 },
   chime:  { notes: [659.25, 880], type: "sine", dur: 0.16, g: 0.07, gap: 0.09 },
   alarm:  { notes: [880, 660, 880, 660, 880, 660], type: "square", dur: 0.09, g: 0.045, gap: 0.1 },
-  scan:   { sweep: [400, 1600], type: "sawtooth", dur: 1.2, g: 0.035 },
+  scan:   { sweep: [400, 1600], type: "sawtooth", dur: 1.2, g: 0.09 },
   whoosh: { noise: true, dur: 0.32, g: 0.09, sweepFilter: [3200, 260] },
   step:   { f: 1400, type: "triangle", dur: 0.012, g: 0.05, drop: 0.7 },
   unlock: { notes: [523.25, 783.99], type: "sine", dur: 0.13, g: 0.07, gap: 0.09 },
   lock:   { notes: [392, 246.94], type: "square", dur: 0.1, g: 0.05, gap: 0.11 },
-  power:  { sweep: [80, 240], type: "sawtooth", dur: 0.5, g: 0.045 },
-  extract:{ noise: true, dur: 0.28, g: 0.08, sweepFilter: [400, 2600] },
-  insert: { noise: true, dur: 0.26, g: 0.08, sweepFilter: [2400, 260] },
+  power:  { sweep: [70, 320], type: "sawtooth", dur: 0.5, g: 0.1 },
+  extract:{ noise: true, dur: 0.28, g: 0.14, sweepFilter: [400, 2600] },
+  insert: { noise: true, dur: 0.26, g: 0.11, sweepFilter: [2400, 260] },
   glitch: { notes: [820, 320, 1650, 520, 1230, 410], type: "square", dur: 0.012, g: 0.04, gap: 0.022 },
   error:  { notes: [220, 220], type: "square", dur: 0.12, g: 0.06, gap: 0.16 },
 };
@@ -479,6 +479,7 @@ async function rlScene3D(container) {
   const cam = { theta: 0.5, phi: 1.24, r: 17, vTheta: 0, vPhi: 0, rT: 17 };
   const focus = new THREE.Vector3(0, 0, 0), focusT = new THREE.Vector3(0, 0, 0);
   let dragging = false, px = 0, py = 0, mouseNDC = null, hovered = null, selected = null;
+  let lastTouch = performance.now();
 
   const detail = container.querySelector(".s-detail");
   const hudSel = container.querySelector(".s-hud .sel");
@@ -516,7 +517,7 @@ async function rlScene3D(container) {
   };
   toSpherical();
 
-  container.addEventListener("pointerdown", (e) => { dragging = true; px = e.clientX; py = e.clientY; try { container.setPointerCapture(e.pointerId); } catch (err) {} });
+  container.addEventListener("pointerdown", (e) => { dragging = true; px = e.clientX; py = e.clientY; lastTouch = performance.now(); try { container.setPointerCapture(e.pointerId); } catch (err) {} });
   container.addEventListener("pointerup", (e) => {
     dragging = false;
     if (Math.hypot(e.clientX - px, e.clientY - py) >= 6) return; // 拖拽不是点击
@@ -542,6 +543,7 @@ async function rlScene3D(container) {
   container.addEventListener("pointermove", (e) => {
     const rect = container.getBoundingClientRect();
     mouseNDC = { x: ((e.clientX - rect.left) / rect.width) * 2 - 1, y: -((e.clientY - rect.top) / rect.height) * 2 + 1 };
+    lastTouch = performance.now();
     if (dragging) {
       cam.vTheta -= (e.clientX - px) * 0.0035;
       cam.vPhi += (e.clientY - py) * 0.0028;
@@ -551,8 +553,13 @@ async function rlScene3D(container) {
   container.addEventListener("pointerleave", () => { mouseNDC = null; });
   container.addEventListener("wheel", (e) => {
     e.preventDefault();
+    lastTouch = performance.now();
     cam.rT = Math.min(30, Math.max(9, cam.rT + e.deltaY * 0.01));
   }, { passive: false });
+  container.addEventListener("dblclick", () => {            // 双击复位视角
+    deselect(); cam.theta = 0.5; cam.phi = 1.24; cam.vTheta = 0; cam.vPhi = 0;
+    cam.rT = 17; rlSfx("ui");
+  });
 
   const ray = new THREE.Raycaster();
   let last = performance.now(), t = 0;
@@ -561,6 +568,7 @@ async function rlScene3D(container) {
     const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; t += dt;
 
     if (!dragging) { cam.vTheta *= 0.92; cam.vPhi *= 0.92; }
+    if (!dragging && now - lastTouch > 5000) cam.theta += dt * 0.06;   // 闲置 5s 慢速环绕
     cam.theta += cam.vTheta * dt;
     cam.phi = Math.min(1.45, Math.max(0.35, cam.phi + cam.vPhi * dt));
     cam.r += (cam.rT - cam.r) * Math.min(1, dt * 5);
@@ -737,7 +745,7 @@ function rlTour() {
   };
   const startTimer = () => { clearInterval(timer); if (playing) timer = setInterval(() => go(idx + 1), 10000); };
   const play = (on) => { playing = on; startTimer(); show(); };
-  const next = () => { go(idx + 1); play(true); };
+  const next = () => { go(idx + 1); };   // 手动翻页不自动重启巡演
   const pause = () => play(false);
 
   const stopIdle = () => { clearTimeout(idleTimer); clearInterval(idleTick); idleLeft = 0; };
@@ -764,11 +772,36 @@ function rlTour() {
     else if (e.code === "ArrowUp") { e.preventDefault(); go(idx - 1); }
     else if (playing) pause();
   });
-  badge.addEventListener("click", () => { play(!playing); rlSfx(playing ? "ui" : "thump"); });
+  badge.addEventListener("pointerdown", (e) => e.stopPropagation());  // 防止文档层抢先 pause 破坏 toggle
+badge.addEventListener("click", () => { play(!playing); rlSfx(playing ? "ui" : "thump"); });
 
   armIdle();
 }
 
+/* ── 色板音阶：色块按序播放对应音高 ── */
+function rlNote(freq) {
+  try {
+    const ctx = rlAC(); if (ctx.state === "suspended") ctx.resume();
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.08, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.4);
+  } catch (e) {}
+}
+function rlPalette(el) {
+  [...el.querySelectorAll(".sw")].forEach((sw, i) => {
+    sw.addEventListener("click", () => rlNote(320 * Math.pow(2, i / 12)));
+    sw.addEventListener("mouseenter", () => rlSfx("step"));
+  });
+}
+/* ── 雷达：点击播放扫频 ── */
+function rlRadar(el) {
+  el.addEventListener("click", () => rlSfx("scan"));
+}
+
+/* ── 页面编排：进入视口时触发 ── */
 /* ── 页面编排：进入视口时触发 ── */
 /* ── 页面编排：进入视口时触发 ── */
 /* ── 页面编排：进入视口时触发 ── */
@@ -798,9 +831,11 @@ function rlActivate() {
       if (el.hasAttribute("data-terminal")) rlTerminal(el);
       if (el.hasAttribute("data-search")) rlSearch(el, document.querySelector(el.dataset.target), document.querySelector(el.dataset.count));
       if (el.hasAttribute("data-sfx-lab")) rlSfxLab(el);
+      if (el.hasAttribute("data-palette")) rlPalette(el);
+      if (el.hasAttribute("data-radar")) rlRadar(el);
     });
   }, { threshold: 0.3 });
-  document.querySelectorAll("[data-scramble],[data-type],[data-cjk],[data-odometer],[data-warning],[data-bar],[data-mark],[data-rows],[data-cards],[data-clock],[data-decrypt],[data-glitch],[data-scene3d],[data-terminal],[data-search],[data-sfx-lab]")
+  document.querySelectorAll("[data-scramble],[data-type],[data-cjk],[data-odometer],[data-warning],[data-bar],[data-mark],[data-rows],[data-cards],[data-clock],[data-decrypt],[data-glitch],[data-scene3d],[data-terminal],[data-search],[data-sfx-lab],[data-palette],[data-radar]")
     .forEach((el) => io.observe(el));
   // 所有 .rl-btn 附加电子反馈音
   document.querySelectorAll(".rl-btn").forEach((b) => {
