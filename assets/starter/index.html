@@ -1932,13 +1932,21 @@ function rlScrollToEl(el, done) {
   }
   window._rlScrollStart = startT;
   window._rlMuteUntil = startT + dur;                    // 静音仅覆盖飞行段
+  window._rlScrollActive = true;                         // ★ 飞行期间 IO 触发入队，落地后统一播放（音效/动画完整）
   (function step(now) {
     const p = Math.min(1, (now - startT) / dur);
     const e = 1 - Math.pow(1 - p, 3);
     const target = el.getBoundingClientRect().top + window.scrollY - margin;
     window.scrollTo({ top: startY + (target - startY) * e, behavior: "instant" });
     if (p < 1) _rlScrollRAF = requestAnimationFrame(step);
-    else { window._rlMuteUntil = 0; if (done) done(); }   // 落地：解除静音 → 触发确认音
+    else {
+      _rlScrollRAF = null;
+      window._rlScrollActive = false;
+      const q = window._rlFireQueue; window._rlFireQueue = [];
+      window._rlMuteUntil = 0;                             // 落地：解除静音
+      if (q) q.forEach((e2) => window._rlFire && window._rlFire(e2));  // ★ 补播飞行中错过的板块动画（含音效）
+      if (done) done();
+    }
   })(startT);
 }
 
@@ -2136,19 +2144,25 @@ function rlActivate() {
     if (el.hasAttribute("data-palette")) rlPalette(el);
     if (el.hasAttribute("data-radar")) rlRadar(el);
   };
+  const deliver = (el) => {
+    // 翻页飞行中触发的板块 → 入队，落地后统一播放（否则动画播大半、音效被静音窗口吞掉）
+    if (window._rlScrollActive) (window._rlFireQueue ??= []).push(el);
+    else fire(el);
+  };
+  window._rlFire = fire;   // 供 rlScrollToEl 落地时补播队列
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       const el = e.target;
       if (ONCE_ATTRS.some((a) => el.hasAttribute(a))) {
         if (!e.isIntersecting || el.dataset.done) return;
         el.dataset.done = "1";
-        fire(el);
+        deliver(el);
         return;
       }
       if (e.isIntersecting) {
         if (el.dataset.armed !== "1") return;   // 须先完全离场，才允许重播
         el.dataset.armed = "";
-        fire(el);
+        deliver(el);
       } else {
         el.dataset.armed = "1";
       }
