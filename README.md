@@ -6,7 +6,7 @@
 
 *Science-fiction archive-terminal aesthetics for the web — paper white, ink black, warning orange.*
 
-[![Version](https://img.shields.io/badge/version-0.12.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
+[![Version](https://img.shields.io/badge/version-0.12.1-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
 
 一个蒸馏自官方 PV、开源同人项目与电影级 FUI 方法论的**完整设计语言**：
 设计 token · 12+ 动效模式 · Three.js 3D 档案阵列 · 17 种合成音效 · 终端登录开场。
@@ -34,7 +34,7 @@
 
 | Demo | 内容 |
 |---|---|
-| `assets/starter/index.html` | **全要素演示**：终端登录开场 → 19 个板块（排版/乱码解码/打字机/里程计/3D CSS 档案卡/解密动画/机密档案/警告板/故障转场/暗色主题/色板/章节黑块/终端日志/加载态/音效馆/检索/品牌排版/FUI 语法/出处），支持自动巡演 |
+| `assets/starter/index.html` | **全要素演示**：终端登录开场 → 19 个编号板块（排版/乱码解码/打字机/里程计/3D CSS 档案卡/解密动画/机密档案/警告板/故障转场/∞ 落版/暗色主题/色板/章节黑块/终端日志/加载态/音效馆/检索/品牌排版/FUI 语法/出处），支持自动巡演 |
 | `assets/starter/scene3d.html` | **Three.js 3D 档案阵列**：40 份档案 · 5 科室 · 折射玻璃盖板 · Canvas 标签贴图 · 选中抽出 + 波浪传导 · 详情面板 |
 
 两个页面均为**单文件自包含**（CSS/JS 内联），浏览器直接打开即可运行。3D 页需联网加载 three.js CDN。
@@ -109,6 +109,10 @@ Then just say *"generate a Rhine Lab style …"* in a WorkBuddy conversation, or
 ```
 rhine-lab-motion/
 ├── SKILL.md                        # 技能入口：设计内核/工作流/触发方式
+├── AGENTS.md                       # 跨 harness 指令（Codex/Cursor/Qwen Code 等自动读取）
+├── integrations/
+│   ├── SKILL-PROMPT.txt            # 自包含风格提示词（千问/Kimi/DSH 聊天端粘贴用）
+│   └── README.md                   # 各 harness 适配矩阵
 ├── references/
 │   ├── design-tokens.md            # 色板·字体·缓动库·节拍网格·1080p 布局基准
 │   ├── motion-patterns.md          # 12 种动效模式详解与实现
@@ -125,12 +129,21 @@ rhine-lab-motion/
 
 - **空闲 15s** 自动巡演（每页 10s，左下角有倒计时预告）— idle 15s → auto tour, 10s per section
 - **空格 / ↓** 下一页，**↑** 上一页，**Esc** 或点击角标暂停 — space/↓ next, ↑ prev, Esc pause
-- 3D 页：**拖拽**环绕、**滚轮**缩放、**点击**抽出档案 + 波浪、**再点**开详情面板 — drag to orbit, click to extract
+- 3D 页：**拖拽**环绕、**滚轮**缩放、**点击**抽出档案 + 波浪、**再点**开详情面板、**双击**复位视角、闲置 5s 自动慢速环绕 — drag to orbit, click to extract, dbl-click to reset
+- 彩蛋交互：色板色块点击播放音阶、雷达点击扫频、检索输入框橙色光标 — palette = musical scale, radar = sweep, caret styled
 
 ## 📋 版本 / Versions
 
-遵循 `0.x.0` 语义：新功能进位 x，小修进位末位。详见技能包内 `版本说明` 或 git 历史。
-SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.12.0** — cross-harness adapters (`AGENTS.md`, `integrations/SKILL-PROMPT.txt`) so the kit works beyond WorkBuddy.
+遵循 `0.x.0` 语义：新功能进位 x，小修进位末位。
+SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.12.1**.
+
+| 版本 | 变更 / Changes |
+|---|---|
+| **0.12.1** | 修复巡演角标暂停失效与键盘翻页误触发巡演；音效增益（scan/power/extract）；导航顺序对齐；色板/雷达音效交互；橙色光标；板块间距与翻页落位；3D 闲置环绕 + 双击复位 |
+| 0.12.0 | 跨 harness 适配：`AGENTS.md` + `integrations/SKILL-PROMPT.txt`（千问/Kimi/DSH 可用） |
+| 0.11.0 | 二轮调研蒸馏：`style-deep-dive.md`（舟味配方/孤星 PV/方舟 UI 六角度/FUI 语法/Arwes 准则）+ FUI 语法演示板块 |
+| 0.10.x | 自动巡演、音效馆（17 种合成音效）、3D 拆独立页、跳动修复 |
+| 0.9.0 | 一句话调用：触发词显式化 |
 
 ## 📜 许可与出处 / License & Credits
 
