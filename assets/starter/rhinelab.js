@@ -654,7 +654,7 @@ function rlTerminal(el) {
   setInterval(tick, 1200);
 }
 
-/* ── 检索：过滤卡片 + 计数回显 ── */
+/* ── 检索：过滤卡片 + 计数回显 + 终端式块状光标 ── */
 function rlSearch(input, cardsEl, cntEl) {
   const cards = [...cardsEl.querySelectorAll(".rl-card")];
   input.addEventListener("input", () => {
@@ -668,6 +668,34 @@ function rlSearch(input, cardsEl, cntEl) {
     });
     if (cntEl) cntEl.textContent = String(n).padStart(2, "0") + " / " + cards.length;
   });
+  // 终端式闪烁小方块光标：镜像 span 测量文本宽度（等宽字体，精确）
+  const bar = input.parentElement;
+  const caret = document.createElement("i");
+  caret.className = "search-caret";
+  bar.appendChild(caret);
+  const mirror = document.createElement("span");
+  const cs = getComputedStyle(input);
+  Object.assign(mirror.style, { position: "absolute", visibility: "hidden", whiteSpace: "pre",
+    fontFamily: cs.fontFamily, fontSize: cs.fontSize, fontWeight: cs.fontWeight, letterSpacing: cs.letterSpacing });
+  document.body.appendChild(mirror);
+  const padL = parseFloat(cs.paddingLeft) || 0;
+  const padT = parseFloat(cs.paddingTop) || 0;
+  const padB = parseFloat(cs.paddingBottom) || 0;
+  const update = () => {
+    const on = document.activeElement === input;
+    caret.style.display = on ? "block" : "none";
+    if (!on) return;
+    mirror.textContent = input.value.slice(0, input.selectionStart ?? input.value.length);
+    const lineH = input.clientHeight - padT - padB;
+    const x = Math.min(mirror.getBoundingClientRect().width, input.clientWidth - padL - caret.offsetWidth - 2);
+    caret.style.left = (input.offsetLeft + padL + x) + "px";
+    caret.style.top = (input.offsetTop + padT) + "px";
+    caret.style.height = lineH + "px";
+  };
+  ["input", "keyup", "click", "focus", "select"].forEach((ev) =>
+    input.addEventListener(ev, () => requestAnimationFrame(update)));
+  input.addEventListener("blur", update);
+  update();
 }
 
 /* ── 音效馆：17 种合成音效试听 ── */

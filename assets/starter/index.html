@@ -587,9 +587,12 @@ body::before {
 .loader .bar { margin: 14px 0 0; }
 
 /* 检索演示 */
-.search-bar { display: flex; border: 2px solid var(--rl-ink); max-width: 540px; }
-.search-bar input { flex: 1; min-width: 0; border: none; background: var(--rl-card); font-family: var(--rl-font-mono); font-size: 14px; padding: 12px 16px; outline: none; color: var(--rl-ink); letter-spacing: 1px; caret-color: var(--rl-orange); }
+.search-bar { position: relative; display: flex; border: 2px solid var(--rl-ink); max-width: 540px; }
+.search-bar input { flex: 1; min-width: 0; border: none; background: var(--rl-card); font-family: var(--rl-font-mono); font-size: 14px; padding: 12px 16px; outline: none; color: var(--rl-ink); letter-spacing: 1px; caret-color: transparent; }
 .search-bar:focus-within { border-color: var(--rl-orange); }
+.search-caret { position: absolute; width: 9px; background: var(--rl-orange); pointer-events: none; z-index: 2;
+  display: none; animation: rl-caret-blink 1.06s step-end infinite; }
+@keyframes rl-caret-blink { 50% { opacity: 0; } }
 .search-bar .cnt { background: var(--rl-plate); color: var(--rl-ink-inv); font-family: var(--rl-font-mono); font-size: 12px; display: flex; align-items: center; padding: 0 16px; letter-spacing: 1px; white-space: nowrap; }
 
 /* 品牌排版（原片 13.48s 实测比例） */
@@ -1774,7 +1777,7 @@ function rlTerminal(el) {
   setInterval(tick, 1200);
 }
 
-/* ── 检索：过滤卡片 + 计数回显 ── */
+/* ── 检索：过滤卡片 + 计数回显 + 终端式块状光标 ── */
 function rlSearch(input, cardsEl, cntEl) {
   const cards = [...cardsEl.querySelectorAll(".rl-card")];
   input.addEventListener("input", () => {
@@ -1788,6 +1791,34 @@ function rlSearch(input, cardsEl, cntEl) {
     });
     if (cntEl) cntEl.textContent = String(n).padStart(2, "0") + " / " + cards.length;
   });
+  // 终端式闪烁小方块光标：镜像 span 测量文本宽度（等宽字体，精确）
+  const bar = input.parentElement;
+  const caret = document.createElement("i");
+  caret.className = "search-caret";
+  bar.appendChild(caret);
+  const mirror = document.createElement("span");
+  const cs = getComputedStyle(input);
+  Object.assign(mirror.style, { position: "absolute", visibility: "hidden", whiteSpace: "pre",
+    fontFamily: cs.fontFamily, fontSize: cs.fontSize, fontWeight: cs.fontWeight, letterSpacing: cs.letterSpacing });
+  document.body.appendChild(mirror);
+  const padL = parseFloat(cs.paddingLeft) || 0;
+  const padT = parseFloat(cs.paddingTop) || 0;
+  const padB = parseFloat(cs.paddingBottom) || 0;
+  const update = () => {
+    const on = document.activeElement === input;
+    caret.style.display = on ? "block" : "none";
+    if (!on) return;
+    mirror.textContent = input.value.slice(0, input.selectionStart ?? input.value.length);
+    const lineH = input.clientHeight - padT - padB;
+    const x = Math.min(mirror.getBoundingClientRect().width, input.clientWidth - padL - caret.offsetWidth - 2);
+    caret.style.left = (input.offsetLeft + padL + x) + "px";
+    caret.style.top = (input.offsetTop + padT) + "px";
+    caret.style.height = lineH + "px";
+  };
+  ["input", "keyup", "click", "focus", "select"].forEach((ev) =>
+    input.addEventListener(ev, () => requestAnimationFrame(update)));
+  input.addEventListener("blur", update);
+  update();
 }
 
 /* ── 音效馆：17 种合成音效试听 ── */
