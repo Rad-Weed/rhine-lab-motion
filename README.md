@@ -6,42 +6,44 @@
 
 *Science-fiction archive-terminal aesthetics for the web — paper white, ink black, warning orange.*
 
-[![Version](https://img.shields.io/badge/version-0.14.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
+[![Version](https://img.shields.io/badge/version-0.15.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
 
-一个蒸馏自官方 PV、开源同人项目与电影级 FUI 方法论的**完整设计语言**：
-设计 token · 12+ 动效模式 · Three.js 3D 档案阵列 · 17 种合成音效 · 终端登录开场。
+一套蒸馏自官方 PV、开源同人项目与电影级 FUI 方法论的**完整设计语言**：
+编辑设计系统 · 设计 token · 12+ 动效模式 · ∞ 立体档案卷 · 21 种合成音效 · 终端登录开场。
 零版权风险（音效全部 WebAudio 实时合成，无任何原片采样）。
 
 </div>
 
 ---
 
-## ✨这是什么 / What is this
+## ✨ 这是什么 / What is this
 
-**中文**：本项目是一套可复用的「莱茵生命」风格动效与 UI 设计语言，以 [WorkBuddy](https://www.workbuddy.cn) 技能（skill）形式组织。它提炼自《明日方舟》特别映像《莱茵生命：访问》的视觉语言、高质量开源同人项目（laiyin-video / RhineLabUI / rhine-lab-art / Multiplane）、中文游戏 UI 分析文章，以及好莱坞 FUI（Fictional User Interface）设计方法论。技能内含完整设计 token、动效模式库、3D 档案阵列实现与可直接运行的演示页。
+**中文**：本项目是一套可复用的「莱茵生命」风格设计语言，以 [WorkBuddy](https://www.workbuddy.cn) 技能（skill）形式组织。它的核心不是"动效组件库"，而是一套**编辑设计系统**——把每一页当作一册被投影到屏幕上的印刷档案来排版：网格、字阶、构图纪律、印刷工艺痕迹，动效与音效只是从属。素材提炼自《明日方舟》特别映像《莱茵生命：访问》的视觉语言、高质量开源同人项目（laiyin-video / RhineLabUI / rhine-lab-art / Multiplane）、中文游戏 UI 分析文章，以及好莱坞 FUI（Fictional User Interface）设计方法论。
 
-**English**: A reusable "Rhine Lab" motion & UI design language, packaged as a [WorkBuddy](https://www.workbuddy.cn) skill. It distills the visual language of the Arknights promotional film *"Rhine Lab: Access"*, high-quality fan projects (laiyin-video / RhineLabUI / rhine-lab-art / Multiplane), Chinese game-UI design analyses, and Hollywood-grade FUI (Fictional User Interface) methodology into design tokens, a motion-pattern library, a Three.js 3D archive array, and ready-to-run demo pages.
+**English**: A reusable "Rhine Lab" design language, packaged as a [WorkBuddy](https://www.workbuddy.cn) skill. Its core is not a component showcase but an **editorial design system** — every page is composed as a printed dossier projected onto a screen: grid, type scale, composition discipline, and printing artifacts first; motion and sound are subordinate. It distills the visual language of the Arknights promotional film *"Rhine Lab: Access"*, high-quality fan projects (laiyin-video / RhineLabUI / rhine-lab-art / Multiplane), Chinese game-UI analyses, and Hollywood-grade FUI methodology.
 
 > **非官方同人声明 / Unofficial fan work.** 本项目与 Hypergryph / 鹰角网络无隶属、未获认可。Not affiliated with or endorsed by Hypergryph / Hypergryph Network.
 
 ## 🌐 在线演示 / Live Demo（GitHub Pages）
 
-- **演示索引 / Demo index**: https://rad-weed.github.io/rhine-lab-motion/
-- **全要素演示 / Full demo**: https://rad-weed.github.io/rhine-lab-motion/assets/starter/index.html
-- **3D 档案阵列 / 3D archive array**: https://rad-weed.github.io/rhine-lab-motion/assets/starter/scene3d.html
-
-## 🖼 效果预览 / Preview
-
-| Demo | 内容 |
+| 页面 | 地址 |
 |---|---|
-| `assets/starter/index.html` | **档案册（旗舰 / flagship）**：七版面印刷档案册——封面 / 索引 / 正文 / 数据 / 图版 / 海报 / 版权页；含网点制版、套准裁切、贴纸胶带印章、拆封开场、`G` 键网格叠加、21 种音效 |
-| `assets/starter/motion-lab.html` | **动效手册 / motion lab**：终端登录开场 + 19 个编号板块（排版/乱码/打字机/里程计/解密/警告板/故障转场/音效馆/FUI 语法等）+ 自动巡演 |
-| `assets/dossier/` | 版式基座**源文件**：`dossier.css`（网格·字阶·印刷件）、`dossier.js`（音频总线·网点·拆封·入场）、`index.src.html`（七版面模板） |
-| `assets/starter/scene3d.html` | **∞ 档案卷 / archive roll**：320 张纸页沿双纽线层层叠压，每页与路径垂直并逐页微旋，形成一卷有体积、带自阴影的 ∞（环内 ± 符号）；靠近鼓起、点击抽出一页并转正、再点展开档案内容；3/4 机位可拖拽环绕（Three.js，需联网） |
+| 演示索引 / Demo index | https://rad-weed.github.io/rhine-lab-motion/ |
+| **档案册（旗舰）** / Dossier (flagship) | https://rad-weed.github.io/rhine-lab-motion/assets/starter/index.html |
+| 动效手册 / Motion lab | https://rad-weed.github.io/rhine-lab-motion/assets/starter/motion-lab.html |
+| **∞ 档案卷（3D）** / Archive roll | https://rad-weed.github.io/rhine-lab-motion/assets/starter/scene3d.html |
 
-两个页面均为**单文件自包含**（CSS/JS 内联），浏览器直接打开即可运行。3D 页需联网加载 three.js CDN。
+## 🖼 三个演示 / Three demos
 
-Both pages are **self-contained** (CSS/JS inlined) — just open them in a browser. The 3D page needs network access for the three.js CDN.
+| 文件 | 内容 |
+|---|---|
+| `assets/starter/index.html` | **档案册（旗舰 / flagship）** — 七版面印刷档案册：封面 / 索引 / 正文 / 数据 / 图版 / 海报 / 版权页。含 45° 网点制版图版、套准/裁切/色条/折线/装订孔、贴纸胶带印章涂抹条、拆封开场、`G` 键网格叠加、21 种音效。整册零 WebGL。 |
+| `assets/starter/motion-lab.html` | **动效手册 / motion lab** — 终端登录开场 + 19 个编号板块（排版 / 乱码解码 / 打字机 / 里程计 / 解密 / 警告板 / 故障转场 / 音效馆 / FUI 语法…）+ 自动巡演 + 键盘可达性。同样注入了档案册的印刷版式层。 |
+| `assets/starter/scene3d.html` | **∞ 档案卷 / archive roll** — 320 张纸页沿双纽线层层叠压，每页与路径垂直并逐页微旋，形成**一卷有体积、带自阴影的 ∞**（环内 ＋/−）。鼠标靠近鼓起波浪、点击抽出一页并转正、再点展开档案内容。Three.js，需联网。 |
+
+三个页面均为**单文件自包含**（CSS/JS 内联），浏览器直接打开即可运行；只有 3D 页需要联网加载 three.js CDN。
+
+All three pages are **self-contained** (CSS/JS inlined) — just open them in a browser. Only the 3D page needs network access for the three.js CDN.
 
 ## 🚀 快速开始 / Quick Start
 
@@ -52,10 +54,10 @@ Both pages are **self-contained** (CSS/JS inlined) — just open them in a brows
 git clone https://github.com/Rad-Weed/rhine-lab-motion.git
 cd rhine-lab-motion
 
-# 2. 打开演示 / open the demos
-#    直接双击打开即可：
-#    assets/starter/index.html   ← 主演示（零依赖）
-#    assets/starter/scene3d.html ← 3D 阵列（需联网加载 three.js）
+# 2. 打开演示 / open the demos（直接双击即可）
+#    assets/starter/index.html        ← 档案册（零依赖，建议从这里开始）
+#    assets/starter/motion-lab.html   ← 动效手册（零依赖）
+#    assets/starter/scene3d.html      ← ∞ 档案卷（需联网加载 three.js）
 ```
 
 ### 作为 WorkBuddy 技能安装 / Install as a WorkBuddy skill
@@ -72,9 +74,14 @@ Then just say *"generate a Rhine Lab style …"* in a WorkBuddy conversation, or
 ### 复用组件 / Reuse as a library
 
 ```html
+<!-- 动效手册的组件库（token + 动效 + 17 音效） -->
 <link rel="stylesheet" href="assets/starter/rhinelab.css">
 <script src="assets/starter/rhinelab.js"></script>
 ```
+
+档案册的版式基座是另一套（更偏印刷）：`assets/dossier/dossier.css` + `dossier.js` + `index.src.html`，组装方式见文件内 `__INLINE_CSS__` / `__INLINE_JS__` 占位符。
+
+The dossier uses a separate print-oriented base: `assets/dossier/` (template + css + js, assembled via `__INLINE_*__` placeholders).
 
 ## 🔌 跨 Harness 兼容 / Cross-harness compatibility
 
@@ -88,62 +95,102 @@ Then just say *"generate a Rhine Lab style …"* in a WorkBuddy conversation, or
 
 ## 🎨 设计语言速览 / Design Language at a Glance
 
+### 编辑设计（骨架 / skeleton）
+
+| 项 | 值 |
+|---|---|
+| 版心 / measure | 1180px，页边 56px |
+| 网格 / grid | 12 栏，栏距 20px，基线 8px |
+| 字号阶梯 / type scale | 大标题 → 正文 → 脚注，字距随字号光学调整（大到 −0.035em，小到 +0.24em） |
+| 构图 / composition | **一页一锚点**、尺度对比 ≈10:1、静区 ≥40%、密→空→密、7:5 非对称版面、注释即纹理 |
+| 印刷件 / print artifacts | 13 种：裁切标记、套准靶、色条、折线、装订孔、贴纸、胶带、印章、涂抹条、边注、脚注、图注、校改栏 |
+| 网点 / halftone | 45° 网屏，点径 `√density × cell × 0.63`，套准橙点占 1–2% 面积 |
+
+### 色彩（色彩即状态 / colour means status）
+
 | Token | 值 | 语义 |
 |---|---|---|
 | `--rl-paper` | `#e7e5e1` | 纸面底色 / warm paper base |
 | `--rl-ink` | `#111214` | 墨色正文 / ink |
 | `--rl-plate` | `#101112` | 深色板 / dark plate |
-| `--rl-orange` | `#ff7b00` | **主强调：警告/当前/机械交互** / primary accent |
-| `--rl-lime` | `#b9e432` | 次级点缀：光标/在线确认 / secondary accent |
-| `--rl-amber`(暗色) | `#c5a16b` | 暗色主题强调 / dark-theme accent |
+| `--rl-orange` | `#ff7b00` | **主强调：警告 / 当前 / 机械交互** / primary accent |
+| `--rl-lime` | `#b9e432` | 次级点缀：光标 / 在线确认 / secondary accent |
+| `--rl-amber`（暗色） | `#c5a16b` | 暗色主题强调 / dark-theme accent |
 
-**五条铁律 / Five iron rules**
-1. 橙是唯一主强调，lime 只做点缀；色彩即状态 / orange is the only primary accent; color means status
-2. 少即是好（迪特·拉姆斯）——简单几何 × 多层叠加 / less but better
-3. 一切皆档案——编号、日志、进度、取景框、涂抹条 / everything is an archive
-4. 动效是机械的不是弹性的——outCubic/outExpo/弹簧(ζ≈0.45)，至多过冲一次 / mechanical easing, no bounce
-5. 文字入场=乱码解码(32ms tick)或打字机；数字=里程计；线条=按进度绘制 / decode, typewriter, odometer, draw-on
+**六条铁律 / Six iron rules**
+1. 一页一个锚点，其余留白——版面先成立，动效才加 / one anchor per page; whitespace before motion
+2. 橙是唯一主强调，lime 只做点缀；遮盖用黑版不用专色 / orange only as accent; redaction uses black plate
+3. 少即是好（迪特·拉姆斯）——简单几何 × 多层叠加 / less but better
+4. 一切皆档案——编号、日志、进度、取景框、涂抹条 / everything is an archive
+5. 动效只做三件事：压印、显影、归档——机械缓动，至多过冲一次 / impression, development, filing; no bounce
+6. 文字=乱码解码或打字机；数字=里程计；线条=按进度绘制 / decode, typewriter, odometer, draw-on
 
-**进阶**：3D 档案阵列（通道距 5.2 / 波浪阻尼 4.2 / 临界阻尼弹簧 ω=14）、三轨自适应 BGM、17 类交互音效、1080p HUD 布局基准 —— 详见 [`references/`](references/)。
+**进阶**：∞ 档案卷（320 页等弧长布点 / 自阴影 / 实例化）、纸质音效包络（翻页 / 盖章 / 划擦 / 撕封）、三轨自适应 BGM、1080p HUD 布局基准 —— 详见 [`references/`](references/)。
 
 ## 📁 结构 / Structure
 
 ```
 rhine-lab-motion/
-├── SKILL.md                        # 技能入口：设计内核/工作流/触发方式
+├── SKILL.md                        # 技能入口：设计内核（文件而非界面）·工作流·触发方式
 ├── AGENTS.md                       # 跨 harness 指令（Codex/Cursor/Qwen Code 等自动读取）
+├── README.md · LICENSE · THIRD_PARTY_NOTICES.md
+├── index.html                      # GitHub Pages 着陆页（演示索引）
 ├── integrations/
 │   ├── SKILL-PROMPT.txt            # 自包含风格提示词（千问/Kimi/DSH 聊天端粘贴用）
 │   └── README.md                   # 各 harness 适配矩阵
 ├── references/
+│   ├── editorial-system.md         # ★ 编辑设计系统：网格·字阶·构图六律·13 印刷件·网点·版式模板
 │   ├── design-tokens.md            # 色板·字体·缓动库·节拍网格·1080p 布局基准
 │   ├── motion-patterns.md          # 12 种动效模式详解与实现
-│   ├── advanced-3d-audio.md        # 3D 阵列/解密/三轨 BGM/交互音效/暗色主题/时长表
+│   ├── advanced-3d-audio.md        # 3D/解密/三轨 BGM/交互音效/暗色主题/时长表
 │   ├── style-deep-dive.md          # 深度剖析：舟味配方·孤星 PV·方舟 UI 六角度·FUI 语法·Arwes 准则
 │   └── sources.md                  # 全部参考出处与许可（开源必读）
-└── assets/starter/
-    ├── index.html                  # 自包含全要素演示（自动巡演/翻页）
-    ├── scene3d.html                # 独立 3D 档案阵列页
-    ├── rhinelab.css / rhinelab.js  # 可复用组件库（token + 动效 + 17 音效）
+└── assets/
+    ├── dossier/                    # 档案册版式基座（源文件，可重新组装）
+    │   ├── dossier.css             # 网格·字阶·印刷件·版式模板
+    │   ├── dossier.js              # 音频总线·网点制版·拆封·入场
+    │   ├── index.src.html          # 七版面模板（__INLINE_CSS__ / __INLINE_JS__ 占位）
+    │   ├── lab-retrofit.css        # 手册的印刷版式补丁（可重复注入）
+    │   └── lab-retrofit.js
+    └── starter/
+        ├── index.html              # 档案册（成品，自包含）
+        ├── motion-lab.html         # 动效手册（成品，自包含）
+        ├── scene3d.html            # ∞ 档案卷（成品，自包含，需联网）
+        └── rhinelab.css / rhinelab.js  # 手册组件库（token + 动效 + 17 音效）
 ```
 
 ## ⌨️ 演示页操作 / Demo controls
 
+**档案册 `index.html`**
+- 进入：点击封面的 **UNSEAL 印章**（撕封条音效）— click the UNSEAL seal to break the seal
+- **G**：叠加/隐藏 12 栏网格与基线，自查版式 — toggle grid & baseline overlay
+- 涂抹条 **hover** 显字、贴纸/胶带/印章均为纯 CSS 印刷件 — hover redactions to reveal
+
+**动效手册 `motion-lab.html`**
 - **空闲 15s** 自动巡演（每页 10s，左下角有倒计时预告）— idle 15s → auto tour, 10s per section
-- **空格 / ↓** 下一页，**↑** 上一页，**Esc** 或点击角标暂停 — space/↓ next, ↑ prev, Esc pause
-- 3D 页：**拖拽**环绕、**滚轮**缩放、**点击**抽出档案 + 波浪、**再点**开详情面板、**双击**复位视角、闲置 5s 自动慢速环绕 — drag to orbit, click to extract, dbl-click to reset
-- 彩蛋交互：色板色块点击播放音阶、雷达点击扫频、检索输入框橙色光标 — palette = musical scale, radar = sweep, caret styled
+- **空格 / ↓** 下一页，**↑** 上一页，**Esc** 暂停 — space/↓ next, ↑ prev, Esc pause
+- **Tab + Enter** 可在音效馆 / 色板 / 档案卡间纯键盘操作 — full keyboard access
+
+**∞ 档案卷 `scene3d.html`**
+- **拖拽**环绕、**滚轮**缩放、**点击**抽出一页并转正、**再点**展开档案内容、**Esc** 归位 — drag / wheel / click to extract / click again to open / Esc to file back
+- 鼠标靠近纸卷会鼓起波浪，悬停显示编号与标题 — hover raises a wave and shows the file label
 
 ## 📋 版本 / Versions
 
 遵循 `0.x.0` 语义：新功能进位 x，小修进位末位。
-SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.14.0**.
+SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.15.0**.
 
 | 版本 | 变更 / Changes |
 |---|---|
-| **0.14.0** | 修复巡演角标暂停失效与键盘翻页误触发巡演；音效增益（scan/power/extract）；导航顺序对齐；色板/雷达音效交互；橙色光标；板块间距与翻页落位；3D 闲置环绕 + 双击复位 |
-| 0.12.0 | 跨 harness 适配：`AGENTS.md` + `integrations/SKILL-PROMPT.txt`（千问/Kimi/DSH 可用） |
-| 0.11.0 | 二轮调研蒸馏：`style-deep-dive.md`（舟味配方/孤星 PV/方舟 UI 六角度/FUI 语法/Arwes 准则）+ FUI 语法演示板块 |
+| **0.15.0** | **3D 重构为 ∞ 档案卷**：320 张纸页沿双纽线等弧长层层叠压、每页与路径垂直并逐页微旋，实例化单次绘制 + 自阴影；修 `slerpQuaternions` 与"抽出页命中"两处真 bug |
+| 0.14.4 | 堆叠轴改为竖向（每站 5 层）——后被 0.15.0 取代 |
+| 0.14.3 | 3D 改为立体纸壳雕塑（56 站点 × 3 层径向外扇 + 环内 ±） |
+| 0.14.2 | 3D 首版重构：72 张纸页等弧长排成 ∞ 标志（解决参数均匀 ≠ 视觉均匀） |
+| 0.14.1 | 旧演示统一版式：`motion-lab.html` 注入印刷版式层（版口/页码/裁切角标），逻辑零改动 |
+| **0.14.0** | **编辑设计重做**：新增 `references/editorial-system.md`；旗舰演示重建为七版面印刷档案册（网点制版/拆封开场/21 音效）；原演示保留为 `motion-lab.html` |
+| 0.13.x | 板块动画离场重播、键盘可达性、翻页时序修复（飞行期触发入队、落地统一补播） |
+| 0.12.x | 跨 harness 适配（`AGENTS.md` + `SKILL-PROMPT.txt`）；音效链重构（主增益总线 + 全音效重标）；检索框终端式块光标；翻页精准化 |
+| 0.11.0 | 二轮调研蒸馏：`style-deep-dive.md`（舟味配方 / 孤星 PV / 方舟 UI 六角度 / FUI 语法 / Arwes 准则）+ FUI 语法板块 |
 | 0.10.x | 自动巡演、音效馆（17 种合成音效）、3D 拆独立页、跳动修复 |
 | 0.9.0 | 一句话调用：触发词显式化 |
 

@@ -12,7 +12,7 @@
   .land-hero .inf .o { color: var(--rl-orange); }
   .land-hero .cn { font-size: 15px; letter-spacing: 6px; color: var(--rl-mute); margin-top: 14px; font-weight: 600; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 40px; }
-  .card { display: block; text-decoration: none; color: var(--rl-ink); background: var(--rl-card);
+  .card { display: flex; flex-direction: column; text-decoration: none; color: var(--rl-ink); background: var(--rl-card);
     border: 1px solid var(--rl-faint); padding: 28px; position: relative;
     transition: transform 0.28s cubic-bezier(0.33,1,0.68,1), border-color 0.28s, box-shadow 0.28s; }
   .card:hover { transform: translateY(-6px); border-color: var(--rl-ink); box-shadow: 0 16px 36px rgba(17,18,20,0.15); }
@@ -21,7 +21,7 @@
   .card h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin: 18px 0 6px; }
   .card .no { font-family: var(--rl-font-mono); font-size: 12px; color: var(--rl-orange); letter-spacing: 2px; }
   .card p { font-size: 12.5px; line-height: 2; color: var(--rl-mute); margin-top: 10px; }
-  .card .go { display: inline-block; margin-top: 16px; font-family: var(--rl-font-mono); font-size: 11px;
+  .card .go { display: inline-block; margin-top: auto; padding-top: 18px; align-self: flex-start; font-family: var(--rl-font-mono); font-size: 11px;
     letter-spacing: 2px; color: var(--rl-ink); border-bottom: 2px solid var(--rl-lime); padding-bottom: 2px; }
   .meta { font-family: var(--rl-font-mono); font-size: 10.5px; letter-spacing: 1.5px; color: var(--rl-mute);
     display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 48px; line-height: 2; }
@@ -43,23 +43,30 @@
   <section class="land-hero">
     <div class="inf" aria-hidden="true">＋ <span class="o">−</span> ＝ ∞</div>
     <div class="cn" data-cjk>莱茵生命 · 动效与界面风格套件 —— 非官方同人风格研究</div>
-    <div class="hero-sub" data-type>RHINE LAB MOTION &amp; UI STYLE KIT // v0.11.0</div>
+    <div class="hero-sub" data-type>RHINE LAB MOTION &amp; UI STYLE KIT // v0.15.0</div>
   </section>
 
   <div class="cards">
     <a class="card" href="assets/starter/index.html">
-      <span class="tab">FULL DEMO</span>
+      <span class="tab">DOSSIER · FLAGSHIP</span>
       <div class="no">DEMO-01</div>
-      <h2>全要素演示 · Full Demo</h2>
-      <p>终端登录开场、乱码解码、打字机、里程计、3D CSS 档案卡、解密动画、警告板、故障转场、音效馆（17 种合成音效）、自动巡演——19 个板块。零 WebGL，任何设备流畅运行。</p>
-      <span class="go">ACCESS DEMO →</span>
+      <h2>档案册 · Dossier</h2>
+      <p>七版面印刷档案册：封面 / 索引 / 正文 / 数据 / 图版 / 海报 / 版权页。45° 网点制版、套准裁切色条折线、贴纸胶带印章涂抹条、拆封开场、21 种音效。按 G 叠加 12 栏网格自查版式。零 WebGL。</p>
+      <span class="go">UNSEAL →</span>
+    </a>
+    <a class="card" href="assets/starter/motion-lab.html">
+      <span class="tab">MOTION LAB</span>
+      <div class="no">DEMO-02</div>
+      <h2>动效手册 · Motion Lab</h2>
+      <p>终端登录开场、乱码解码、打字机、里程计、解密动画、警告板、故障转场、音效馆（17 种合成音效）、FUI 语法——19 个编号板块，自动巡演 + 全键盘可达。</p>
+      <span class="go">ACCESS →</span>
     </a>
     <a class="card" href="assets/starter/scene3d.html">
-      <span class="tab">3D ARCHIVE ARRAY</span>
-      <div class="no">DEMO-02</div>
-      <h2>3D 档案阵列 · Three.js</h2>
-      <p>40 份档案 · 5 列科室 · 圆角玻璃盖板（折射）· Canvas 标签贴图 · 拖拽环绕 / 滚轮缩放 / 点击抽出 + 波浪传导 / 详情面板。需联网加载 three.js。</p>
-      <span class="go">ACCESS DEMO →</span>
+      <span class="tab">3D · ARCHIVE ROLL</span>
+      <div class="no">DEMO-03</div>
+      <h2>∞ 档案卷 · Three.js</h2>
+      <p>320 张纸页沿双纽线层层叠压成一卷有体积、带自阴影的 ∞（环内 ＋/−）。靠近鼓起波浪、点击抽出一页并转正、再点展开档案内容。需联网加载 three.js。</p>
+      <span class="go">EXTRACT →</span>
     </a>
   </div>
 
@@ -67,6 +74,7 @@
     <span>MIT LICENSE</span>
     <span>UNOFFICIAL FAN WORK — NOT AFFILIATED WITH HYPERGRYPH</span>
     <span>SFX = WEB AUDIO SYNTHESIS · NO SAMPLES</span>
+    <span>21 SFX · 13 PRINT ARTIFACTS · 45° HALFTONE</span>
     <span><a href="https://github.com/Rad-Weed/rhine-lab-motion/blob/main/references/sources.md" target="_blank" rel="noopener">SOURCES &amp; CREDITS</a></span>
     <span><a href="https://github.com/Rad-Weed/rhine-lab-motion" target="_blank" rel="noopener">SOURCE CODE</a></span>
   </div>
