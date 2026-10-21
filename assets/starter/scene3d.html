@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RHINE LAB — ∞ 档案阵列 / ARCHIVE CONSTELLATION</title>
-<meta name="description" content="72 张档案纸页沿 ∞ 轨迹悬浮堆叠成莱茵标志：靠近形成波浪，点击抽出，再点展开内容。非官方同人作品。">
+<title>RHINE LAB — ∞ 档案卷 / ARCHIVE ROLL</title>
+<meta name="description" content="240 张档案纸沿 ∞ 卷成一卷立体纸卷：靠近鼓起波浪，点击抽出一页，再点展开内容。非官方同人作品。">
 <style>
 :root{
   --paper:#e6e2d6; --sheet:#f6f3eb; --ink:#151513; --ink-2:#3c3c36; --mute:#7d7a72;
@@ -18,19 +18,17 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%}
 body{
-  background:radial-gradient(120% 80% at 50% 10%,#f2eee5 0%,var(--paper) 58%,#d3cec0 100%);
+  background:radial-gradient(120% 80% at 50% 12%,#f3efe6 0%,var(--paper) 58%,#d2cdbf 100%);
   color:var(--ink); font-family:var(--sans); overflow:hidden;
   -webkit-font-smoothing:antialiased;
 }
-#stage{position:fixed;inset:0}
-#c{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+#c{position:fixed;inset:0;display:block;width:100%;height:100%;cursor:grab;touch-action:none}
 #c.dragging{cursor:grabbing}
 #c.pointing{cursor:pointer}
-.grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.42;background-image:var(--noise);mix-blend-mode:multiply}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.40;background-image:var(--noise);mix-blend-mode:multiply}
 
-/* HUD */
 .hud{position:fixed;z-index:5;font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase}
-.hud-top{left:34px;top:28px;max-width:52vw}
+.hud-top{left:34px;top:28px;max-width:54vw}
 .hud-top .mark{display:flex;align-items:baseline;gap:8px}
 .hud-top .mark b{font:700 15px/1 var(--disp);letter-spacing:.2em}
 .hud-top .mark i{font-style:normal;color:var(--accent);font-size:19px;line-height:1;transform:translateY(1px)}
@@ -40,30 +38,24 @@ body{
   color:var(--ink);text-decoration:none;border-bottom:1px solid var(--accent);padding-bottom:3px;text-transform:uppercase}
 .hud-back:hover{color:var(--accent)}
 .hud-left{left:34px;bottom:26px;font-size:8.5px;color:var(--mute);line-height:2.2}
-.hud-left b{color:var(--ink);font-weight:600}
 .hud-left .key{border:1px solid var(--hair);padding:1px 5px;margin-right:4px;color:var(--ink)}
 .hud-right{right:34px;bottom:26px;font-size:8.5px;color:var(--mute);text-align:right;line-height:2}
 .hud-right b{color:var(--ink)}
 .hud-right .sel{color:var(--accent)}
 
-.tip{
-  position:fixed;z-index:6;pointer-events:none;opacity:0;transform:translate(12px,-50%);
+.tip{position:fixed;z-index:6;pointer-events:none;opacity:0;transform:translate(12px,-50%);
   background:var(--sheet);border:1px solid var(--ink);padding:6px 9px;
   font:600 8.5px/1.5 var(--mono);letter-spacing:.14em;text-transform:uppercase;
-  box-shadow:0 8px 18px -8px rgba(38,32,20,.45);transition:opacity .15s;
-}
+  box-shadow:0 8px 18px -8px rgba(38,32,20,.45);transition:opacity .15s}
 .tip.on{opacity:1}
 .tip b{color:var(--accent)}
 
-/* 内容页 */
-.panel{
-  position:fixed;z-index:8;right:32px;top:86px;bottom:86px;width:440px;
+.panel{position:fixed;z-index:8;right:32px;top:86px;bottom:86px;width:440px;
   background:var(--sheet);border:1px solid rgba(21,21,19,.12);
   box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 30px 60px -24px rgba(38,32,20,.4);
   padding:28px 30px 24px;overflow:auto;
   transform:translateX(calc(100% + 44px));opacity:0;pointer-events:none;
-  transition:transform .5s cubic-bezier(.33,1,.68,1),opacity .4s;
-}
+  transition:transform .5s cubic-bezier(.33,1,.68,1),opacity .4s}
 .panel.on{transform:none;opacity:1;pointer-events:auto}
 .panel::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--noise);opacity:.2;mix-blend-mode:multiply}
 .panel > *{position:relative;z-index:1}
@@ -124,21 +116,21 @@ body{
 </head>
 <body>
 
-<div id="stage"><canvas id="c"></canvas></div>
+<canvas id="c"></canvas>
 <div class="grain"></div>
 
 <header class="hud hud-top">
   <div class="mark"><b>RHINE LAB</b><i>∞</i></div>
-  <div class="sub">ARCHIVE CONSTELLATION / 档案星座<br>SECTION 00 — <span>280 SHEETS · 56 STATIONS</span></div>
+  <div class="sub">ARCHIVE ROLL / 档案卷<br>SECTION 00 — <span>320 SHEETS · ONE CONTINUOUS ROLL</span></div>
 </header>
 <a class="hud-back" href="index.html">◂ 档案册 DOSSIER</a>
 
 <div class="hud hud-left">
-  <div><span class="key">MOVE</span>靠近形成波浪　<span class="key">CLICK</span>抽出文档　<span class="key">CLICK×2</span>展开内容</div>
+  <div><span class="key">MOVE</span>靠近鼓起　<span class="key">CLICK</span>抽出一页　<span class="key">CLICK×2</span>展开内容</div>
   <div><span class="key">DRAG</span>环绕　<span class="key">WHEEL</span>缩放　<span class="key">ESC</span>归位</div>
 </div>
 <div class="hud hud-right">
-  <div>SHEETS <b>280</b> / STATIONS <b>56</b></div>
+  <div>SHEETS <b>320</b> / ROLL <b>1</b></div>
   <div>SELECTED <b class="sel" id="hudsel">—</b></div>
 </div>
 
@@ -186,8 +178,8 @@ body{
 
 <script type="module">
 /* ══════════════════════════════════════════════════════════════
-   RHINE LAB — ∞ ARCHIVE CONSTELLATION
-   72 张纸页沿 Gerono 双纽线堆叠成悬浮 ∞；波浪 / 抽出 / 展开
+   RHINE LAB — ∞ ARCHIVE ROLL
+   240 张纸页沿双纽线层层叠压、逐页绕路径微旋 → 一卷 ∞ 纸卷
    ══════════════════════════════════════════════════════════════ */
 
 const $ = (s) => document.querySelector(s);
@@ -200,12 +192,9 @@ catch (e) {
   try { THREE = await import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"); }
   catch (e2) { THREE = null; }
 }
-if (!THREE) {
-  $("#loading").classList.add("off");
-  $("#fallback").classList.add("on");
-}
+if (!THREE) { $("#loading").classList.add("off"); $("#fallback").classList.add("on"); }
 
-/* ── 音效：纸的声音 ─────────────────────────────────────────── */
+/* ── 音效 ─────────────────────────────────────────────────── */
 let AC = null, audioOn = false;
 function ac() {
   if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
@@ -213,12 +202,12 @@ function ac() {
   return AC;
 }
 function sfx(kind) {
-  if (!audioOn) return;                 // 首次手势前不发声（浏览器策略）
+  if (!audioOn) return;
   try {
     const ctx = ac(), t = ctx.currentTime;
     const master = (window._m ||= (() => { const g = ctx.createGain(); g.gain.value = 1; g.connect(ctx.destination); return g; })());
     if (kind === "paper" || kind === "extract" || kind === "insert") {
-      const dur = kind === "paper" ? 0.34 : 0.3;
+      const dur = kind === "paper" ? 0.32 : 0.3;
       const len = Math.ceil(ctx.sampleRate * dur);
       const buf = ctx.createBuffer(1, len, ctx.sampleRate);
       const d = buf.getChannelData(0);
@@ -230,7 +219,7 @@ function sfx(kind) {
       bp.frequency.setValueAtTime(up ? 700 : 2600, t);
       bp.frequency.exponentialRampToValueAtTime(up ? 3200 : 700, t + dur);
       const g = ctx.createGain();
-      g.gain.setValueAtTime(kind === "paper" ? 0.16 : 0.2, t);
+      g.gain.setValueAtTime(kind === "paper" ? 0.15 : 0.19, t);
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
       src.connect(bp).connect(g).connect(master);
       src.start(t); src.stop(t + dur);
@@ -243,13 +232,13 @@ function sfx(kind) {
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
       o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.02);
     };
-    if (kind === "beep") tone(1200, 0.07, "sine", 0.18);
-    if (kind === "stamp") { tone(140, 0.12, "sine", 0.3); setTimeout(() => { try { tone(96, 0.1, "sine", 0.22); } catch (e) {} }, 45); }
-    if (kind === "close") tone(420, 0.09, "square", 0.12);
+    if (kind === "beep") tone(1200, 0.07, "sine", 0.17);
+    if (kind === "stamp") { tone(140, 0.12, "sine", 0.28); setTimeout(() => { try { tone(96, 0.1, "sine", 0.2); } catch (e) {} }, 45); }
+    if (kind === "close") tone(420, 0.09, "square", 0.11);
   } catch (e) {}
 }
 
-/* ── 数据 ───────────────────────────────────────────────────── */
+/* ── 数据 ─────────────────────────────────────────────────── */
 const DEPTS = [
   { code: "OA", cn: "源石技艺部", en: "ORIGINIUM ARTS", titles: ["源石技艺应用总纲", "术式回路兼容性", "法阵稳定性观测", "源石增益迭代实验", "共振阈值测定", "抗干扰场测试", "载体技艺评估", "边缘术式归档"] },
   { code: "BT", cn: "生命科学部", en: "BIOTECH", titles: ["细胞活性培养报告", "源石病病理切片", "免疫应答观测", "基因图谱比对", "药剂配比修订", "临床前试验纪要", "组织再生评估", "样本库巡检记录"] },
@@ -267,40 +256,35 @@ const ROW_POOL = [
   ["采样批次", "B-2026-10", "n=12"], ["环境温度", "−12.0 ℃", "±0.6"],
   ["申报页数", "42", "—"], ["复核状态", "双盲", "通过"],
 ];
-
 function makeData(n) {
   const list = [];
   for (let i = 0; i < n; i++) {
     const dept = DEPTS[i % DEPTS.length];
     const title = dept.titles[Math.floor(i / DEPTS.length) % dept.titles.length];
     list.push({
-      no: "X-" + String(i + 1).padStart(3, "0"),
-      dept, title,
-      level: 2 + (i % 3),
-      rev: 1 + (i % 9),
-      pages: 4 + (i % 9),
-      body1: BODIES[i % BODIES.length],
-      body2: BODIES[(i + 2) % BODIES.length],
+      no: "X-" + String(i + 1).padStart(3, "0"), dept, title,
+      level: 2 + (i % 3), rev: 1 + (i % 9), pages: 4 + (i % 9),
+      body1: BODIES[i % BODIES.length], body2: BODIES[(i + 2) % BODIES.length],
       rows: [ROW_POOL[i % ROW_POOL.length], ROW_POOL[(i + 3) % ROW_POOL.length], ROW_POOL[(i + 5) % ROW_POOL.length]],
     });
   }
   return list;
 }
 
-/* ── 纸面贴图 ───────────────────────────────────────────────── */
+/* ── 纸面贴图（抽出时用） ─────────────────────────────────── */
 function sheetTexture(d, seed) {
   const W = 384, H = 264, SC = 512 / 384;
   const c = document.createElement("canvas");
   c.width = Math.round(W * SC); c.height = Math.round(H * SC);
   const x = c.getContext("2d"); x.scale(SC, SC);
-  x.fillStyle = "#f4f1e8"; x.fillRect(0, 0, W, H);
-  for (let i = 0; i < 900; i++) {              // 纸纹
-    x.fillStyle = "rgba(21,21,19," + (0.012 + hash(i + seed) * 0.02) + ")";
+  x.fillStyle = "#f5f2e9"; x.fillRect(0, 0, W, H);
+  for (let i = 0; i < 900; i++) {
+    x.fillStyle = "rgba(21,21,19," + (0.01 + hash(i + seed) * 0.018) + ")";
     x.fillRect(hash(i * 1.7 + seed) * W, hash(i * 3.1 + seed) * H, 1, 1);
   }
-  x.strokeStyle = "rgba(21,21,19,.28)"; x.lineWidth = 2; x.strokeRect(1, 1, W - 2, H - 2);
-  x.fillStyle = "#151513"; x.fillRect(20, 18, 74, 22);           // 部门标签
-  x.fillStyle = "#f4f1e8"; x.font = "600 12px 'JetBrains Mono',Consolas,monospace";
+  x.strokeStyle = "rgba(21,21,19,.26)"; x.lineWidth = 2; x.strokeRect(1, 1, W - 2, H - 2);
+  x.fillStyle = "#151513"; x.fillRect(20, 18, 74, 22);
+  x.fillStyle = "#f5f2e9"; x.font = "600 12px 'JetBrains Mono',Consolas,monospace";
   x.textBaseline = "middle"; x.fillText(d.dept.code, 28, 30);
   x.fillStyle = "#e9521c"; x.font = "700 14px 'JetBrains Mono',Consolas,monospace";
   x.fillText(d.no, W - 86, 30);
@@ -312,57 +296,27 @@ function sheetTexture(d, seed) {
   x.beginPath(); x.moveTo(20, 128); x.lineTo(W - 20, 128); x.stroke();
   x.fillStyle = "rgba(21,21,19,.55)"; x.font = "500 9px 'JetBrains Mono',Consolas,monospace";
   x.fillText("CLEARANCE LV." + d.level + "  ·  PAGES " + String(d.pages).padStart(2, "0") + "  ·  FILED 2026.10", 20, 146);
-  let bx = 20, bi = 0;                                          // 条码
+  let bx = 20, bi = 0;
   while (bx < 208) {
     const w = 1 + Math.floor(hash(bi + seed) * 3);
     if (hash(bi * 2.3 + seed) > 0.34) { x.fillStyle = "#151513"; x.fillRect(bx, 164, w, 44); }
     bx += w + 2 + Math.floor(hash(bi + 99 + seed) * 3); bi++;
   }
-  x.strokeStyle = "#151513"; x.lineWidth = 4;                   // ∞ 落款
+  x.strokeStyle = "#151513"; x.lineWidth = 4;
   x.beginPath(); x.arc(W - 78, 188, 15, 0, Math.PI * 2); x.stroke();
   x.beginPath(); x.arc(W - 48, 188, 15, 0, Math.PI * 2); x.stroke();
   x.fillStyle = "#7d7a72"; x.font = "700 9px 'JetBrains Mono',Consolas,monospace";
   x.fillText("RHINE LAB", 20, 238);
   const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
-  return t;
-}
-
-/* ── 素纸（后层用）：只留极淡的印刷痕迹 ───────────────────── */
-function plainTexture() {
-  const W = 448, H = 302;
-  const c = document.createElement("canvas"); c.width = W; c.height = H;
-  const x = c.getContext("2d");
-  x.fillStyle = "#f3f0e7"; x.fillRect(0, 0, W, H);
-  for (let i = 0; i < 700; i++) {
-    x.fillStyle = "rgba(21,21,19," + (0.008 + hash(i) * 0.014) + ")";
-    x.fillRect(hash(i * 1.3) * W, hash(i * 2.7) * H, 1, 1);
-  }
-  x.strokeStyle = "rgba(21,21,19,.10)"; x.lineWidth = 2; x.strokeRect(7, 7, W - 14, H - 14);
-  x.fillStyle = "rgba(21,21,19,.14)";
-  let bx = 24;
-  for (let i = 0; i < 24; i++) {
-    const w = 1 + Math.floor(hash(i + 7) * 3);
-    x.fillRect(bx, 30, w, 30);
-    bx += w + 3 + Math.floor(hash(i + 31) * 3);
-  }
-  x.fillStyle = "rgba(21,21,19,.18)"; x.font = "600 10px 'JetBrains Mono',Consolas,monospace";
-  x.fillText("RHINE LAB / ARCHIVE STACK", 24, H - 26);
-  const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
   return t;
 }
-
-/* ── ± 环内符号 ─────────────────────────────────────────────── */
 function glyphTexture(ch) {
   const c = document.createElement("canvas"); c.width = 256; c.height = 256;
-  const x = c.getContext("2d");
-  x.fillStyle = "#151513";
+  const x = c.getContext("2d"); x.fillStyle = "#151513";
   if (ch === "+") { x.fillRect(100, 24, 56, 208); x.fillRect(24, 100, 208, 56); }
   else { x.fillRect(24, 104, 208, 48); }
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
@@ -373,31 +327,38 @@ function boot() {
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
   renderer.setSize(innerWidth, innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.02;
+  renderer.toneMappingExposure = 1.1;
 
   const scene = new THREE.Scene();
   const PAPER = new THREE.Color(0xe6e2d6);
   scene.background = PAPER;
-  scene.fog = new THREE.Fog(PAPER, 26, 62);
+  scene.fog = new THREE.Fog(PAPER, 36, 82);
 
-  const camera = new THREE.PerspectiveCamera(43, innerWidth / innerHeight, 0.5, 160);
-  const cam = { theta: 0.34, phi: 1.33, r: 22, vt: 0, vp: 0, rt: 22 };
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
-  scene.add(new THREE.AmbientLight(0xffffff, 0.42));
-  const key = new THREE.DirectionalLight(0xfff4e4, 1.15); key.position.set(7, 12, 14); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xdfe6ef, 0.45); rim.position.set(-10, -4, -8); scene.add(rim);
+  const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.5, 200);
+  const cam = { theta: 0.2, phi: 1.36, r: 34, vt: 0, vp: 0, rt: 34 };
 
-  const root = new THREE.Group();
-  scene.add(root);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xded8ca, 0.95));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const key = new THREE.DirectionalLight(0xfff8ee, 1.55); key.position.set(12, 18, 22);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.left = -24; key.shadow.camera.right = 24;
+  key.shadow.camera.top = 24; key.shadow.camera.bottom = -24;
+  key.shadow.camera.near = 1; key.shadow.camera.far = 90;
+  key.shadow.bias = -0.0006;
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xf2f5fa, 0.6); fill.position.set(-16, -8, 12); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xffffff, 0.5); rim.position.set(-6, 4, -18); scene.add(rim);
 
-  /* 双纽线（Gerono） */
-  const A = 10.4, B = 5.6;
+  const root = new THREE.Group(); scene.add(root);
+
+  /* 双纽线 + 等弧长查找表 */
+  const A = 15.0, B = 8.2;
   const lem = (t) => ({ x: A * Math.cos(t), y: B * Math.sin(t) * Math.cos(t) });
-  const tangent = (t) => Math.atan2(B * Math.cos(2 * t), -A * Math.sin(t));
-
-  /* 等弧长参数化：按累计弧长取点，避免曲率大处纸张堆叠、直段稀疏 */
   const ARC = (() => {
-    const M = 1400, ts = [], ss = [];
+    const M = 1600, ts = [], ss = [];
     let acc = 0, prev = lem(0);
     for (let i = 0; i <= M; i++) {
       const t = (i / M) * Math.PI * 2, p = lem(t);
@@ -409,187 +370,135 @@ function boot() {
   function tAt(s) {
     const target = ((s % ARC.L) + ARC.L) % ARC.L;
     let lo = 0, hi = ARC.ss.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (ARC.ss[mid] < target) lo = mid + 1; else hi = mid;
-    }
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (ARC.ss[mid] < target) lo = mid + 1; else hi = mid; }
     return ARC.ts[lo];
   }
-
-  /* 轨迹参考线 */
-  {
-    const pts = [];
-    for (let i = 0; i <= 420; i++) {
-      const t = (i / 420) * Math.PI * 2, p = lem(t);
-      pts.push(new THREE.Vector3(p.x, p.y, -1.15));
-    }
-    const g = new THREE.BufferGeometry().setFromPoints(pts);
-    const m = new THREE.LineDashedMaterial({ color: 0x151513, transparent: true, opacity: 0.16, dashSize: 0.22, gapSize: 0.22 });
-    const line = new THREE.Line(g, m);
-    line.computeLineDistances();
-    root.add(line);
+  function tangentAt(t) {
+    const e = 0.002, a = lem(t - e), b = lem(t + e);
+    const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1;
+    return { x: dx / d, y: dy / d };
   }
 
-  /* 文档：84 站点 × 3 层向外扇出，形成有厚度的 ∞ 雕塑 */
-  const STATIONS = 56, COPIES = 5, TOTAL = STATIONS * COPIES;
-  const GEO = new THREE.BoxGeometry(2.36, 1.6, 0.058);
-  const TAB = new THREE.BoxGeometry(0.5, 0.09, 0.075);
-  const DATA = makeData(STATIONS);
-  const OFF_R = [0, 0, 0, 0, 0];        // 不横向扇出
-  const OFF_Y = [0, 0.19, -0.19, 0.36, -0.36];   // 竖向堆叠：上下错层
-  const OFF_Z = [0, -0.05, -0.05, -0.1, -0.1];   // 只做小幅前后错位
-  const OFF_S = [1, 0.99, 0.99, 0.97, 0.97];
-  const docs = [];
+  /* ── 纸卷：N 张纸沿路径叠压，逐页绕路径微旋 ── */
+  const N = 320, TOTAL = N;
+  const DATA = makeData(N);
+  const PW = 2.5, PH = 1.8, PD = 0.045;
+  const GEO = new THREE.BoxGeometry(PW, PH, PD);
+  const MAT = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.86, metalness: 0 });
 
-  for (let sIdx = 0; sIdx < STATIONS; sIdx++) {
-    const t = tAt((sIdx / STATIONS) * ARC.L);
-    const p = lem(t), ang = tangent(t);
-    // 扇出方向 = 远离本环环心（环内空隙因此保持干净）
-    const cx = p.x < 0 ? -6.1 : 6.1;
-    let nx = p.x - cx, ny = p.y;
-    const dl = Math.hypot(nx, ny);
-    if (dl < 1.3) { nx = Math.cos(ang + Math.PI / 2); ny = Math.sin(ang + Math.PI / 2); }
-    else { nx /= dl; ny /= dl; }
+  const mesh = new THREE.InstancedMesh(GEO, MAT, N);
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  root.add(mesh);
 
-    const tex = sheetTexture(DATA[sIdx], sIdx + 1);   // 每站一张，五层共用
-    for (let k = 0; k < COPIES; k++) {
-      const i = sIdx * COPIES + k;
-      const front = k === 0;
-      const edgeC = [0xe4decf, 0xe2dccd, 0xe0dac9, 0xdbd4c2, 0xd8d1be][k];
-      const faceC = [0xffffff, 0xf4f0e6, 0xf0ebdf, 0xebe5d6, 0xe7e1d1][k];
-      const mEdge = new THREE.MeshStandardMaterial({ color: edgeC, roughness: 0.96, metalness: 0, transparent: true });
-      const mBack = new THREE.MeshStandardMaterial({ color: 0xefeade, roughness: 0.97, metalness: 0, transparent: true });
-      const mFace = new THREE.MeshStandardMaterial({ map: tex, color: faceC, roughness: 0.95, metalness: 0, transparent: true });
-      const mats = [mEdge, mEdge, mEdge, mEdge, mFace, mBack];
+  const pages = [];
+  const tmpM = new THREE.Matrix4(), tmpP = new THREE.Vector3(), tmpS = new THREE.Vector3(1, 1, 1);
+  const zAxis = new THREE.Vector3(0, 0, 1);
 
-      const g = new THREE.Group();
-      g.add(new THREE.Mesh(GEO, mats));
-
-      let tabMat = { opacity: 1 };
-      if (front) {
-        tabMat = new THREE.MeshStandardMaterial({ color: 0xe9521c, roughness: 0.6, transparent: true });
-        const tab = new THREE.Mesh(TAB, tabMat);
-        tab.position.set(0, 0.865, 0.005);
-        g.add(tab);
-      }
-
-      const gx = p.x + nx * OFF_R[k] + (k - 2) * 0.012 * (hash(i * 2.1) - 0.5);
-      const gy = p.y + ny * OFF_R[k] + OFF_Y[k];
-      const gz = OFF_Z[k] + (hash(i) - 0.5) * 0.02;
-      g.position.set(gx, gy, gz);
-      g.rotation.z = ang * 0.24 + (k - 2) * 0.012 + (hash(i * 7.3) - 0.5) * 0.015;
-      g.rotation.y = (k - 2) * 0.012;      // 近乎共面，只留极轻的错开
-      g.rotation.x += (k - 2) * 0.022;    // 每层极轻的翻页角
-      g.rotation.x = (hash(i * 3.7) - 0.5) * 0.03;
-      const sc = OFF_S[k];
-      g.scale.setScalar(sc);
-      root.add(g);
-
-      docs.push({
-        i, station: sIdx, copy: k, front, data: DATA[sIdx], group: g,
-        mats: [mEdge, mBack, mFace], tabMat,
-        base: new THREE.Vector3(gx, gy, gz),
-        baseRot: g.rotation.clone(), baseScale: sc,
-        z: 0, vz: 0, phase: hash(i * 5.1) * Math.PI * 2,
-        state: "in", startAt: performance.now() + i * 4, intro: 0,
-      });
-    }
+  for (let i = 0; i < N; i++) {
+    const t = tAt((i / N) * ARC.L);
+    const p = lem(t);
+    const tg = tangentAt(t);
+    // 页面法线沿路径 → 每张纸都与路径垂直（像被穿在一卷纸上）
+    const q = new THREE.Quaternion().setFromUnitVectors(zAxis, new THREE.Vector3(tg.x, tg.y, 0));
+    // 逐页绕自身法线微旋 → 卷起的层理
+    q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, i * 0.024));
+    const scale = 1 + (hash(i * 3.1) - 0.5) * 0.03;
+    const basePos = new THREE.Vector3(p.x, p.y, (hash(i * 5.7) - 0.5) * 0.05);
+    pages.push({ i, data: DATA[i], basePos, quat: q, scale, wave: 0 });
+    tmpM.compose(basePos, q, new THREE.Vector3(scale, scale, 1));
+    mesh.setMatrixAt(i, tmpM);
   }
+  mesh.instanceMatrix.needsUpdate = true;
 
   /* ± 环内符号 */
   {
     const mk = (ch, px) => {
       const m = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.1, 2.1),
-        new THREE.MeshBasicMaterial({ map: glyphTexture(ch), transparent: true, opacity: 0.9 })
+        new THREE.PlaneGeometry(3.0, 3.0),
+        new THREE.MeshBasicMaterial({ map: glyphTexture(ch), transparent: true, opacity: 0.92 })
       );
-      m.position.set(px, 0.12, -0.7);
+      m.position.set(px, 0.1, -3.2);
       root.add(m);
     };
-    mk("+", -6.1);
-    mk("-", 6.1);
+    mk("+", -8.6);
+    mk("-", 8.6);
   }
 
   /* 尘埃 */
   {
-    const cnt = 260, pos = new Float32Array(cnt * 3);
+    const cnt = 240, pos = new Float32Array(cnt * 3);
     for (let i = 0; i < cnt; i++) {
-      pos[i * 3] = (hash(i) - 0.5) * 34;
-      pos[i * 3 + 1] = (hash(i + 91) - 0.5) * 20;
-      pos[i * 3 + 2] = (hash(i + 181) - 0.5) * 18;
+      pos[i * 3] = (hash(i) - 0.5) * 46;
+      pos[i * 3 + 1] = (hash(i + 91) - 0.5) * 26;
+      pos[i * 3 + 2] = (hash(i + 181) - 0.5) * 22;
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const dust = new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8b8781, size: 0.06, transparent: true, opacity: 0.42, depthWrite: false }));
-    scene.add(dust);
-    scene.userData.dust = dust;
+    const dust = new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8b8781, size: 0.07, transparent: true, opacity: 0.35, depthWrite: false }));
+    scene.add(dust); scene.userData.dust = dust;
   }
 
   /* 相机 */
-  const camTarget = new THREE.Vector3(0, 0, 0);
+  let dragging = false, moved = 0;
   function updateCamera(dt) {
     if (!dragging) { cam.vt *= 0.94; cam.vp *= 0.94; }
     cam.theta += cam.vt * dt;
-    cam.phi = Math.min(1.58, Math.max(0.92, cam.phi + cam.vp * dt));
+    cam.phi = Math.min(1.56, Math.max(0.95, cam.phi + cam.vp * dt));
     cam.r += (cam.rt - cam.r) * Math.min(1, dt * 6);
-    const sway = Math.sin(performance.now() * 0.00016) * 0.045;
+    const sway = Math.sin(performance.now() * 0.00015) * 0.04;
     const th = cam.theta + sway;
     camera.position.set(
-      camTarget.x + cam.r * Math.sin(cam.phi) * Math.sin(th),
-      camTarget.y + cam.r * Math.cos(cam.phi) + 1.6,
-      camTarget.z + cam.r * Math.sin(cam.phi) * Math.cos(th)
+      cam.r * Math.sin(cam.phi) * Math.sin(th),
+      cam.r * Math.cos(cam.phi) + 1.2,
+      cam.r * Math.sin(cam.phi) * Math.cos(th)
     );
-    camera.lookAt(camTarget);
+    camera.lookAt(0, 0, 0);
   }
 
-  /* 指针 / 交互 */
+  /* 交互 */
   const ray = new THREE.Raycaster();
   const ndc = new THREE.Vector2(-9, -9);
   const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
   const wavePt = new THREE.Vector3(999, 999, 0);
-  let waveOn = false, dragging = false, moved = 0;
-  let hovered = null, selected = null, panelOpen = false;
-
+  let waveOn = false, hovered = null, selected = null, panelOpen = false;
   const tip = $("#tip");
-  function setTip(doc, cx, cy) {
-    if (!doc || selected) { tip.classList.remove("on"); return; }
-    tip.classList.add("on");
-    tip.style.left = cx + "px"; tip.style.top = cy + "px";
-    tip.innerHTML = "<b>" + doc.data.no + "</b> " + doc.data.title;
-  }
 
-  const groups = docs.map((d) => d.group);
-  function pick() {
+  function hitPage() {
     ray.setFromCamera(ndc, camera);
-    const hits = ray.intersectObjects(groups, true);
-    if (!hits.length) return null;
-    let o = hits[0].object;
-    while (o && !groups.includes(o)) o = o.parent;
-    const hit = docs.find((d) => d.group === o);
-    if (!hit) return null;
-    return docs.find((d) => d.station === hit.station && d.front) || hit;
+    const hit = ray.intersectObject(mesh, false)[0];
+    return hit && hit.instanceId != null ? pages[hit.instanceId] : null;
+  }
+  function hitOut() {
+    if (!outMesh) return false;
+    ray.setFromCamera(ndc, camera);
+    return ray.intersectObject(outMesh, false).length > 0;
   }
   function worldPoint() {
     ray.setFromCamera(ndc, camera);
     const v = new THREE.Vector3();
     return ray.ray.intersectPlane(plane, v) ? v : null;
   }
+  function setTip(pg, cx, cy) {
+    if (!pg || selected) { tip.classList.remove("on"); return; }
+    tip.classList.add("on");
+    tip.style.left = cx + "px"; tip.style.top = cy + "px";
+    tip.innerHTML = "<b>" + pg.data.no + "</b> " + pg.data.title;
+  }
 
   canvas.addEventListener("pointerdown", (e) => {
-    dragging = true; moved = 0;
-    audioOn = true; ac();
+    dragging = true; moved = 0; audioOn = true; ac();
     canvas.classList.add("dragging");
     try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
-    ac();
   });
   canvas.addEventListener("pointerup", () => {
-    dragging = false;
-    canvas.classList.remove("dragging");
+    dragging = false; canvas.classList.remove("dragging");
     if (moved >= 6) return;
-    const hit = pick();
-    if (!hit) { if (selected) (panelOpen ? closePanel() : fileBack()); return; }
-    if (hit === selected) { panelOpen ? closePanel() : openPanel(hit); }
-    else { if (panelOpen) closePanel(true); select(hit); }
+    if (selected && hitOut()) { panelOpen ? closePanel() : openPanel(); return; }   // 再点抽出的这一页
+    const pg = hitPage();
+    if (!pg) { if (selected) (panelOpen ? closePanel() : fileBack()); return; }
+    if (selected && pg === selected) { panelOpen ? closePanel() : openPanel(); }
+    else { if (panelOpen) closePanel(true); select(pg); }
   });
   canvas.addEventListener("pointermove", (e) => {
     const r = canvas.getBoundingClientRect();
@@ -600,12 +509,8 @@ function boot() {
       cam.vt -= (e.movementX || 0) * 0.0032;
       cam.vp += (e.movementY || 0) * 0.0026;
     }
-    const h = pick();
-    if (h !== hovered) {
-      hovered = h;
-      canvas.classList.toggle("pointing", !!h);
-      if (h) sfx("paper");
-    }
+    const h = hitPage();
+    if (h !== hovered) { hovered = h; canvas.classList.toggle("pointing", !!h); if (h) sfx("paper"); }
     setTip(hovered, e.clientX, e.clientY);
     const wp = worldPoint();
     if (wp) wavePt.copy(wp);
@@ -613,51 +518,68 @@ function boot() {
   });
   canvas.addEventListener("pointerleave", () => {
     waveOn = false; hovered = null; ndc.set(-9, -9);
-    canvas.classList.remove("pointing");
-    tip.classList.remove("on");
+    canvas.classList.remove("pointing"); tip.classList.remove("on");
   });
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    cam.rt = Math.min(38, Math.max(17, cam.rt + e.deltaY * 0.012));
+    cam.rt = Math.min(48, Math.max(20, cam.rt + e.deltaY * 0.014));
   }, { passive: false });
 
   /* 抽出 / 归位 / 面板 */
-  const vDir = new THREE.Vector3(), vRight = new THREE.Vector3();
+  let outMesh = null, outFrom = null, outT = 0;
+  const vDir = new THREE.Vector3(), vRight = new THREE.Vector3(), vTarget = new THREE.Vector3();
   function extractPose() {
     camera.getWorldDirection(vDir);
     vRight.crossVectors(vDir, camera.up).normalize();
     const p = camera.position.clone()
-      .add(vDir.clone().multiplyScalar(9.4))
-      .add(vRight.clone().multiplyScalar(panelOpen ? -2.5 : -0.9));
-    p.y += 0.25;
+      .add(vDir.clone().multiplyScalar(10.5))
+      .add(vRight.clone().multiplyScalar(panelOpen ? -3.0 : -1.2));
+    p.y += 0.2;
     return p;
   }
-  const qWorld = new THREE.Quaternion(), qLocal = new THREE.Quaternion(), vTarget = new THREE.Vector3();
+  function select(pg) {
+    selected = pg;
+    $("#hudsel").textContent = pg.data.no;
+    tmpM.makeScale(0, 0, 0);
+    mesh.setMatrixAt(pg.i, tmpM);
+    mesh.instanceMatrix.needsUpdate = true;
 
-  function select(doc) {
-    doc.state = "out";
-    selected = doc;
-    $("#hudsel").textContent = doc.data.no;
+    const face = new THREE.MeshStandardMaterial({ map: sheetTexture(pg.data, pg.i + 1), roughness: 0.94 });
+    const edge = new THREE.MeshStandardMaterial({ color: 0xefe9db, roughness: 0.95, transparent: true });
+    const m = new THREE.Mesh(GEO, [edge, edge, edge, edge, face, edge]);
+    m.position.copy(pg.basePos);
+    m.quaternion.copy(pg.quat);
+    m.scale.setScalar(pg.scale);
+    m.userData.mats = [edge, face];
+    root.add(m);
+    outMesh = m; outFrom = m.position.clone(); outT = 0;
     sfx("extract"); setTimeout(() => sfx("beep"), 120);
     tip.classList.remove("on");
   }
   function fileBack() {
     if (!selected) return;
-    const d = selected;
-    d.state = "in";
+    const pg = selected;
+    if (outMesh) {
+      root.remove(outMesh);
+      outMesh.userData.mats.forEach((mm) => { if (mm.map) mm.map.dispose(); mm.dispose(); });
+      outMesh = null;
+    }
+    tmpM.compose(pg.basePos, pg.quat, new THREE.Vector3(pg.scale, pg.scale, 1));
+    mesh.setMatrixAt(pg.i, tmpM);
+    mesh.instanceMatrix.needsUpdate = true;
     selected = null;
     $("#hudsel").textContent = "—";
     sfx("insert");
-    root.attach(d.group);
   }
-  function openPanel(doc) {
-    const d = doc.data;
+  function openPanel() {
+    if (!selected) return;
+    const d = selected.data;
     $("#p-no").textContent = d.no;
     $("#p-dept").textContent = d.dept.cn + " / " + d.dept.en;
     $("#p-title").textContent = d.title;
     $("#p-lv").textContent = "LEVEL " + d.level;
     $("#p-rev").textContent = "REV." + String(d.rev).padStart(2, "0");
-    $("#p-idx").textContent = String(doc.station + 1).padStart(2, "0") + " / " + STATIONS;
+    $("#p-idx").textContent = String(selected.i + 1).padStart(3, "0") + " / " + TOTAL;
     $("#p-pg").textContent = String(d.pages).padStart(2, "0");
     $("#p-b1").textContent = d.body1;
     $("#p-b2").textContent = d.body2;
@@ -668,11 +590,11 @@ function boot() {
     panelOpen = true;
     sfx("stamp");
   }
-  function closePanel(keepSelected) {
+  function closePanel(keep) {
     $("#panel").classList.remove("on");
     $("#panel").setAttribute("aria-hidden", "true");
     panelOpen = false;
-    if (!keepSelected) sfx("close");
+    if (!keep) sfx("close");
   }
   $("#p-close").addEventListener("click", () => closePanel());
   $("#p-file").addEventListener("click", () => { closePanel(); fileBack(); });
@@ -701,8 +623,9 @@ function boot() {
     }
   }
 
-  /* 动画循环 */
+  /* 动画 */
   let last = performance.now(), tAcc = 0, firstFrame = true;
+  const vAxis = new THREE.Vector3();
 
   function frame(now) {
     requestAnimationFrame(frame);
@@ -711,59 +634,40 @@ function boot() {
 
     updateCamera(dt);
 
-    root.position.y = Math.sin(tAcc * 0.5) * 0.12;
-    root.rotation.z = Math.sin(tAcc * 0.28) * 0.018;
-    root.rotation.x = -0.055 + Math.sin(tAcc * 0.22) * 0.012;
-    root.rotation.y = -0.06 + Math.sin(tAcc * 0.17) * 0.02;
+    root.rotation.x = -0.02 + Math.sin(tAcc * 0.22) * 0.01;
+    root.rotation.y = -0.05 + Math.sin(tAcc * 0.17) * 0.018;
+    root.position.y = Math.sin(tAcc * 0.5) * 0.1;
 
-    camera.updateMatrixWorld();
-    camera.getWorldQuaternion(qWorld);
-
-    for (const d of docs) {
-      if (d.intro < 1) {                          // 入场：从漂浮中归位
-        const p = clamp01((now - d.startAt) / 900);
-        d.intro = p;
-        if (p < 1) {
-          const e = 1 - Math.pow(1 - p, 3);
-          d.group.position.set(d.base.x, d.base.y + (1 - e) * 6 * (hash(d.i * 3.3) - 0.5), d.base.z - (1 - e) * 3);
-          d.group.scale.setScalar(0.72 + 0.28 * e);
-          d.mats.forEach((m) => (m.opacity = e));
-          d.tabMat.opacity = e;
-          if (p > 0.55 && d.i % 7 === 0) sfx("paper");
-        }
+    let dirty = false;
+    for (const pg of pages) {
+      if (pg === selected) continue;
+      let target = 0;
+      if (waveOn && !selected) {
+        const d = Math.hypot(pg.basePos.x - wavePt.x, pg.basePos.y - wavePt.y);
+        target = Math.exp(-(d * d) / (2 * 4.2 * 4.2));
       }
+      if (pg === hovered && !selected) target = Math.max(target, 0.85);
+      pg.wave += (target - pg.wave) * Math.min(1, dt * 7);
 
-      if (d === selected) {
-        vTarget.copy(extractPose());
-        d.group.position.lerp(vTarget, Math.min(1, dt * 5));
-        qLocal.copy(root.quaternion).invert().multiply(qWorld);
-        d.group.quaternion.slerp(qLocal, Math.min(1, dt * 5));
-        d.group.scale.lerp(new THREE.Vector3(1.62, 1.62, 1.62), Math.min(1, dt * 5));
-      } else if (d.state === "in") {
-        let target = 0;
-        if (waveOn && !selected) {
-          const dist = Math.hypot(d.base.x - wavePt.x, d.base.y - wavePt.y);
-          target = 2.45 * Math.exp(-(dist * dist) / (2 * 3.7 * 3.7));
-        }
-        if (d === hovered && !selected) target += 0.95;
-        target *= 1 - d.copy * 0.22;
-        d.vz += ((target - d.z) * 58 - d.vz * 9) * dt;
-        d.z += d.vz * dt;
-        const breathe = Math.sin(tAcc * 1.1 + d.phase) * 0.03;
-        d.group.position.set(d.base.x, d.base.y + d.z * 0.18, d.base.z + d.z + breathe);
-        d.group.rotation.z = d.baseRot.z;
-        d.group.rotation.x = d.baseRot.x - d.z * 0.11;   // 鼓包朝镜头微倾
-        d.group.rotation.y = -d.z * 0.045;
-        d.group.scale.setScalar(1 + Math.min(0.085, d.z * 0.045));
-      }
+      const s = pg.scale * (1 + pg.wave * 0.075);
+      vAxis.set(1, 0, 0).applyQuaternion(pg.quat);
+      tmpP.copy(pg.basePos).addScaledVector(vAxis, pg.wave * 0.22);
+      tmpM.compose(tmpP, pg.quat, tmpS.set(s, s, 1));
+      mesh.setMatrixAt(pg.i, tmpM);
+      dirty = true;
+    }
+    if (dirty) mesh.instanceMatrix.needsUpdate = true;
 
-      const dim = selected && d !== selected ? 0.24 : 1;
-      d.mats.forEach((m) => { m.opacity += (dim - m.opacity) * Math.min(1, dt * 6); });
-      d.tabMat.opacity += (dim - d.tabMat.opacity) * Math.min(1, dt * 6);
+    if (outMesh && selected) {
+      outT = Math.min(1, outT + dt * 2.2);
+      const e = 1 - Math.pow(1 - outT, 3);
+      vTarget.copy(extractPose());
+      outMesh.position.lerpVectors(outFrom, vTarget, e);
+      outMesh.quaternion.slerpQuaternions(selected.quat, camera.quaternion, e);
+      outMesh.scale.setScalar(selected.scale * (1 + 0.55 * e));
     }
 
-    if (scene.userData.dust) scene.userData.dust.rotation.z = tAcc * 0.008;
-
+    if (scene.userData.dust) scene.userData.dust.rotation.z = tAcc * 0.006;
     renderer.render(scene, camera);
     if (firstFrame) { firstFrame = false; window._rlBooted = true; $("#loading").classList.add("off"); }
   }
