@@ -1,0 +1,202 @@
+/* ══════════════════════════════════════════════════════════════════
+   LAB RETROFIT — 把动效手册（motion-lab.html）并入档案册的印刷语言
+   v0.14.1 · 只改版式与观感，不改任何演示逻辑
+   ══════════════════════════════════════════════════════════════════ */
+
+:root{
+  --rl-paper:#e4e0d5;
+  --rl-card:#f6f3eb;
+  --rl-tab:#efece2;
+  --rl-ink:#151513;
+  --rl-faint:rgba(21,21,19,.18);
+  --rl-mute:#7d7a72;
+  --rl-orange:#e9521c;
+  --rl-plate:#121211;
+  --rl-ink-inv:#f6f3eb;
+  --lab-mono:"JetBrains Mono","SF Mono","Cascadia Mono",Consolas,"Courier New",monospace;
+  --lab-disp:"Helvetica Neue",Helvetica,"Nimbus Sans",Arial,sans-serif;
+}
+
+body{
+  background:radial-gradient(130% 80% at 50% -12%,#f0ece3 0%,var(--rl-paper) 52%,#d7d2c4 100%) !important;
+  font-family:"Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  color:var(--rl-ink);
+  padding-bottom:72px !important;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+/* ── 页与报头 ─────────────────────────────────────────────── */
+.page{max-width:1180px;margin:0 auto;padding:0 !important;position:relative;z-index:1}
+.hud-header{
+  padding:34px 56px 12px !important;
+  border-bottom:1px solid var(--rl-faint);
+  display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+}
+.hud-title{
+  font:700 16px/1 var(--lab-disp) !important;
+  letter-spacing:.18em !important;
+  order:1;
+}
+.hud-sub{
+  font:500 8.5px/1.4 var(--lab-mono) !important;
+  letter-spacing:.24em !important;color:var(--rl-mute) !important;
+  border-left:1px solid var(--rl-faint);padding-left:14px;order:2;
+}
+.hud-os{
+  font:600 9px/1 var(--lab-mono) !important;letter-spacing:.2em;
+  margin-left:auto !important;color:var(--rl-mute);order:3;
+}
+.hud-os .bold{color:var(--rl-ink)}
+.hud-os .light{color:var(--rl-mute)}
+
+/* ── 导航：细线 + 下划线，而非胶囊边框 ───────────────────── */
+.demo-nav{
+  background:rgba(246,243,235,.93) !important;
+  backdrop-filter:blur(6px);
+  padding:8px 56px !important;
+  border-bottom:1px solid var(--rl-faint) !important;
+  gap:0 !important;
+  top:0;
+  z-index:40;
+}
+.demo-nav a{
+  border:none !important;border-bottom:1px solid transparent !important;
+  padding:6px 7px !important;
+  font:600 9px/1 var(--lab-mono) !important;
+  letter-spacing:.14em;color:var(--rl-mute) !important;
+  text-transform:uppercase;
+}
+.demo-nav a:hover{color:var(--rl-ink) !important;border-bottom-color:var(--rl-ink) !important}
+.demo-nav a[href="index.html"]{color:var(--rl-orange) !important}
+
+/* ── 版面：每节变成一页纸 ─────────────────────────────────── */
+.section{
+  background:var(--rl-card);
+  border:1px solid rgba(21,21,19,.11);
+  padding:44px 56px 58px !important;
+  margin:26px 0 0 !important;
+  position:relative;
+  box-shadow:0 1px 0 rgba(255,255,255,.75) inset,0 22px 48px -18px rgba(38,32,20,.22);
+}
+.section::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity:.2;mix-blend-mode:multiply;
+}
+.section > *{position:relative;z-index:1}
+
+/* 裁切角标 */
+.cm{position:absolute;width:16px;height:16px;opacity:.5;pointer-events:none;z-index:2}
+.cm::before,.cm::after{content:"";position:absolute;background:var(--rl-ink)}
+.cm::before{width:16px;height:1px}
+.cm::after{width:1px;height:16px}
+.cm.tl{left:14px;top:14px}
+.cm.tr{right:14px;top:14px}
+.cm.tr::before{right:0}.cm.tr::after{right:0}
+.cm.bl{left:14px;bottom:14px}
+.cm.bl::before{bottom:0}.cm.bl::after{bottom:0}
+.cm.br{right:14px;bottom:14px}
+.cm.br::before{right:0;bottom:0}.cm.br::after{right:0;bottom:0}
+
+/* 版口 running head */
+.rh{
+  display:flex;align-items:baseline;gap:14px;
+  border-bottom:1px solid var(--rl-faint);
+  padding-bottom:10px;margin-bottom:26px;
+}
+.rh .no{font:700 11px/1 var(--lab-mono);letter-spacing:.2em;color:var(--rl-orange)}
+.rh .ti{font:600 10px/1 var(--lab-mono);letter-spacing:.3em;text-transform:uppercase;color:var(--rl-ink)}
+.rh .fo{margin-left:auto;font:500 9px/1 var(--lab-mono);letter-spacing:.2em;color:var(--rl-mute)}
+
+/* 页脚 folio */
+.folio{
+  position:absolute;right:56px;bottom:20px;z-index:2;
+  font:500 8.5px/1 var(--lab-mono);letter-spacing:.2em;color:var(--rl-mute);
+}
+.demo-h{display:none}
+.demo-h:not(.conv){
+  display:block;
+  font:600 9px/1.6 var(--lab-mono) !important;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--rl-mute) !important;
+  margin-bottom:14px;
+}
+
+/* ── 组件：细线化 ─────────────────────────────────────────── */
+.rl-btn{
+  border:1px solid var(--rl-ink) !important;
+  background:transparent !important;
+  border-radius:0 !important;
+  font:600 9.5px/1 var(--lab-mono) !important;
+  letter-spacing:.18em !important;
+  text-transform:uppercase;
+  padding:9px 14px !important;
+  box-shadow:none !important;
+  color:var(--rl-ink);
+  transition:background .2s,color .2s;
+}
+.rl-btn:hover{background:var(--rl-ink) !important;color:var(--rl-card) !important}
+.rl-card{border-radius:1px !important;border-color:var(--rl-faint) !important}
+.rl-card.selected{outline:1px solid var(--rl-orange);outline-offset:3px}
+.dossier,.chip,.sfx,.term,.search-bar,.loader,.ld-blocks,.sw i,.bar{border-radius:0 !important}
+.dossier{background:var(--rl-tab) !important;border:1px solid var(--rl-faint)}
+.chip{
+  border:1px solid var(--rl-faint) !important;background:transparent !important;
+  font:600 8.5px/1 var(--lab-mono) !important;letter-spacing:.2em !important;
+  padding:5px 8px !important;color:var(--rl-mute) !important;
+}
+.search-bar{border:1px solid var(--rl-ink) !important;background:var(--rl-card) !important}
+.search-bar input{background:transparent !important;font-family:var(--lab-mono) !important}
+.sfx{border:1px solid var(--rl-faint) !important;background:var(--rl-card) !important}
+.sfx:hover{border-color:var(--rl-ink) !important}
+.term{background:var(--rl-plate) !important;border:1px solid #000 !important}
+.bar{border:1px solid var(--rl-ink) !important}
+.sw{border:1px solid var(--rl-faint) !important}
+.swatches .sw i{outline:1px solid rgba(21,21,19,.12)}
+.credits{font-family:var(--lab-mono) !important;font-size:9.5px !important;line-height:2 !important;letter-spacing:.04em}
+.credits a{color:var(--rl-ink) !important;border-bottom:1px solid var(--rl-orange);text-decoration:none !important}
+.subtitle-plate{
+  background:var(--rl-plate) !important;
+  border-radius:0 !important;
+  font-family:var(--lab-mono) !important;
+}
+.tour-badge{border-radius:0 !important;font-family:var(--lab-mono) !important}
+.steps .st{font-family:var(--lab-mono) !important}
+.steps .st.on i{background:var(--rl-orange) !important}
+.rail{opacity:.35}
+.hero{letter-spacing:.01em}
+
+/* 首屏提示条 */
+.lab-note{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:10px 56px 0;
+  font:500 8.5px/1.6 var(--lab-mono);letter-spacing:.22em;color:var(--rl-mute);
+  text-transform:uppercase;
+}
+.lab-note b{color:var(--rl-orange);font-weight:700}
+.lab-note span:last-child{margin-left:auto}
+
+/* 暗色版面内保持反白 */
+.plate-block .demo-h,.section-tile .demo-h{color:rgba(246,243,235,.6) !important}
+
+@media (max-width:900px){
+  .hud-header{padding:22px 20px 10px !important}
+  .demo-nav{padding:8px 20px !important}
+  .section{padding:28px 20px 44px !important}
+  .folio{right:20px}
+  .lab-note{padding:10px 20px 0}
+}
+
+/* 涂抹条统一为墨色（印刷逻辑：遮盖用黑版，不用专色） */
+.redact,.redacted,[class*="redact"]{
+  background:var(--rl-ink) !important;color:transparent !important;
+  padding:0 .22em;border-radius:1px;cursor:help;
+  transition:background .18s,color .18s;
+}
+.redact:hover,.redacted:hover,[class*="redact"]:hover{
+  background:rgba(233,82,28,.14) !important;color:var(--rl-ink) !important;
+}
+/* lab-redact-unify */

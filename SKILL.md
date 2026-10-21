@@ -1,6 +1,6 @@
 ---
 name: rhine-lab-motion
-version: 0.14.0
+version: 0.14.1
 description: 莱茵生命（明日方舟 Rhine Lab）视觉与动效风格技能。一句话触发："生成莱茵生命风格"、"莱茵生命风格"、"莱茵生命动效"、"Rhine Lab 风格"、"科研档案风 UI"、"磁带盒未来主义"、"白橙科技感"。核心不是组件而是**编辑设计系统**：一册被投影到屏幕上的印刷档案——12 栏网格/8px 基线、字号阶梯与字距光学曲线、单版面大锚点构图、45° 网点制版、套印错位、裁切/套准标记、贴纸胶带印章、装订与涂抹条，以及翻页/盖章/撕封条的纸质音效；附动效模式库、3D 档案阵列、终端开场、出处与许可表。
 agent_created: true
 ---
@@ -54,7 +54,8 @@ agent_created: true
 | `references/editorial-system.md` | **本技能的核心**：网格/字阶/字距表、构图比例、13 种印刷件配方、网点制版算法、纸质音效包络、六个版式模板、自检清单、反例 |
 | `assets/dossier/` | 档案册源文件：`dossier.css`（版式基座）、`dossier.js`（音频总线/网点/拆封/入场）、`index.src.html`（七版面模板）；组装为 `assets/starter/index.html` |
 | `assets/starter/index.html` | **旗舰演示（自包含单页）**：封面→索引→正文→数据→图版→海报→版权页，含 21 种音效与 `G` 键网格叠加 |
-| `assets/starter/motion-lab.html` | 动效手册：boot 开场、12 种动效模式、17 板块、音效馆、自动巡演（交互与动效参考库） |
+| `assets/starter/motion-lab.html` | **动效手册**：boot 开场、12 种动效模式、19 板块、音效馆、自动巡演；已注入印刷版式层（版口/页码/裁切角标） |
+| `assets/dossier/lab-retrofit.css` + `.js` | 手册的版式补丁（可重复注入，`<!--LAB-RETROFIT-->` 标记之间替换，不改演示逻辑） |
 | `assets/starter/scene3d.html` | Three.js 3D 档案阵列（40 份档案、玻璃折射、波浪、详情面板） |
 | `references/design-tokens.md` | 精确色板、字体系统、缓动函数（JS+CSS）、节拍网格、1080p 布局基准 |
 | `references/motion-patterns.md` | 12 种动效模式详解与实现（乱码解码/打字机/CJK 滑入/里程计/警告板/进度绘制/HUD/故障转场等） |
