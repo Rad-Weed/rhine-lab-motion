@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHINE LAB — ARCHIVE DOSSIER / 档案集成 第一卷</title>
+<meta name="description" content="莱茵生命风格印刷档案册：网格、字阶、网点图版、套印错位、印章与装订的完整编辑设计系统。非官方同人作品。">
+<style>
+__INLINE_CSS__
+</style>
+<style>
+/* ══ 页面专属版式：封面 / 索引 / 图版 / 海报 / 版权页 ══ */
+.cover{padding-top:34px}
+.cover .cropmarks{position:absolute;inset:0;pointer-events:none}
+.cover-body{display:grid;grid-template-columns:1fr 262px;gap:38px;margin-top:30px;align-items:start}
+@media (max-width:900px){.cover-body{grid-template-columns:1fr}}
+.cv-rule{height:1px;background:var(--ink);margin:20px 0 14px}
+.cv-lockup{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.cv-lockup span{font:600 10.5px/1 var(--f-mono);letter-spacing:.30em;text-transform:uppercase}
+.cv-cn{max-width:30em;margin-top:22px}
+.cv-right{position:relative;padding-top:4px}
+.cv-inf{width:100%;height:auto;display:block;margin-bottom:18px}
+.cv-inf circle{fill:none;stroke:var(--ink);stroke-width:2.4;opacity:.9}
+.cv-inf .ghost{stroke:var(--accent);stroke-width:1;opacity:.5}
+.meta-rows{border-top:1px solid var(--ink)}
+.meta-rows div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--hair-2)}
+.meta-rows dt{font:500 8.5px/1.6 var(--f-mono);letter-spacing:.2em;color:var(--mute);text-transform:uppercase}
+.meta-rows dd{font:600 9.5px/1.6 var(--f-mono);letter-spacing:.1em;text-align:right}
+.barcode{width:100%;height:auto;display:block;margin-top:14px;image-rendering:pixelated}
+.cv-sticker{right:-6px;bottom:96px;max-width:190px;line-height:1.7}
+.cv-tape{left:-26px;top:-12px}
+.cv-marks{display:flex;align-items:center;justify-content:space-between;margin-top:26px;gap:16px;flex-wrap:wrap}
+.cv-foot{display:flex;justify-content:space-between;gap:16px;margin-top:16px;flex-wrap:wrap}
+
+/* 索引 */
+.ix{margin-top:6px}
+.ix-row{display:flex;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid var(--hair-2);text-decoration:none;color:inherit}
+.ix-row .code{font:700 10px/1 var(--f-mono);letter-spacing:.14em;color:var(--accent);width:26px;flex:none}
+.ix-row .nm{font:600 13px/1.4 var(--f-sans);letter-spacing:.03em}
+.ix-row .en{font:500 8.5px/1 var(--f-mono);letter-spacing:.2em;color:var(--mute);text-transform:uppercase}
+.ix-row .lead{flex:1;border-bottom:1px dotted var(--hair);transform:translateY(-3px)}
+.ix-row .pg{font:600 10px/1 var(--f-mono);letter-spacing:.12em;color:var(--ink-2)}
+.ix-row:hover .nm{color:var(--accent)}
+.abstract{margin-top:26px;padding-top:14px;border-top:1px solid var(--ink)}
+.abstract .t-body{column-count:2;column-gap:26px}
+@media (max-width:760px){.abstract .t-body{column-count:1}}
+.big-no{position:relative;text-align:right}
+.big-no .t-outline{display:block;margin-top:-22px}
+.big-no .anno{position:absolute;right:0;top:46%;width:64%;height:1px;background:var(--hair)}
+.big-no .anno::before{content:"";position:absolute;left:0;top:-3px;width:7px;height:7px;border:1px solid var(--accent);border-radius:50%}
+.big-no .anno span{position:absolute;right:0;top:-18px;font:500 8px/1 var(--f-mono);letter-spacing:.2em;color:var(--mute)}
+
+/* 正文跨栏 */
+.body-cols{column-count:2;column-gap:30px}
+@media (max-width:760px){.body-cols{column-count:1}}
+.dropcap::first-letter{
+  float:left;font:700 54px/.86 var(--f-disp);margin:4px 8px 0 0;color:var(--ink);
+  letter-spacing:-.03em;
+}
+.q-note{display:inline-block;font:600 9px/1 var(--f-mono);color:var(--accent);vertical-align:super}
+.pull{
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--hair);
+  padding:14px 0;margin:20px 0;font:600 15px/1.9 var(--f-sans);letter-spacing:.02em;
+}
+.pull em{font-style:normal;color:var(--accent)}
+
+/* 图版集 */
+.plates{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+@media (max-width:760px){.plates{grid-template-columns:1fr}}
+.plates .plate{aspect-ratio:4/3}
+.plates .plate:nth-child(2){transform:translateY(18px)}
+.plates .plate:nth-child(3){transform:translateY(-10px)}
+.plates .plate:nth-child(4){transform:translateY(8px)}
+.plates .plate:hover{transform:translateY(-4px)}
+
+/* 海报版 */
+.poster .glyphs{display:flex;gap:.06em;flex-wrap:wrap;align-items:flex-end;margin:26px 0 10px}
+.poster .glyphs span{font:700 clamp(64px,13.5vw,190px)/.86 var(--f-disp);letter-spacing:-.03em;display:inline-block}
+.poster .glyphs span:nth-child(2){color:var(--accent)}
+.poster .cap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:34px;border-top:1px solid rgba(246,243,235,.22);padding-top:16px}
+@media (max-width:820px){.poster .cap-grid{grid-template-columns:repeat(2,1fr)}}
+.poster .cap-grid div{font:500 8.5px/1.9 var(--f-mono);letter-spacing:.16em;color:rgba(246,243,235,.6);text-transform:uppercase}
+.poster .cap-grid b{display:block;color:var(--inv);letter-spacing:.24em;margin-bottom:4px}
+.poster .p-seal{position:absolute;right:48px;top:52px;transform:rotate(8deg)}
+.poster .p-seal .stamp{border-color:var(--accent);color:var(--accent);mix-blend-mode:screen;opacity:.9}
+.poster .sticker{background:#f7f4ec;right:64px;bottom:54px;transform:rotate(-6deg)}
+
+/* 版权页 */
+.colo{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;margin-top:8px}
+@media (max-width:820px){.colo{grid-template-columns:repeat(2,1fr)}}
+.colo h4{font:600 8.5px/1 var(--f-mono);letter-spacing:.24em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.colo p,.colo li{font:500 9.5px/1.95 var(--f-mono);letter-spacing:.04em;color:var(--ink-2);list-style:none}
+.colo a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--accent)}
+.colo a:hover{color:var(--accent)}
+.disc{border-top:1px solid var(--ink);margin-top:22px;padding-top:12px;font:500 9px/1.9 var(--f-mono);letter-spacing:.06em;color:var(--mute)}
+</style>
+<script>
+/* 防白屏保险：主脚本若异常，8 秒后强制拆封并显示全部内容 */
+setTimeout(function () {
+  var b = document.body, ov = document.getElementById('unseal');
+  if (ov && !ov.classList.contains('off')) { ov.classList.add('off'); }
+  if (b) b.classList.remove('locked');
+  document.querySelectorAll('[data-rev]').forEach(function (el) { el.classList.add('in'); });
+}, 8000);
+</script>
+</head>
+<body class="locked">
+
+<div class="binding" aria-hidden="true"><i style="top:16%"></i><i style="top:36%"></i><i style="top:56%"></i><i style="top:76%"></i></div>
+
+<!-- ══ 拆封 ══ -->
+<div class="unseal" id="unseal" role="dialog" aria-label="拆封档案">
+  <div class="band"><span>RHINE LAB.LLC — ARCHIVE TRANSFER</span><span>SEALED · DO NOT BEND</span></div>
+  <div class="unseal-inner">
+    <button class="seal" id="seal" aria-label="拆封">
+      <span class="mark">∞</span>
+      <span class="un">UNSEAL</span>
+      <span class="sub">CL.IV / 第 7 次修订</span>
+    </button>
+    <p class="hint">点击印章拆封 · <b>ENTER</b> · 开封后自动登记</p>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="inner">
+    <div class="logo">RHINE LAB<span class="inf">∞</span></div>
+    <div class="mh-sub"><span data-scramble>SYNTHESIZE INFORMATION</span><br><span data-scramble>ANALYSIS OS</span></div>
+    <nav class="mh-nav" id="nav">
+      <a href="#s00" class="on"><i>00</i>封面</a>
+      <a href="#s01"><i>01</i>索引</a>
+      <a href="#s02"><i>02</i>正文</a>
+      <a href="#s03"><i>03</i>数据</a>
+      <a href="#s04"><i>04</i>图版</a>
+      <a href="#s05"><i>05</i>海报</a>
+      <a href="#s06"><i>06</i>版权</a>
+      <a href="motion-lab.html"><i>↗</i>动效手册</a>
+      <a href="scene3d.html"><i>↗</i>3D 档案库</a>
+    </nav>
+    <div class="mh-meta">CAT. RL-X000<br>CL. IV / REV. 07</div>
+  </div>
+</header>
+
+<main class="doc" id="doc">
+
+  <!-- ══════════ 00 封面 ══════════ -->
+  <section class="spread cover" id="s00">
+    <div class="cropmarks"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+    <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap" class="t-micro">
+      <span>RHINE LAB.LLC / 档案集成 · 第一卷</span>
+      <span>INTERNAL CIRCULATION ONLY</span>
+    </div>
+
+    <div class="cover-body">
+      <div class="cv-left">
+        <div class="t-micro" data-rev>VOL. 01 — ORIGINIUM ARTS &amp; LIFE SCIENCE</div>
+        <h1 class="t-cover" data-rev style="--d:90ms">RHINE<br>LAB<span class="accent">.</span></h1>
+        <div class="cv-rule" data-rev style="--d:170ms"></div>
+        <div class="cv-lockup" data-rev style="--d:230ms">
+          <span data-scramble>SYNTHESIZE INFORMATION</span>
+          <span data-scramble>ANALYSIS OS</span>
+          <span class="accent">＋ − ＝ ∞</span>
+        </div>
+        <p class="t-lead cv-cn" data-rev style="--d:300ms">
+          本卷收录第 7 次修订后的全部观测记录。档案经四名主任级研究员会签，
+          按 IV 级保密协议归档；复制、外借与引用均须登记。
+        </p>
+        <p class="t-body cv-cn" data-rev style="--d:360ms">
+          记录的排列方式即结论本身：先计量，再判断；先归档，再命名。
+          任何未标注来源的数值一律视为无效观测。
+        </p>
+        <div class="cv-kw" data-rev style="--d:390ms">
+          <span>KEYWORDS</span><span>ORIGINIUM ARTS / SYNERGY / DOSSIER / CL.IV / REV.07</span>
+        </div>
+        <div class="cv-marks" data-rev style="--d:440ms">
+          <div class="reg" aria-hidden="true"><i></i><b></b></div>
+          <div class="colorbar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="t-micro">REG. MARK / COLOR CONTROL · 105g</div>
+        </div>
+      </div>
+
+      <aside class="cv-right">
+        <svg class="cv-inf" viewBox="0 0 220 120" aria-hidden="true">
+          <circle class="ghost" cx="82" cy="60" r="31"></circle>
+          <circle class="ghost" cx="138" cy="60" r="31"></circle>
+          <circle cx="82" cy="60" r="31" data-inf-1></circle>
+          <circle cx="138" cy="60" r="31" data-inf-2></circle>
+        </svg>
+        <dl class="meta-rows">
+          <div><dt>CAT. NO.</dt><dd>RL-X000</dd></div>
+          <div><dt>CLASS</dt><dd>IV / 限制</dd></div>
+          <div><dt>REVISION</dt><dd>07</dd></div>
+          <div><dt>PAGES</dt><dd>42</dd></div>
+          <div><dt>ISSUED</dt><dd>2026.10.21</dd></div>
+          <div><dt>SIGN.</dt><dd>4 / 4 会签</dd></div>
+        </dl>
+        <canvas class="barcode" data-barcode="RL-X000-2026-IV" width="440" height="88"></canvas>
+        <div class="t-micro" style="margin-top:6px;text-align:right">RL-X000-2026-IV</div>
+        <div class="sticker cv-sticker">
+          <b>已归档 / FILED</b><br>2026.10.21 · 第 7 次修订<br>复制须登记
+        </div>
+        <div class="tape cv-tape"></div>
+      </aside>
+    </div>
+
+    <div class="cv-foot">
+      <div class="t-micro">PAPER 105g 胶版 / SINGLE INK + SPOT ORANGE</div>
+      <div class="t-micro">PRINTED BY RHINE LAB PRINT BUREAU</div>
+      <div class="t-micro accent">DO NOT DUPLICATE</div>
+    </div>
+    <div class="fold" style="left:63%"><em>FOLD</em></div>
+    <div class="folio">P.00 — COVER</div>
+  </section>
+
+  <!-- ══════════ 01 索引 ══════════ -->
+  <section class="spread" id="s01">
+    <div class="rh"><span class="no">01</span><span class="ti">INDEX / 目录</span><span class="en">DEPT. RECORDS · 5 CHANNELS</span></div>
+    <div class="g">
+      <div class="c1-7">
+        <div class="ix" data-rev>
+          <a class="ix-row" href="#s02"><span class="code">OA</span><span class="nm">源石技艺部 · 应用总纲</span><span class="en">ORIGINIUM ARTS</span><span class="lead"></span><span class="pg">04</span></a>
+          <a class="ix-row" href="#s03"><span class="code">BT</span><span class="nm">生命科学部 · 临床前记录</span><span class="en">BIOTECH</span><span class="lead"></span><span class="pg">09</span></a>
+          <a class="ix-row" href="#s04"><span class="code">DF</span><span class="nm">防御工程部 · 应力测试</span><span class="en">DEFENSE</span><span class="lead"></span><span class="pg">14</span></a>
+          <a class="ix-row" href="#s04"><span class="code">EN</span><span class="nm">能源转化部 · 供能效率</span><span class="en">ENERGY</span><span class="lead"></span><span class="pg">21</span></a>
+          <a class="ix-row" href="#s04"><span class="code">LG</span><span class="nm">后勤中枢 · 流转与巡检</span><span class="en">LOGISTICS</span><span class="lead"></span><span class="pg">28</span></a>
+        </div>
+        <div class="abstract" data-rev style="--d:120ms">
+          <div class="t-micro" style="margin-bottom:8px">ABSTRACT / 摘要</div>
+          <div class="t-body">
+            本卷以「可复核」为唯一编排原则。凡进入正文的数值，均须附观测条件、采样批次与偏差区间；凡未通过双盲复核的结论，一律降级为脚注并以<em class="accent" style="font-style:normal">橙色标记</em>。
+          </div>
+          <div class="t-body">
+            图像部分采用 45° 单色网点制版，网点直径随密度连续变化，不作锐化处理——保留观测时的噪声，是档案可信度的一部分。
+          </div>
+        </div>
+      </div>
+
+      <div class="c9-12 big-no" data-rev style="--d:200ms">
+        <div class="t-micro" style="text-align:right">TOTAL RECORDS</div>
+        <span class="t-outline" data-ode="42">42</span>
+        <div class="anno">含附表 18 / 图版 24</div>
+        <div class="sidenote" style="margin-top:26px">
+          <b>注 01</b>　编号连续，缺号即销毁。<br>
+          <b>注 02</b>　REV.05 曾撤回两项结论，见 P.11 修订栏。<br>
+          <b>注 03</b>　本卷不含附录 C（权限不足）。
+        </div>
+      </div>
+    </div>
+    <div class="folio">P.01 — INDEX</div>
+  </section>
+
+  <!-- ══════════ 02 正文 ══════════ -->
+  <section class="spread" id="s02">
+    <div class="rh"><span class="no">02</span><span class="ti">DOSSIER / 研究记录</span><span class="en">OA-0417 · REV.07</span></div>
+    <div class="g">
+      <div class="c1-7">
+        <h2 class="t-h1" data-rev style="margin-bottom:14px">源石技艺应用总纲<br><span class="t-cap" style="display:block;margin-top:8px">GENERAL SPECIFICATION OF ORIGINIUM ARTS</span></h2>
+        <div class="body-cols t-body">
+          <p class="dropcap" data-rev style="--d:60ms">术式回路的稳定性并不取决于输出上限，而取决于回路在负载变化时的收敛速度。第七次修订将收敛窗口从 <span class="mono">1.8s</span> 收窄至 <span class="mono">1.2s</span>，代价是法阵边缘出现<span class="redact">低频共振</span>的阈值下降约 <span class="mono">6.4%</span><span class="q-note">[2]</span>。</p>
+          <p data-rev style="--d:120ms">三次对照实验均在受控低温工况下进行。对照组采用旧版回路，实验组的差异仅限于导流层的<span class="redact">材料替换</span>；其余参数（供能、环境、操作者）保持一致。</p>
+          <p data-rev style="--d:180ms">结论：效率提升 <span class="mono">8.3%</span>，但长期稳定性仍待验证。建议在下一年度预算周期内追加三组实验，并同步更新风险评估模型<span class="q-note">[3]</span>。</p>
+        </div>
+        <div class="pull" data-rev style="--d:240ms">「先计量，再判断。<em>未标注来源的数值，一律无效。</em>」</div>
+        <div class="footnote" data-rev style="--d:300ms">
+          <sup>[2]</sup> 边缘共振的观测方法见 P.06，采样率 48kHz。<br>
+          <sup>[3]</sup> 风险模型版本 R7-3；旧版已于 REV.05 撤回，撤回记录附于 P.11。
+        </div>
+      </div>
+
+      <div class="c8-12">
+        <figure class="plate" data-rev style="--d:120ms;aspect-ratio:5/4">
+          <canvas data-halftone="figure" data-cell="4.4"></canvas>
+          <span class="plate-tag">FIG.02</span>
+          <figcaption class="plate-cap">实验体观测影像 / SUBJECT 07 — 45° 单色网点，密度 38%</figcaption>
+        </figure>
+        <div class="figcap"><b>FIG.02</b><span>网点直径随局部密度连续变化；橙色点为制版套准标记的溢出，属工艺痕迹而非数据。</span></div>
+
+        <div data-rev style="position:relative;margin-top:26px;--d:240ms">
+          <div class="sidenote">
+            <b>边注</b>　观测者在记录第 12 分钟出现手部震颤，数据段已标注为<span class="strike">可用</span>待复核。
+          </div>
+          <div class="stamp" style="position:absolute;right:0;bottom:-42px">已阅 / APPROVED</div>
+          <div class="tape" style="left:-14px;bottom:-30px;transform:rotate(2.5deg)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="folio">P.04 — OA-0417</div>
+  </section>
+
+  <!-- ══════════ 03 数据 ══════════ -->
+  <section class="spread" id="s03">
+    <div class="rh"><span class="no">03</span><span class="ti">DATA PLATE / 数据</span><span class="en">TAB.03 · FIG.03</span></div>
+    <div class="g">
+      <div class="c1-6" data-rev>
+        <table class="tab">
+          <caption>TAB.03 — 能效迭代记录 / EFFICIENCY ITERATION</caption>
+          <thead><tr><th>REV.</th><th>工况 ℃</th><th class="n">输出 GW·h⁻¹</th><th class="n">偏差 %</th><th class="n">判定</th></tr></thead>
+          <tbody>
+            <tr><td>R1</td><td>−12.0</td><td class="n">0.6410</td><td class="n">±2.4</td><td class="n">基线</td></tr>
+            <tr><td>R3</td><td>−12.0</td><td class="n">0.6832</td><td class="n">±1.9</td><td class="n">通过</td></tr>
+            <tr><td>R5</td><td>−8.5</td><td class="n">0.7114</td><td class="n">±3.1</td><td class="n">撤回</td></tr>
+            <tr class="hot"><td>R7</td><td>−12.0</td><td class="n">0.7731</td><td class="n">±0.8</td><td class="n">待验证</td></tr>
+            <tr><td>R7-b</td><td>−18.0</td><td class="n">0.7509</td><td class="n">±1.1</td><td class="n">观察中</td></tr>
+          </tbody>
+        </table>
+        <div class="footnote">采样批次 B-2026-10 / n=12 / 双盲复核；R5 因采样偏差撤回，不参与趋势拟合。</div>
+      </div>
+
+      <div class="c8-12" data-rev style="--d:120ms">
+        <div class="t-micro">ANCHOR VALUE / 主读数</div>
+        <div class="t-num"><span data-ode="0.7731" data-dec="4">0.7731</span><span class="mono" style="font-size:12px;letter-spacing:.1em;color:var(--mute)"> GW·h⁻¹</span></div>
+        <div class="t-cap" style="margin-top:2px">R7 / 偏差 ±0.8% · 待验证</div>
+      </div>
+    </div>
+
+    <div class="g" data-rev style="margin-top:30px;--d:180ms">
+      <div class="c1-12">
+        <svg class="chart" viewBox="0 0 1080 210" aria-label="能效迭代趋势">
+          <line class="axis" x1="0" y1="180" x2="1080" y2="180"></line>
+          <line class="axis" x1="0" y1="10" x2="0" y2="180"></line>
+          <g class="grid">
+            <line x1="0" y1="140" x2="1080" y2="140"></line>
+            <line x1="0" y1="100" x2="1080" y2="100"></line>
+            <line x1="0" y1="60" x2="1080" y2="60"></line>
+            <line x1="0" y1="20" x2="1080" y2="20"></line>
+          </g>
+          <polyline class="line" points="20,150 290,128 560,104 830,38 1060,58"></polyline>
+          <circle class="dot" cx="830" cy="38" r="4.5"></circle>
+          <line x1="830" y1="38" x2="830" y2="180" stroke="rgba(233,82,28,.5)" stroke-width="1" stroke-dasharray="3 4"></line>
+          <text x="842" y="30" class="note">R7 — 0.7731</text>
+          <text x="20" y="198">R1</text>
+          <text x="290" y="198">R3</text>
+          <text x="560" y="198">R5</text>
+          <text x="830" y="198">R7</text>
+          <text x="1032" y="198">R7-b</text>
+          <text x="0" y="8">GW·h⁻¹</text>
+        </svg>
+        <div class="figcap"><b>FIG.03</b><span>趋势按 R1 / R3 / R7 / R7-b 拟合，R5 已撤回故留空。</span></div>
+      </div>
+    </div>
+    <div class="folio">P.09 — TAB.03</div>
+  </section>
+
+  <!-- ══════════ 04 图版集 ══════════ -->
+  <section class="spread" id="s04">
+    <div class="rh"><span class="no">04</span><span class="ti">PLATES / 图版</span><span class="en">24 PLATES · 45° SCREEN</span></div>
+    <div class="g">
+      <div class="c1-4">
+        <h2 class="t-h2" data-rev>图版按 45° 单色网点制版</h2>
+        <p class="t-body" data-rev style="--d:60ms;margin-top:10px">
+          网点直径 0.8–4.4px，随局部密度连续变化；不锐化、不插值。
+          橙色点仅用于制版套准，出现位置不构成数据。
+        </p>
+        <div class="sidenote" data-rev style="--d:120ms;margin-top:18px">
+          <b>PL.01</b> 观测阵列 / ORBIT<br>
+          <b>PL.02</b> 干涉条纹 / WAVE<br>
+          <b>PL.03</b> 噪声底 / NOISE<br>
+          <b>PL.04</b> 实验体 / SUBJECT
+        </div>
+      </div>
+      <div class="c6-12">
+        <div class="plates">
+          <figure class="plate" data-rev style="--d:80ms"><canvas data-halftone="orbit" data-cell="4"></canvas><span class="plate-tag">PL.01</span><figcaption class="plate-cap">观测阵列 · ORBIT</figcaption></figure>
+          <figure class="plate" data-rev style="--d:160ms"><canvas data-halftone="wave" data-cell="4"></canvas><span class="plate-tag">PL.02</span><figcaption class="plate-cap">干涉条纹 · WAVE</figcaption></figure>
+          <figure class="plate" data-rev style="--d:240ms"><canvas data-halftone="noise" data-cell="3.6"></canvas><span class="plate-tag">PL.03</span><figcaption class="plate-cap">噪声底 · NOISE FLOOR</figcaption></figure>
+          <figure class="plate" data-rev style="--d:320ms"><canvas data-halftone="figure" data-cell="5"></canvas><span class="plate-tag">PL.04</span><figcaption class="plate-cap">实验体 · SUBJECT 07</figcaption></figure>
+        </div>
+      </div>
+    </div>
+    <div class="folio">P.14 — PLATES</div>
+  </section>
+
+  <!-- ══════════ 05 海报 ══════════ -->
+  <section class="spread poster" id="s05">
+    <div class="cropmarks"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+    <div class="rh"><span class="no">05</span><span class="ti">EXHIBITION PLATE / 展陈</span><span class="en">SECTION 05 — SYNERGY · 1:16</span></div>
+    <div class="glyphs" data-rev>
+      <span>＋</span><span>−</span><span>＝</span><span>∞</span>
+    </div>
+    <div class="t-cap" style="color:rgba(246,243,235,.62);letter-spacing:.22em">加知识 · 减边界 · 等于无限</div>
+    <div class="cap-grid" data-rev style="--d:140ms">
+      <div><b>01 / METHOD</b>先归档，再命名</div>
+      <div><b>02 / SCREEN</b>45° 单色网点</div>
+      <div><b>03 / INK</b>单黑 + 专橙</div>
+      <div><b>04 / TONE</b>冷静 · 可复核</div>
+    </div>
+    <div class="p-seal"><span class="stamp">展陈 2026 / RHINE</span></div>
+    <div class="sticker">＋ − ＝ ∞<br><span class="accent">SYNERGY</span></div>
+    <div class="fold" style="left:50%;border-color:rgba(246,243,235,.22);color:rgba(246,243,235,.45)"><em>FOLD</em></div>
+    <div class="folio">P.21 — PLATE 05</div>
+  </section>
+
+  <!-- ══════════ 06 版权页 ══════════ -->
+  <section class="spread" id="s06">
+    <div class="rh"><span class="no">06</span><span class="ti">COLOPHON / 版权页</span><span class="en">PRINT SPECIFICATION</span></div>
+    <div class="colo" data-rev>
+      <div>
+        <h4>出版 / ISSUE</h4>
+        <p>RHINE LAB.LLC<br>档案集成 第一卷<br>第 7 次修订<br>2026.10.21</p>
+      </div>
+      <div>
+        <h4>印刷 / PRINT</h4>
+        <p>单色胶印 + 专橙<br>105g 米色胶版纸<br>45° 网点 · 175 lpi<br>套准误差 ≤0.1mm</p>
+      </div>
+      <div>
+        <h4>字体 / TYPE</h4>
+        <p>拉丁 Helvetica Neue<br>中文 思源黑体 / 苹方<br>数据 JetBrains Mono<br>字距随字号光学收紧</p>
+      </div>
+      <div>
+        <h4>声音 / AUDIO</h4>
+        <p>全部由 WebAudio<br>振荡器与噪声实时合成<br>翻页 / 盖章 / 划擦 / 撕封<br>无任何原片采样</p>
+      </div>
+    </div>
+
+    <div class="colo" data-rev style="margin-top:24px;--d:120ms">
+      <div style="grid-column:1/3">
+        <h4>参考出处 / SOURCES</h4>
+        <ul>
+          <li>laiyin-video — 同人逐帧渲染短片「＋−＝∞」· AGPL-3.0 · <a href="https://github.com/tmc5csxr9m-cpu/laiyin-video" target="_blank" rel="noopener">github</a></li>
+          <li>RhineLabUI — 交互式 3D 终端复刻 · MIT · <a href="https://github.com/LBEILC/RhineLabUI" target="_blank" rel="noopener">github</a></li>
+          <li>rhine-lab-art — 交互艺术网站 · <a href="https://github.com/reverieach/rhine-lab-art" target="_blank" rel="noopener">github</a></li>
+          <li>Multiplane — 无头 HTML 视频渲染器 · Apache-2.0 · <a href="https://github.com/LBEILC/Multiplane" target="_blank" rel="noopener">github</a></li>
+        </ul>
+      </div>
+      <div style="grid-column:3/5">
+        <h4>登记 / REGISTRY</h4>
+        <p>CAT. RL-X000<br>CL. IV — 限制<br>REV. 07 / 42 页<br>复制须登记 · 外借须会签</p>
+        <div class="stamp ink" style="margin-top:12px">REV.07 / 已校</div>
+      </div>
+    </div>
+
+    <div class="disc" data-rev style="--d:180ms">
+      《明日方舟》莱茵生命 © Hypergryph / 鹰角网络。本页为非官方同人风格演示，与官方无隶属关系；
+      页面中的机构、编号、数值与结论均为虚构。音效为 WebAudio 合成，未使用任何原片采样；
+      字体优先使用系统字体，未分发任何商业字体文件。
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px;gap:16px;flex-wrap:wrap">
+      <div class="t-micro">RHINE LAB ARCHIVE · FAN STYLE KIT · NOT AFFILIATED WITH HYPERGRYPH</div>
+      <canvas data-barcode="RL-X000-REV07" width="300" height="60" style="width:150px;height:auto"></canvas>
+    </div>
+    <div class="folio">P.42 — COLOPHON</div>
+  </section>
+
+</main>
+
+<div class="hud">
+  <span>X <b id="hx">0000</b> · Y <b id="hy">0000</b></span>
+  <span>·</span>
+  <span id="hsec">SEC.00</span>
+  <button id="gridbtn" title="网格/基线 (G)">GRID</button>
+</div>
+<div class="grid-overlay" id="gridov"><div class="base"></div><div class="cols" id="gridcols"></div></div>
+
+<script>
+__INLINE_JS__
+</script>
+</body>
+</html>
