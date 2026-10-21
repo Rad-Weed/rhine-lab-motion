@@ -37,7 +37,7 @@
 | `assets/starter/index.html` | **档案册（旗舰 / flagship）**：七版面印刷档案册——封面 / 索引 / 正文 / 数据 / 图版 / 海报 / 版权页；含网点制版、套准裁切、贴纸胶带印章、拆封开场、`G` 键网格叠加、21 种音效 |
 | `assets/starter/motion-lab.html` | **动效手册 / motion lab**：终端登录开场 + 19 个编号板块（排版/乱码/打字机/里程计/解密/警告板/故障转场/音效馆/FUI 语法等）+ 自动巡演 |
 | `assets/dossier/` | 版式基座**源文件**：`dossier.css`（网格·字阶·印刷件）、`dossier.js`（音频总线·网点·拆封·入场）、`index.src.html`（七版面模板） |
-| `assets/starter/scene3d.html` | **∞ 档案星座 / archive constellation**：72 张纸页沿双纽线等弧长堆叠成悬浮 ∞ 标志；靠近鼓起波浪、点击抽出、再点展开档案内容（Three.js，需联网） |
+| `assets/starter/scene3d.html` | **∞ 档案雕塑 / archive sculpture**：56 站点 × 3 层纸页沿双纽线径向外扇成**有厚度的立体标志**（前沿印刷、后层素纸、环内 ± 符号）；靠近鼓起波浪、点击抽出、再点展开档案内容；3/4 机位可拖拽环绕（Three.js，需联网） |
 
 两个页面均为**单文件自包含**（CSS/JS 内联），浏览器直接打开即可运行。3D 页需联网加载 three.js CDN。
 

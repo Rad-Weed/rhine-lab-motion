@@ -1,6 +1,6 @@
 ---
 name: rhine-lab-motion
-version: 0.14.2
+version: 0.14.3
 description: 莱茵生命（明日方舟 Rhine Lab）视觉与动效风格技能。一句话触发："生成莱茵生命风格"、"莱茵生命风格"、"莱茵生命动效"、"Rhine Lab 风格"、"科研档案风 UI"、"磁带盒未来主义"、"白橙科技感"。核心不是组件而是**编辑设计系统**：一册被投影到屏幕上的印刷档案——12 栏网格/8px 基线、字号阶梯与字距光学曲线、单版面大锚点构图、45° 网点制版、套印错位、裁切/套准标记、贴纸胶带印章、装订与涂抹条，以及翻页/盖章/撕封条的纸质音效；附动效模式库、3D 档案阵列、终端开场、出处与许可表。
 agent_created: true
 ---
@@ -56,7 +56,7 @@ agent_created: true
 | `assets/starter/index.html` | **旗舰演示（自包含单页）**：封面→索引→正文→数据→图版→海报→版权页，含 21 种音效与 `G` 键网格叠加 |
 | `assets/starter/motion-lab.html` | **动效手册**：boot 开场、12 种动效模式、19 板块、音效馆、自动巡演；已注入印刷版式层（版口/页码/裁切角标） |
 | `assets/dossier/lab-retrofit.css` + `.js` | 手册的版式补丁（可重复注入，`<!--LAB-RETROFIT-->` 标记之间替换，不改演示逻辑） |
-| `assets/starter/scene3d.html` | **∞ 档案星座**：72 张纸页按等弧长沿双纽线堆叠成悬浮标志；鼠标靠近鼓起波浪、点击抽出、再点展开档案页（Three.js，需联网） |
+| `assets/starter/scene3d.html` | **∞ 档案雕塑**：56 站点 × 3 层纸页沿双纽线径向外扇成有厚度的立体标志（前沿带印刷、后层素纸，环内 ± 符号）；靠近鼓起波浪、点击抽出、再点展开档案页；3/4 机位 + 拖拽环绕（Three.js，需联网） |
 | `references/design-tokens.md` | 精确色板、字体系统、缓动函数（JS+CSS）、节拍网格、1080p 布局基准 |
 | `references/motion-patterns.md` | 12 种动效模式详解与实现（乱码解码/打字机/CJK 滑入/里程计/警告板/进度绘制/HUD/故障转场等） |
 | `references/advanced-3d-audio.md` | 3D 参数、解密动画、三轨 BGM、17 类交互音、Novecento 排版实测、暗色主题、Multiplane 管线 |

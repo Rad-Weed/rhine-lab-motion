@@ -129,7 +129,7 @@ body{
 
 <header class="hud hud-top">
   <div class="mark"><b>RHINE LAB</b><i>∞</i></div>
-  <div class="sub">ARCHIVE CONSTELLATION / 档案星座<br>SECTION 00 — <span>72 SHEETS · LEMNISCATE</span></div>
+  <div class="sub">ARCHIVE CONSTELLATION / 档案星座<br>SECTION 00 — <span>168 SHEETS · 56 STATIONS</span></div>
 </header>
 <a class="hud-back" href="index.html">◂ 档案册 DOSSIER</a>
 
@@ -138,7 +138,7 @@ body{
   <div><span class="key">DRAG</span>环绕　<span class="key">WHEEL</span>缩放　<span class="key">ESC</span>归位</div>
 </div>
 <div class="hud hud-right">
-  <div>SHEETS <b>72</b> / LAYERS <b>3</b></div>
+  <div>SHEETS <b>168</b> / STATIONS <b>56</b></div>
   <div>SELECTED <b class="sel" id="hudsel">—</b></div>
 </div>
 
@@ -329,6 +329,43 @@ function sheetTexture(d, seed) {
   return t;
 }
 
+/* ── 素纸（后层用）：只留极淡的印刷痕迹 ───────────────────── */
+function plainTexture() {
+  const W = 448, H = 302;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  x.fillStyle = "#f3f0e7"; x.fillRect(0, 0, W, H);
+  for (let i = 0; i < 700; i++) {
+    x.fillStyle = "rgba(21,21,19," + (0.008 + hash(i) * 0.014) + ")";
+    x.fillRect(hash(i * 1.3) * W, hash(i * 2.7) * H, 1, 1);
+  }
+  x.strokeStyle = "rgba(21,21,19,.10)"; x.lineWidth = 2; x.strokeRect(7, 7, W - 14, H - 14);
+  x.fillStyle = "rgba(21,21,19,.14)";
+  let bx = 24;
+  for (let i = 0; i < 24; i++) {
+    const w = 1 + Math.floor(hash(i + 7) * 3);
+    x.fillRect(bx, 30, w, 30);
+    bx += w + 3 + Math.floor(hash(i + 31) * 3);
+  }
+  x.fillStyle = "rgba(21,21,19,.18)"; x.font = "600 10px 'JetBrains Mono',Consolas,monospace";
+  x.fillText("RHINE LAB / ARCHIVE STACK", 24, H - 26);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return t;
+}
+
+/* ── ± 环内符号 ─────────────────────────────────────────────── */
+function glyphTexture(ch) {
+  const c = document.createElement("canvas"); c.width = 256; c.height = 256;
+  const x = c.getContext("2d");
+  x.fillStyle = "#151513";
+  if (ch === "+") { x.fillRect(100, 24, 56, 208); x.fillRect(24, 100, 208, 56); }
+  else { x.fillRect(24, 104, 208, 48); }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 /* ── 主程序 ─────────────────────────────────────────────────── */
 function boot() {
   const canvas = $("#c");
@@ -343,8 +380,8 @@ function boot() {
   scene.background = PAPER;
   scene.fog = new THREE.Fog(PAPER, 26, 62);
 
-  const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.5, 160);
-  const cam = { theta: 0, phi: 1.42, r: 27, vt: 0, vp: 0, rt: 27 };
+  const camera = new THREE.PerspectiveCamera(43, innerWidth / innerHeight, 0.5, 160);
+  const cam = { theta: 0.34, phi: 1.33, r: 22, vt: 0, vp: 0, rt: 22 };
   scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
   scene.add(new THREE.AmbientLight(0xffffff, 0.42));
   const key = new THREE.DirectionalLight(0xfff4e4, 1.15); key.position.set(7, 12, 14); scene.add(key);
@@ -393,46 +430,83 @@ function boot() {
     root.add(line);
   }
 
-  /* 文档 */
-  const N = 72, LAYERS = 3, PER = N / LAYERS;
-  const GEO = new THREE.BoxGeometry(2.55, 1.72, 0.062);
+  /* 文档：84 站点 × 3 层向外扇出，形成有厚度的 ∞ 雕塑 */
+  const STATIONS = 56, COPIES = 3, TOTAL = STATIONS * COPIES;
+  const GEO = new THREE.BoxGeometry(2.36, 1.6, 0.058);
   const TAB = new THREE.BoxGeometry(0.5, 0.09, 0.075);
-  const DATA = makeData(N);
+  const DATA = makeData(STATIONS);
+  const PLAIN = plainTexture();
+  const OFF_R = [0, 0.62, 1.2];         // 沿环心径向外
+  const OFF_Z = [0, -0.75, -1.5];       // 逐层后退 → 厚度
+  const OFF_S = [1, 1.05, 1.12];
   const docs = [];
 
-  for (let i = 0; i < N; i++) {
-    const layer = i % LAYERS;
-    const j = Math.floor(i / LAYERS);
-    const t = tAt((j / PER + layer / (PER * 3)) * ARC.L);
-    const p = lem(t);
-    const z = -layer * 0.16 + (hash(i) - 0.5) * 0.05;
+  for (let sIdx = 0; sIdx < STATIONS; sIdx++) {
+    const t = tAt((sIdx / STATIONS) * ARC.L);
+    const p = lem(t), ang = tangent(t);
+    // 扇出方向 = 远离本环环心（环内空隙因此保持干净）
+    const cx = p.x < 0 ? -6.1 : 6.1;
+    let nx = p.x - cx, ny = p.y;
+    const dl = Math.hypot(nx, ny);
+    if (dl < 1.3) { nx = Math.cos(ang + Math.PI / 2); ny = Math.sin(ang + Math.PI / 2); }
+    else { nx /= dl; ny /= dl; }
 
-    const tex = sheetTexture(DATA[i], i + 1);
-    const mEdge = new THREE.MeshStandardMaterial({ color: 0xe4decf, roughness: 0.96, metalness: 0, transparent: true });
-    const mBack = new THREE.MeshStandardMaterial({ color: 0xefeade, roughness: 0.97, metalness: 0, transparent: true });
-    const mFace = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.94, metalness: 0, transparent: true });
-    const mats = [mEdge, mEdge, mEdge, mEdge, mFace, mBack];
+    for (let k = 0; k < COPIES; k++) {
+      const i = sIdx * COPIES + k;
+      const front = k === 0;
+      const tex = front ? sheetTexture(DATA[sIdx], sIdx + 1) : PLAIN;
+      const edgeC = [0xe4decf, 0xe0dac9, 0xdbd4c2][k];
+      const faceC = [0xffffff, 0xefeade, 0xe9e3d4][k];
+      const mEdge = new THREE.MeshStandardMaterial({ color: edgeC, roughness: 0.96, metalness: 0, transparent: true });
+      const mBack = new THREE.MeshStandardMaterial({ color: 0xefeade, roughness: 0.97, metalness: 0, transparent: true });
+      const mFace = new THREE.MeshStandardMaterial({ map: tex, color: faceC, roughness: 0.95, metalness: 0, transparent: true });
+      const mats = [mEdge, mEdge, mEdge, mEdge, mFace, mBack];
 
-    const mesh = new THREE.Mesh(GEO, mats);
+      const g = new THREE.Group();
+      g.add(new THREE.Mesh(GEO, mats));
 
-    const tabMat = new THREE.MeshStandardMaterial({ color: 0xe9521c, roughness: 0.6, transparent: true });
-    const tab = new THREE.Mesh(TAB, tabMat);
-    tab.position.set(0, 0.865, 0.005);
+      let tabMat = { opacity: 1 };
+      if (front) {
+        tabMat = new THREE.MeshStandardMaterial({ color: 0xe9521c, roughness: 0.6, transparent: true });
+        const tab = new THREE.Mesh(TAB, tabMat);
+        tab.position.set(0, 0.865, 0.005);
+        g.add(tab);
+      }
 
-    const g = new THREE.Group();
-    g.add(mesh, tab);
-    g.position.set(p.x, p.y, z);
-    g.rotation.z = tangent(t) * 0.26 + (hash(i * 7.3) - 0.5) * 0.03;
-    g.rotation.x = (hash(i * 3.7) - 0.5) * 0.03;
-    root.add(g);
+      const gx = p.x + nx * OFF_R[k];
+      const gy = p.y + ny * OFF_R[k];
+      const gz = OFF_Z[k] + (hash(i) - 0.5) * 0.04;
+      g.position.set(gx, gy, gz);
+      g.rotation.z = ang * 0.24 + (k - 1) * 0.04 + (hash(i * 7.3) - 0.5) * 0.02;
+      g.rotation.y = (k - 1) * 0.11;      // 向外扇开 → 体积
+      g.rotation.x = (hash(i * 3.7) - 0.5) * 0.03;
+      const sc = OFF_S[k];
+      g.scale.setScalar(sc);
+      root.add(g);
 
-    docs.push({
-      i, data: DATA[i], group: g, mats: [mEdge, mBack, mFace], tabMat,
-      base: new THREE.Vector3(p.x, p.y, z),
-      baseRot: g.rotation.clone(),
-      z: 0, vz: 0, phase: hash(i * 5.1) * Math.PI * 2,
-      state: "in", startAt: performance.now() + i * 7, intro: 0,
-    });
+      docs.push({
+        i, station: sIdx, copy: k, front, data: DATA[sIdx], group: g,
+        mats: [mEdge, mBack, mFace], tabMat,
+        base: new THREE.Vector3(gx, gy, gz),
+        baseRot: g.rotation.clone(), baseScale: sc,
+        z: 0, vz: 0, phase: hash(i * 5.1) * Math.PI * 2,
+        state: "in", startAt: performance.now() + i * 4, intro: 0,
+      });
+    }
+  }
+
+  /* ± 环内符号 */
+  {
+    const mk = (ch, px) => {
+      const m = new THREE.Mesh(
+        new THREE.PlaneGeometry(2.1, 2.1),
+        new THREE.MeshBasicMaterial({ map: glyphTexture(ch), transparent: true, opacity: 0.9 })
+      );
+      m.position.set(px, 0.12, -0.7);
+      root.add(m);
+    };
+    mk("+", -6.1);
+    mk("-", 6.1);
   }
 
   /* 尘埃 */
@@ -490,7 +564,9 @@ function boot() {
     if (!hits.length) return null;
     let o = hits[0].object;
     while (o && !groups.includes(o)) o = o.parent;
-    return docs.find((d) => d.group === o) || null;
+    const hit = docs.find((d) => d.group === o);
+    if (!hit) return null;
+    return docs.find((d) => d.station === hit.station && d.front) || hit;
   }
   function worldPoint() {
     ray.setFromCamera(ndc, camera);
@@ -580,7 +656,7 @@ function boot() {
     $("#p-title").textContent = d.title;
     $("#p-lv").textContent = "LEVEL " + d.level;
     $("#p-rev").textContent = "REV." + String(d.rev).padStart(2, "0");
-    $("#p-idx").textContent = String(doc.i + 1).padStart(2, "0") + " / 72";
+    $("#p-idx").textContent = String(doc.station + 1).padStart(2, "0") + " / " + STATIONS;
     $("#p-pg").textContent = String(d.pages).padStart(2, "0");
     $("#p-b1").textContent = d.body1;
     $("#p-b2").textContent = d.body2;
@@ -636,7 +712,8 @@ function boot() {
 
     root.position.y = Math.sin(tAcc * 0.5) * 0.12;
     root.rotation.z = Math.sin(tAcc * 0.28) * 0.018;
-    root.rotation.x = Math.sin(tAcc * 0.22) * 0.012;
+    root.rotation.x = -0.055 + Math.sin(tAcc * 0.22) * 0.012;
+    root.rotation.y = -0.06 + Math.sin(tAcc * 0.17) * 0.02;
 
     camera.updateMatrixWorld();
     camera.getWorldQuaternion(qWorld);
@@ -668,6 +745,7 @@ function boot() {
           target = 2.45 * Math.exp(-(dist * dist) / (2 * 3.7 * 3.7));
         }
         if (d === hovered && !selected) target += 0.95;
+        target *= 1 - d.copy * 0.22;
         d.vz += ((target - d.z) * 58 - d.vz * 9) * dt;
         d.z += d.vz * dt;
         const breathe = Math.sin(tAcc * 1.1 + d.phase) * 0.03;
