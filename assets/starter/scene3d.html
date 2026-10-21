@@ -129,7 +129,7 @@ body{
 
 <header class="hud hud-top">
   <div class="mark"><b>RHINE LAB</b><i>∞</i></div>
-  <div class="sub">ARCHIVE CONSTELLATION / 档案星座<br>SECTION 00 — <span>168 SHEETS · 56 STATIONS</span></div>
+  <div class="sub">ARCHIVE CONSTELLATION / 档案星座<br>SECTION 00 — <span>280 SHEETS · 56 STATIONS</span></div>
 </header>
 <a class="hud-back" href="index.html">◂ 档案册 DOSSIER</a>
 
@@ -138,7 +138,7 @@ body{
   <div><span class="key">DRAG</span>环绕　<span class="key">WHEEL</span>缩放　<span class="key">ESC</span>归位</div>
 </div>
 <div class="hud hud-right">
-  <div>SHEETS <b>168</b> / STATIONS <b>56</b></div>
+  <div>SHEETS <b>280</b> / STATIONS <b>56</b></div>
   <div>SELECTED <b class="sel" id="hudsel">—</b></div>
 </div>
 
@@ -431,14 +431,14 @@ function boot() {
   }
 
   /* 文档：84 站点 × 3 层向外扇出，形成有厚度的 ∞ 雕塑 */
-  const STATIONS = 56, COPIES = 3, TOTAL = STATIONS * COPIES;
+  const STATIONS = 56, COPIES = 5, TOTAL = STATIONS * COPIES;
   const GEO = new THREE.BoxGeometry(2.36, 1.6, 0.058);
   const TAB = new THREE.BoxGeometry(0.5, 0.09, 0.075);
   const DATA = makeData(STATIONS);
-  const PLAIN = plainTexture();
-  const OFF_R = [0, 0.62, 1.2];         // 沿环心径向外
-  const OFF_Z = [0, -0.75, -1.5];       // 逐层后退 → 厚度
-  const OFF_S = [1, 1.05, 1.12];
+  const OFF_R = [0, 0, 0, 0, 0];        // 不横向扇出
+  const OFF_Y = [0, 0.19, -0.19, 0.36, -0.36];   // 竖向堆叠：上下错层
+  const OFF_Z = [0, -0.05, -0.05, -0.1, -0.1];   // 只做小幅前后错位
+  const OFF_S = [1, 0.99, 0.99, 0.97, 0.97];
   const docs = [];
 
   for (let sIdx = 0; sIdx < STATIONS; sIdx++) {
@@ -451,12 +451,12 @@ function boot() {
     if (dl < 1.3) { nx = Math.cos(ang + Math.PI / 2); ny = Math.sin(ang + Math.PI / 2); }
     else { nx /= dl; ny /= dl; }
 
+    const tex = sheetTexture(DATA[sIdx], sIdx + 1);   // 每站一张，五层共用
     for (let k = 0; k < COPIES; k++) {
       const i = sIdx * COPIES + k;
       const front = k === 0;
-      const tex = front ? sheetTexture(DATA[sIdx], sIdx + 1) : PLAIN;
-      const edgeC = [0xe4decf, 0xe0dac9, 0xdbd4c2][k];
-      const faceC = [0xffffff, 0xefeade, 0xe9e3d4][k];
+      const edgeC = [0xe4decf, 0xe2dccd, 0xe0dac9, 0xdbd4c2, 0xd8d1be][k];
+      const faceC = [0xffffff, 0xf4f0e6, 0xf0ebdf, 0xebe5d6, 0xe7e1d1][k];
       const mEdge = new THREE.MeshStandardMaterial({ color: edgeC, roughness: 0.96, metalness: 0, transparent: true });
       const mBack = new THREE.MeshStandardMaterial({ color: 0xefeade, roughness: 0.97, metalness: 0, transparent: true });
       const mFace = new THREE.MeshStandardMaterial({ map: tex, color: faceC, roughness: 0.95, metalness: 0, transparent: true });
@@ -473,12 +473,13 @@ function boot() {
         g.add(tab);
       }
 
-      const gx = p.x + nx * OFF_R[k];
-      const gy = p.y + ny * OFF_R[k];
-      const gz = OFF_Z[k] + (hash(i) - 0.5) * 0.04;
+      const gx = p.x + nx * OFF_R[k] + (k - 2) * 0.012 * (hash(i * 2.1) - 0.5);
+      const gy = p.y + ny * OFF_R[k] + OFF_Y[k];
+      const gz = OFF_Z[k] + (hash(i) - 0.5) * 0.02;
       g.position.set(gx, gy, gz);
-      g.rotation.z = ang * 0.24 + (k - 1) * 0.04 + (hash(i * 7.3) - 0.5) * 0.02;
-      g.rotation.y = (k - 1) * 0.11;      // 向外扇开 → 体积
+      g.rotation.z = ang * 0.24 + (k - 2) * 0.012 + (hash(i * 7.3) - 0.5) * 0.015;
+      g.rotation.y = (k - 2) * 0.012;      // 近乎共面，只留极轻的错开
+      g.rotation.x += (k - 2) * 0.022;    // 每层极轻的翻页角
       g.rotation.x = (hash(i * 3.7) - 0.5) * 0.03;
       const sc = OFF_S[k];
       g.scale.setScalar(sc);
