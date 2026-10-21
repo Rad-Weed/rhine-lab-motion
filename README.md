@@ -6,7 +6,7 @@
 
 *Science-fiction archive-terminal aesthetics for the web — paper white, ink black, warning orange.*
 
-[![Version](https://img.shields.io/badge/version-0.12.1-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
+[![Version](https://img.shields.io/badge/version-0.14.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
 
 一个蒸馏自官方 PV、开源同人项目与电影级 FUI 方法论的**完整设计语言**：
 设计 token · 12+ 动效模式 · Three.js 3D 档案阵列 · 17 种合成音效 · 终端登录开场。
@@ -135,11 +135,11 @@ rhine-lab-motion/
 ## 📋 版本 / Versions
 
 遵循 `0.x.0` 语义：新功能进位 x，小修进位末位。
-SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.12.1**.
+SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.14.0**.
 
 | 版本 | 变更 / Changes |
 |---|---|
-| **0.12.1** | 修复巡演角标暂停失效与键盘翻页误触发巡演；音效增益（scan/power/extract）；导航顺序对齐；色板/雷达音效交互；橙色光标；板块间距与翻页落位；3D 闲置环绕 + 双击复位 |
+| **0.14.0** | 修复巡演角标暂停失效与键盘翻页误触发巡演；音效增益（scan/power/extract）；导航顺序对齐；色板/雷达音效交互；橙色光标；板块间距与翻页落位；3D 闲置环绕 + 双击复位 |
 | 0.12.0 | 跨 harness 适配：`AGENTS.md` + `integrations/SKILL-PROMPT.txt`（千问/Kimi/DSH 可用） |
 | 0.11.0 | 二轮调研蒸馏：`style-deep-dive.md`（舟味配方/孤星 PV/方舟 UI 六角度/FUI 语法/Arwes 准则）+ FUI 语法演示板块 |
 | 0.10.x | 自动巡演、音效馆（17 种合成音效）、3D 拆独立页、跳动修复 |
