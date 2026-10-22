@@ -25,7 +25,6 @@ body{
 #c{position:fixed;inset:0;display:block;width:100%;height:100%;cursor:grab;touch-action:none}
 #c.dragging{cursor:grabbing}
 #c.pointing{cursor:pointer}
-.grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.40;background-image:var(--noise);mix-blend-mode:multiply}
 /* 四角裁切标记：把视口当成一块印版 */
 .crop{position:fixed;inset:16px;z-index:3;pointer-events:none}
 .crop i{position:absolute;width:26px;height:26px;border:0 solid rgba(21,21,19,.42)}
@@ -127,7 +126,6 @@ body{
 <body>
 
 <canvas id="c"></canvas>
-<div class="grain"></div>
 <div class="crop" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
 
 <header class="hud hud-top">
@@ -138,10 +136,11 @@ body{
 
 <div class="hud hud-left">
   <div><span class="key">HOVER</span>抽出一角　<span class="key">CLICK</span>完全抽出 + 起波　<span class="key">CLICK×2</span>展开内容</div>
-  <div><span class="key">DRAG</span>环绕（上下已反向）　<span class="key">WHEEL</span>缩放　<span class="key">ESC</span>归位</div>
+  <div><span class="key">DRAG</span>环绕（上下已反向）　<span class="key">WHEEL</span>缩放　<span class="key">ESC</span>归位　<span class="key">Q</span>画质</div>
 </div>
 <div class="hud hud-right">
   <div>SHEETS <b>420</b> / ROLL <b>1</b></div>
+  <div>FPS <b id="hudfps">—</b> · QUALITY <b id="hudq">HIGH</b></div>
   <div>SELECTED <b class="sel" id="hudsel">—</b></div>
 </div>
 
@@ -592,6 +591,13 @@ function backdropTexture() {
   reg(W * 0.085, H * 0.8, "rgba(233,82,28,0.30)", 27);
   reg(W * 0.915, H * 0.8, "rgba(21,21,19,0.20)", 24);
 
+  // 细颗粒：烘进贴图，替代原来的全屏 CSS 混合层
+  for (let i = 0; i < 26000; i++) {
+    const a = 0.012 + Math.random() * 0.03;
+    x.fillStyle = "rgba(21,21,19," + a.toFixed(3) + ")";
+    x.fillRect(Math.random() * W, Math.random() * H, 1, 1);
+  }
+
   // 暗角
   const vig = x.createRadialGradient(W * 0.5, H * 0.46, H * 0.2, W * 0.5, H * 0.5, H * 0.9);
   vig.addColorStop(0, "rgba(21,21,19,0)");
@@ -632,9 +638,32 @@ function groundTexture() {
 /* ── 主程序 ─────────────────────────────────────────────────── */
 function boot() {
   const canvas = $("#c");
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+
+  /* 画质档位：像素比是第一成本（实测），其次是阴影分辨率与 sheen */
+  const TIERS = [
+    { name: "HIGH", dpr: 1.75, shadow: 2048, radius: 2.5, sheen: 0.55, every: 1 },
+    { name: "MID", dpr: 1.25, shadow: 1024, radius: 1.5, sheen: 0.28, every: 2 },
+    { name: "LOW", dpr: 1.0, shadow: 512, radius: 1.0, sheen: 0.0, every: 3 },
+  ];
+  let tier = 0, autoTier = true, shadowEvery = 1;
+  const perfEl = $("#hudfps"), qEl = $("#hudq");
+  function applyTier(i, auto) {
+    tier = Math.max(0, Math.min(TIERS.length - 1, i));
+    const t = TIERS[tier];
+    renderer.setPixelRatio(Math.min(t.dpr, window.devicePixelRatio || 1));
+    renderer.setSize(innerWidth, innerHeight);
+    key.shadow.mapSize.set(t.shadow, t.shadow);
+    if (key.shadow.map) { key.shadow.map.dispose(); key.shadow.map = null; }
+    key.shadow.radius = t.radius;
+    MAT.sheen = t.sheen;
+    MAT.needsUpdate = true;
+    shadowEvery = t.every;
+    if (qEl) qEl.textContent = t.name;
+    if (auto) autoTier = false;
+  }
   renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.autoUpdate = false;          // 手动节流：隔帧更新阴影
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.14;
 
@@ -652,7 +681,7 @@ function boot() {
   scene.add(new THREE.AmbientLight(0xffffff, 0.5));
   const key = new THREE.DirectionalLight(0xfff8ee, 1.5); key.position.set(12, 18, 22);
   key.castShadow = true;
-  key.shadow.mapSize.set(4096, 4096);                    // 画质优先：层间暗缝靠它
+  key.shadow.mapSize.set(2048, 2048);                    // 由画质档位接管（见 applyTier）
   key.shadow.camera.left = -22; key.shadow.camera.right = 22;
   key.shadow.camera.top = 22; key.shadow.camera.bottom = -22;
   key.shadow.camera.near = 1; key.shadow.camera.far = 90;
@@ -856,6 +885,7 @@ function boot() {
     mesh.instanceColor.needsUpdate = true;
   }
   GEO.attributes.aTile.needsUpdate = true;
+  applyTier(0);                      // 材质已就绪 → 首次套用画质档位
 
   /* ± 环内标志：三维挤出（有厚度、有倒角、投阴影、可绕看） */
   const glyphs = new THREE.Group();
@@ -1098,6 +1128,7 @@ function boot() {
   $("#p-print").addEventListener("click", () => sfx("stamp"));
   addEventListener("keydown", (e) => {
     if (e.code === "Escape") { panelOpen ? closePanel() : fileBack(); }
+    if (e.code === "KeyQ") { autoTier = false; applyTier((tier + 1) % TIERS.length); }   // 手动选定后不再自动降档
   });
 
   /* 调试：测量某个音效的实际电平（判断"放炮/听不见"） */
@@ -1117,6 +1148,21 @@ function boot() {
       res({ kind, peak: +peak.toFixed(4), dbfs: +(20 * Math.log10(peak || 1e-6)).toFixed(1), rms: +Math.sqrt(sq / Math.max(1, n)).toFixed(4) });
     }, 650);
   });
+
+  /* 调试：逐项开关，定位性能瓶颈 */
+  window._rlTweak = (o = {}) => {
+    if (o.shadow !== undefined) renderer.shadowMap.enabled = !!o.shadow;
+    if (o.sheen !== undefined) { MAT.sheen = o.sheen; MAT.needsUpdate = true; }
+    if (o.dpr !== undefined) { renderer.setPixelRatio(o.dpr); renderer.setSize(innerWidth, innerHeight); }
+    if (o.radius !== undefined) key.shadow.radius = o.radius;
+    if (o.size !== undefined) {
+      key.shadow.mapSize.set(o.size, o.size);
+      if (key.shadow.map) { key.shadow.map.dispose(); key.shadow.map = null; }
+    }
+    if (o.grain !== undefined) { const g = document.querySelector(".grain"); if (g) g.style.display = o.grain ? "" : "none"; }
+    if (o.tone !== undefined) { renderer.toneMapping = o.tone ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping; }
+    return { shadow: renderer.shadowMap.enabled, sheen: MAT.sheen, dpr: renderer.getPixelRatio(), size: key.shadow.mapSize.x };
+  };
 
   /* 调试：渲染开销（draw calls / 三角形） */
   window._rlPerf = () => ({
@@ -1184,10 +1230,23 @@ function boot() {
   let last = performance.now(), tAcc = 0, firstFrame = true;
   const vAxis = new THREE.Vector3();
 
+  let frameNo = 0, accT = 0, accN = 0;
   function frame(now) {
     requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
-    last = now; tAcc += dt;
+    last = now; tAcc += dt; frameNo++;
+
+    /* 自适应画质：连续 40 帧平均超过 24ms（<42fps）就降一档 */
+    accT += dt; accN++;
+    if (accN >= 40) {
+      const avg = accT / accN;
+      if (perfEl) perfEl.textContent = Math.max(1, Math.round(1 / avg));
+      if (autoTier && avg > 0.024 && tier < TIERS.length - 1) {
+        applyTier(tier + 1);
+        accT = 0; accN = 0;
+      } else { accT = 0; accN = 0; }
+    }
+    if (shadowEvery === 1 || frameNo % shadowEvery === 0) renderer.shadowMap.needsUpdate = true;
 
     updateCamera(dt);
 
