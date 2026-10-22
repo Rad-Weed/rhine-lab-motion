@@ -137,8 +137,8 @@ body{
 <a class="hud-back" href="index.html">◂ 档案册 DOSSIER</a>
 
 <div class="hud hud-left">
-  <div><span class="key">MOVE</span>靠近鼓起　<span class="key">CLICK</span>抽出一页　<span class="key">CLICK×2</span>展开内容</div>
-  <div><span class="key">DRAG</span>环绕　<span class="key">WHEEL</span>缩放　<span class="key">ESC</span>归位</div>
+  <div><span class="key">HOVER</span>抽出一角　<span class="key">CLICK</span>完全抽出 + 起波　<span class="key">CLICK×2</span>展开内容</div>
+  <div><span class="key">DRAG</span>环绕（上下已反向）　<span class="key">WHEEL</span>缩放　<span class="key">ESC</span>归位</div>
 </div>
 <div class="hud hud-right">
   <div>SHEETS <b>320</b> / ROLL <b>1</b></div>
@@ -574,6 +574,11 @@ function boot() {
 
   const pages = [];
   const tmpM = new THREE.Matrix4(), tmpP = new THREE.Vector3(), tmpS = new THREE.Vector3(1, 1, 1);
+  const vNormal = new THREE.Vector3();
+  const vCam = new THREE.Vector3();
+  const vToCam = new THREE.Vector3();
+  const qTmp = new THREE.Quaternion();
+  const look = new THREE.Object3D();       // 仅用于算"朝向相机"的四元数
   const zAxis = new THREE.Vector3(0, 0, 1);
 
   for (let i = 0; i < N; i++) {
@@ -586,7 +591,13 @@ function boot() {
     q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, i * 0.024));
     const scale = 1 + (hash(i * 3.1) - 0.5) * 0.03;
     const basePos = new THREE.Vector3(p.x, p.y, (hash(i * 5.7) - 0.5) * 0.05);
-    pages.push({ i, data: DATA[i], basePos, quat: q, scale, wave: 0 });
+    pages.push({
+      i, data: DATA[i], basePos, quat: q, scale,
+      wave: 0,        // 指针靠近的鼓起
+      hover: 0,       // 悬停抽出量 0..1
+      kick: 0,        // 点击时的波浪冲量（弹簧衰减）
+      kickWhen: 0, kickAmp: 0, kickPending: false,
+    });
     tmpM.compose(basePos, q, new THREE.Vector3(scale, scale, 1));
     mesh.setMatrixAt(i, tmpM);
   }
@@ -615,7 +626,8 @@ function boot() {
     const mk = (ch, px) => {
       const m = new THREE.Mesh(glyphGeometry(ch, 4.0, 0.68), [matFace, matSide]);
       m.position.set(px, 0.05, -2.5);
-      m.rotation.y = -0.26 * Math.sign(px);   // 微侧，露出厚度
+      m.userData.baseYaw = -0.2 * Math.sign(px);   // 静止姿态：微侧露出厚度
+      m.rotation.y = m.userData.baseYaw;
       m.castShadow = true; m.receiveShadow = true;
       glyphs.add(m);
       return m;
@@ -707,7 +719,7 @@ function boot() {
     if (dragging) {
       moved += Math.abs(e.movementX || 0) + Math.abs(e.movementY || 0);
       cam.vt -= (e.movementX || 0) * 0.0032;
-      cam.vp += (e.movementY || 0) * 0.0026;
+      cam.vp -= (e.movementY || 0) * 0.0026;   // 上下反向：往下拖 = 镜头抬起
     }
     const h = hitPage();
     if (h !== hovered) {
@@ -792,6 +804,18 @@ function boot() {
     m.userData.mats = [edge, face];
     root.add(m);
     outMesh = m; outFrom = m.position.clone(); outT = 0;
+
+    /* 抽取动作产生一圈外扩的波：按距离延迟 0~320ms、幅度高斯衰减 */
+    const nowMs = performance.now();
+    for (const pg2 of pages) {
+      if (pg2 === pg) continue;
+      const d = Math.hypot(pg2.basePos.x - pg.basePos.x, pg2.basePos.y - pg.basePos.y);
+      if (d > 16) continue;
+      pg2.kickAmp = 1.25 * Math.exp(-(d * d) / (2 * 4.6 * 4.6));
+      pg2.kickWhen = nowMs + d * 34;
+      pg2.kickPending = true;
+    }
+
     sfx("extract");
     setTimeout(() => { if (selected === pg) sfx("beep"); }, 170);
     tip.classList.remove("on");
@@ -871,6 +895,9 @@ function boot() {
     glyphs: glyphs.children.length,
     sheets: root.children.filter((o) => o.isMesh && o.userData.mats).length,
     pages: pages.length,
+    cam: { theta: +cam.theta.toFixed(3), phi: +cam.phi.toFixed(3), r: +cam.r.toFixed(1) },
+    kickMax: +Math.max(...pages.map((q) => Math.abs(q.kick))).toFixed(3),
+    hoverMax: +Math.max(...pages.map((q) => q.hover)).toFixed(3),
   });
 
   function drawBarcode(code) {
@@ -907,12 +934,29 @@ function boot() {
     root.rotation.x = -0.02 + Math.sin(tAcc * 0.22) * 0.01;
     root.rotation.y = -0.05 + Math.sin(tAcc * 0.17) * 0.018;
     root.position.y = Math.sin(tAcc * 0.5) * 0.1;
-    glyphs.rotation.y = Math.sin(tAcc * 0.24) * 0.07;
+    glyphs.rotation.y = Math.sin(tAcc * 0.24) * 0.04;
     glyphs.position.y = Math.sin(tAcc * 0.4 + 1.1) * 0.08;
 
+    /* ± 在 ±60° 内转向相机：始终大体正对，又保留侧转的厚度 */
+    for (const g of glyphs.children) {
+      const want = Math.atan2(vCam.x - g.position.x, vCam.z - g.position.z);
+      const base = g.userData.baseYaw;
+      let dY = want - base;
+      dY = Math.atan2(Math.sin(dY), Math.cos(dY));          // 归一化到 ±π
+      const clamped = base + Math.max(-1.05, Math.min(1.05, dY));
+      g.rotation.y += (clamped - g.rotation.y) * Math.min(1, dt * 3.6);
+    }
+
+    /* 相机在 root 局部坐标系里的位置：悬停抽出、± 朝向都用它 */
+    vCam.copy(camera.position);
+    root.worldToLocal(vCam);
+
     let dirty = false;
+    const idleAmp = 0.55 + 0.45 * Math.sin(tAcc * 0.31);   // 默认行波的强弱呼吸
     for (const pg of pages) {
       if (pg === selected) continue;
+
+      /* 1. 指针靠近：高斯鼓包 */
       let target = 0;
       if (waveOn && !selected) {
         const d = Math.hypot(pg.basePos.x - wavePt.x, pg.basePos.y - wavePt.y);
@@ -921,10 +965,42 @@ function boot() {
       if (pg === hovered && !selected) target = Math.max(target, 0.85);
       pg.wave += (target - pg.wave) * Math.min(1, dt * 7);
 
-      const s = pg.scale * (1 + pg.wave * 0.075);
+      /* 2. 悬停：沿法线抽出一小段（点击后才完全抽出） */
+      const hT = (pg === hovered && !selected) ? 1 : 0;
+      pg.hover += (hT - pg.hover) * Math.min(1, dt * 5.5);
+
+      /* 3. 点击冲量：按距离延迟触发，形成一圈向外扩散的波 */
+      if (pg.kickPending && performance.now() >= pg.kickWhen) {
+        pg.kick += pg.kickAmp;
+        pg.kickPending = false;
+      }
+      pg.kick *= Math.exp(-dt * 3.1);
+
+      /* 4. 阵列自身的默认行波：沿路径行进的微浪（永远在动，但不抢戏） */
+      const idle = Math.sin(tAcc * 1.15 - pg.i * 0.085) * 0.052 * idleAmp;
+
+      vNormal.set(0, 0, 1).applyQuaternion(pg.quat);
       vAxis.set(1, 0, 0).applyQuaternion(pg.quat);
-      tmpP.copy(pg.basePos).addScaledVector(vAxis, pg.wave * 0.22);
-      tmpM.compose(tmpP, pg.quat, tmpS.set(s, s, 1));
+
+      vToCam.copy(vCam).sub(pg.basePos);
+      const dl = vToCam.length() || 1;
+      vToCam.multiplyScalar(1 / dl);                     // 指向相机的单位向量
+
+      const push = pg.wave * 0.24 + pg.kick * 0.75 + idle;
+      const s = pg.scale * (1 + pg.wave * 0.06 + pg.hover * 0.075 + pg.kick * 0.035);
+      tmpP.copy(pg.basePos)
+        .addScaledVector(vNormal, push)
+        .addScaledVector(vToCam, pg.hover * 2.2)         // 悬停：朝镜头抽出一段
+        .addScaledVector(vAxis, pg.wave * 0.1);
+
+      /* 悬停时纸面转向镜头（像把一张纸从卷里抽出来看） */
+      qTmp.copy(pg.quat);
+      if (pg.hover > 0.01) {
+        look.position.copy(tmpP);
+        look.lookAt(vCam);
+        qTmp.slerp(look.quaternion, pg.hover * 0.42);
+      }
+      tmpM.compose(tmpP, qTmp, tmpS.set(s, s, 1));
       mesh.setMatrixAt(pg.i, tmpM);
       dirty = true;
     }
