@@ -6,7 +6,7 @@
 
 *Science-fiction archive-terminal aesthetics for the web — paper white, ink black, warning orange.*
 
-[![Version](https://img.shields.io/badge/version-0.15.3-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
+[![Version](https://img.shields.io/badge/version-0.16.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
 
 一套蒸馏自官方 PV、开源同人项目与电影级 FUI 方法论的**完整设计语言**：
 编辑设计系统 · 设计 token · 12+ 动效模式 · ∞ 立体档案卷 · 21 种合成音效 · 终端登录开场。
@@ -178,11 +178,12 @@ rhine-lab-motion/
 ## 📋 版本 / Versions
 
 遵循 `0.x.0` 语义：新功能进位 x，小修进位末位。
-SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.15.3**.
+SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.16.0**.
 
 | 版本 | 变更 / Changes |
 |---|---|
-| **0.15.3** | 声音与波形修正：①音效改为**颗粒化纸声**（上千个高通脉冲组成的 crackle 颗粒底 + 峰值归一化 + 压缩总线），不再是扫频噪声的呼呼声；电平重标 rustle −29 / extract −20 / insert −23 / stamp −23 dBFS②波浪改为**横波**——位移垂直于纸带（≈ 世界 Z 起伏），不再是沿路径挤压的纵波；③默认动态加强：双频横波 + 纸页绕法线微扭，幅度 0.175/0.105；④**± 始终正对相机**（不限幅，绕到背面也正面朝你，保留 0.34 rad 内倾露厚度） |
+| **0.16.0** | 质感升级（画质优先）：①**每张纸都有印刷**——4×4 印刷图集（部门签/橙色编号/标题/表格/条码/已阅章 + 空白纸），逐实例 UV 偏移 + 自定义着色器，正反两面都可读；②**纸张材质**——sheen 绒光、纤维颗粒、纸边内侧压暗、逆光菲涅尔边光；③**光影**——4096 PCFSoft 自阴影打出层间暗缝、双暖色轮廓光、地面接触阴影；④密度 320→**420 张**（更细密的丝带）；实测 9 draw calls / 5.2k 三角形 |
+| 0.15.3 | 声音与波形修正：①音效改为**颗粒化纸声**（上千个高通脉冲组成的 crackle 颗粒底 + 峰值归一化 + 压缩总线），不再是扫频噪声的呼呼声；电平重标 rustle −29 / extract −20 / insert −23 / stamp −23 dBFS②波浪改为**横波**——位移垂直于纸带（≈ 世界 Z 起伏），不再是沿路径挤压的纵波；③默认动态加强：双频横波 + 纸页绕法线微扭，幅度 0.175/0.105；④**± 始终正对相机**（不限幅，绕到背面也正面朝你，保留 0.34 rad 内倾露厚度） |
 | 0.15.2 | 3D 手感与生命感：①拖拽**上下反向**（往下拖镜头抬起）②**悬停时朝镜头抽出一角并转向你**（2.2 单位 + 42% 朝向插值），点击才完全抽出并**向四周发出扩散波**（34ms/单位延迟、4.6 高斯衰减）③**± 限幅 ±60° 朝向相机**（正反面都成立，保留厚度）④阵列自带**沿路径行进的默认微浪**（`sin(t·1.15 − i·0.085)` × 呼吸包络），静止时也在呼吸 |
 | 0.15.1 | 3D 页修四处：①音效重做为**纸质音效**（缓起包络 5–35ms + 压缩总线 + 全量重标，峰值 −22~−30 dBFS，不再是噪声爆响）②点开另一张档案时**上一张自动飞回原位**（0.3s 插值 + 复位实例，无残留、无泄漏）③**± 改为三维挤出几何**（倒角/厚度/投影，对齐两瓣面心 ±8.84）④背景场景化：印版边框 + 边缘刻度 + 四角套准靶 + 45° 网点 + 地面测绘网格 + CSS 裁切标记 |
 | 0.15.0 | **3D 重构为 ∞ 档案卷**：320 张纸页沿双纽线等弧长层层叠压、每页与路径垂直并逐页微旋，实例化单次绘制 + 自阴影；修 `slerpQuaternions` 与"抽出页命中"两处真 bug |

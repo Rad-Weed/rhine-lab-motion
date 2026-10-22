@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RHINE LAB — ∞ 档案卷 / ARCHIVE ROLL</title>
-<meta name="description" content="320 张档案纸沿 ∞ 卷成一卷立体纸卷：靠近鼓起波浪，点击抽出一页，再点展开内容。非官方同人作品。">
+<meta name="description" content="420 张档案纸沿 ∞ 卷成一卷立体纸卷：靠近鼓起波浪，点击抽出一页，再点展开内容。非官方同人作品。">
 <style>
 :root{
   --paper:#e6e2d6; --sheet:#f6f3eb; --ink:#151513; --ink-2:#3c3c36; --mute:#7d7a72;
@@ -132,7 +132,7 @@ body{
 
 <header class="hud hud-top">
   <div class="mark"><b>RHINE LAB</b><i>∞</i></div>
-  <div class="sub">ARCHIVE ROLL / 档案卷<br>SECTION 00 — <span>320 SHEETS · ONE CONTINUOUS ROLL</span></div>
+  <div class="sub">ARCHIVE ROLL / 档案卷<br>SECTION 00 — <span>420 SHEETS · ONE CONTINUOUS ROLL</span></div>
 </header>
 <a class="hud-back" href="index.html">◂ 档案册 DOSSIER</a>
 
@@ -141,7 +141,7 @@ body{
   <div><span class="key">DRAG</span>环绕（上下已反向）　<span class="key">WHEEL</span>缩放　<span class="key">ESC</span>归位</div>
 </div>
 <div class="hud hud-right">
-  <div>SHEETS <b>320</b> / ROLL <b>1</b></div>
+  <div>SHEETS <b>420</b> / ROLL <b>1</b></div>
   <div>SELECTED <b class="sel" id="hudsel">—</b></div>
 </div>
 
@@ -190,7 +190,7 @@ body{
 <script type="module">
 /* ══════════════════════════════════════════════════════════════
    RHINE LAB — ∞ ARCHIVE ROLL
-   320 张纸页沿双纽线层层叠压、逐页绕路径微旋 → 一卷 ∞ 纸卷
+   420 张纸页沿双纽线层层叠压、逐页绕路径微旋 → 一卷 ∞ 纸卷
    ══════════════════════════════════════════════════════════════ */
 
 const $ = (s) => document.querySelector(s);
@@ -381,6 +381,128 @@ function sheetTexture(d, seed) {
   t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
   return t;
 }
+/* ── 印刷图集：4×4 共 16 个版式（含空白纸），每张纸取其中一块 ──
+   这样 420 张纸不再全是白纸：远看是一叠带字、带表格、带条码的档案。 */
+const ATLAS_TILES = 4, ATLAS_TILE_UV = 1 / 4;
+function paperAtlas(data) {
+  const T = 256, S = T * ATLAS_TILES;      // 1024²
+  const c = document.createElement("canvas");
+  c.width = c.height = S;
+  const x = c.getContext("2d");
+
+  const tileAt = (k) => ({ cx: (k % ATLAS_TILES) * T, cy: Math.floor(k / ATLAS_TILES) * T });
+
+  for (let k = 0; k < ATLAS_TILES * ATLAS_TILES; k++) {
+    const { cx, cy } = tileAt(k);
+    x.save();
+    x.translate(cx, cy);
+
+    // 纸底
+    x.fillStyle = "#f7f4ec"; x.fillRect(0, 0, T, T);
+    for (let i = 0; i < 900; i++) {
+      x.fillStyle = "rgba(21,21,19," + (0.008 + hash(i + k * 13) * 0.014) + ")";
+      x.fillRect(hash(i * 1.7 + k) * T, hash(i * 3.1 + k) * T, 1, 1);
+    }
+
+    if (k === 15) {                        // 空白纸：只有极淡的横线
+      x.strokeStyle = "rgba(21,21,19,.05)"; x.lineWidth = 1;
+      for (let y = 28; y < T - 20; y += 17) {
+        x.beginPath(); x.moveTo(18, y); x.lineTo(T - 18, y); x.stroke();
+      }
+      x.restore();
+      continue;
+    }
+
+    /* 内容内缩 7%：每张纸四周留白，侧看时边缘是白纸，不是一条条黑线 */
+    x.save();
+    x.translate(T * 0.07, T * 0.07);
+    x.scale(0.86, 0.86);
+
+    const d = data[(k * 23) % data.length];
+    // 边框发丝线
+    x.strokeStyle = "rgba(21,21,19,.16)"; x.lineWidth = 1;
+    x.strokeRect(9, 9, T - 18, T - 18);
+
+    // 部门黑签
+    x.fillStyle = "#2e2e28"; x.fillRect(16, 16, 48, 16);
+    x.fillStyle = "#f7f4ec"; x.font = "600 10px 'JetBrains Mono',Consolas,monospace";
+    x.textBaseline = "middle"; x.fillText(d.dept.code, 23, 25);
+
+    // 橙色编号
+    x.fillStyle = "#e9521c"; x.font = "700 11px 'JetBrains Mono',Consolas,monospace";
+    x.textAlign = "right"; x.fillText(d.no, T - 16, 25);
+
+    // 标题（最多两行）
+    x.fillStyle = "#1f1f1b"; x.textAlign = "left";
+    x.font = "700 16px 'Microsoft YaHei','PingFang SC',sans-serif";
+    const t1 = d.title.slice(0, 9);
+    x.fillText(t1, 16, 52);
+    if (d.title.length > 9) x.fillText(d.title.slice(9, 18), 16, 72);
+
+    // 小字行
+    x.fillStyle = "#8b8781"; x.font = "500 7.5px 'JetBrains Mono',Consolas,monospace";
+    x.fillText(d.dept.en + " / REV." + String(d.rev).padStart(2, "0") + " / LV." + d.level, 16, 90);
+
+    // 分隔线
+    x.strokeStyle = "rgba(21,21,19,.22)";
+    x.beginPath(); x.moveTo(16, 100); x.lineTo(T - 16, 100); x.stroke();
+
+    if (k % 3 === 0) {
+      // 版式 A：正文两栏（灰色假文）
+      x.fillStyle = "rgba(21,21,19,.34)";
+      for (let r = 0; r < 7; r++) {
+        const w = (T - 32) * (0.55 + hash(k + r) * 0.42);
+        x.fillRect(16, 110 + r * 9, w, 2.2);
+      }
+      x.fillStyle = "rgba(21,21,19,.2)";
+      for (let r = 0; r < 4; r++) x.fillRect(16, 176 + r * 9, (T - 32) * (0.5 + hash(k + 40 + r) * 0.4), 2);
+    } else if (k % 3 === 1) {
+      // 版式 B：表格
+      x.strokeStyle = "rgba(21,21,19,.3)"; x.lineWidth = 1;
+      x.beginPath(); x.moveTo(16, 118); x.lineTo(T - 16, 118); x.stroke();
+      for (let r = 1; r <= 5; r++) {
+        const y = 118 + r * 16;
+        x.strokeStyle = "rgba(21,21,19,.12)";
+        x.beginPath(); x.moveTo(16, y); x.lineTo(T - 16, y); x.stroke();
+        x.fillStyle = "rgba(21,21,19,.42)"; x.font = "500 7px 'JetBrains Mono',Consolas,monospace";
+        x.fillText(["CAPACITY", "TOLERANCE", "BATCH", "STATUS", "REVIEW"][r - 1], 18, y - 5);
+        x.textAlign = "right"; x.fillText((0.6 + hash(k * 7 + r) * 0.4).toFixed(4), T - 18, y - 5);
+        x.textAlign = "left";
+      }
+    } else {
+      // 版式 C：条码 + 印章
+      let bx = 16;
+      while (bx < T - 96) {
+        const w = 1 + Math.floor(hash(bx + k) * 3);
+        if (hash(bx * 0.7 + k) > 0.32) { x.fillStyle = "#33332d"; x.fillRect(bx, 112, w, 42); }
+        bx += w + 2;
+      }
+      x.strokeStyle = "rgba(233,82,28,.5)"; x.lineWidth = 1.6;
+      x.beginPath(); x.arc(T - 52, 190, 22, 0, Math.PI * 2); x.stroke();
+      x.fillStyle = "rgba(233,82,28,.55)"; x.font = "700 7px 'JetBrains Mono',Consolas,monospace";
+      x.textAlign = "center"; x.fillText("FILED", T - 52, 192); x.textAlign = "left";
+    }
+
+    // 底部：∞ 与机构
+    x.strokeStyle = "rgba(21,21,19,.4)"; x.lineWidth = 1.4;
+    x.beginPath(); x.arc(T - 40, T - 34, 6, 0, Math.PI * 2); x.stroke();
+    x.beginPath(); x.arc(T - 26, T - 34, 6, 0, Math.PI * 2); x.stroke();
+    x.fillStyle = "#8b8781"; x.font = "600 6.5px 'JetBrains Mono',Consolas,monospace";
+    x.fillText("RHINE LAB", 16, T - 30);
+
+    x.restore();   // 内容缩放
+    x.restore();   // 图块偏移
+  }
+
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+
+/* 图集里"空白纸"那一块的 uv 原点（k=15 → 右下角） */
+const BLANK_TILE_UV = [3 * ATLAS_TILE_UV, 0];   // canvas 底行 → uv y=0
+
 /* ── ± 标志：真三维挤出几何（带倒角与厚度），不是贴图 ────── */
 function glyphGeometry(ch, size, depth) {
   const L = size / 2, w = size * 0.145;
@@ -514,12 +636,12 @@ function boot() {
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
   renderer.setSize(innerWidth, innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.1;
+  renderer.toneMappingExposure = 1.14;
 
   const scene = new THREE.Scene();
   const PAPER = new THREE.Color(0xe6e2d6);
   scene.background = PAPER;
-  scene.fog = new THREE.Fog(PAPER, 36, 82);
+  scene.fog = new THREE.Fog(PAPER, 46, 104);
 
   const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.5, 200);
   const cam = { theta: 0.2, phi: 1.36, r: 34, vt: 0, vp: 0, rt: 34 };
@@ -528,16 +650,20 @@ function boot() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   scene.add(new THREE.HemisphereLight(0xffffff, 0xded8ca, 0.95));
   scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-  const key = new THREE.DirectionalLight(0xfff8ee, 1.55); key.position.set(12, 18, 22);
+  const key = new THREE.DirectionalLight(0xfff8ee, 1.5); key.position.set(12, 18, 22);
   key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
-  key.shadow.camera.left = -24; key.shadow.camera.right = 24;
-  key.shadow.camera.top = 24; key.shadow.camera.bottom = -24;
+  key.shadow.mapSize.set(4096, 4096);                    // 画质优先：层间暗缝靠它
+  key.shadow.camera.left = -22; key.shadow.camera.right = 22;
+  key.shadow.camera.top = 22; key.shadow.camera.bottom = -22;
   key.shadow.camera.near = 1; key.shadow.camera.far = 90;
-  key.shadow.bias = -0.0006;
+  key.shadow.bias = -0.00035;
+  key.shadow.normalBias = 0.012;
+  key.shadow.radius = 4;                               // PCFSoft 的柔化半径
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xf2f5fa, 0.6); fill.position.set(-16, -8, 12); scene.add(fill);
-  const rim = new THREE.DirectionalLight(0xffffff, 0.5); rim.position.set(-6, 4, -18); scene.add(rim);
+  const fill = new THREE.DirectionalLight(0xf2f5fa, 0.55); fill.position.set(-16, -8, 12); scene.add(fill);
+  /* 暖色轮廓光：从背后擦过纸边，让每张纸的边缘发亮 */
+  const rim = new THREE.DirectionalLight(0xffe2bd, 1.05); rim.position.set(-10, 6, -20); scene.add(rim);
+  const rim2 = new THREE.DirectionalLight(0xfff4e6, 0.45); rim2.position.set(14, -6, -14); scene.add(rim2);
 
   /* ── 背景：纸面穹顶 + 地面测绘网格（"档案大厅"而不是空场） ── */
   {
@@ -552,6 +678,17 @@ function boot() {
     ground.position.y = -15.5;
     scene.add(ground);
     scene.userData.ground = ground;
+
+    /* 同一高度的软阴影承接层：纸卷把影子落在网格上，悬浮才"站得住" */
+    const shadowCatcher = new THREE.Mesh(
+      new THREE.PlaneGeometry(140, 140),
+      new THREE.ShadowMaterial({ opacity: 0.05, color: 0x2b2418 })
+    );
+    shadowCatcher.rotation.x = -Math.PI / 2;
+    shadowCatcher.position.y = -15.42;
+    shadowCatcher.receiveShadow = true;
+    scene.add(shadowCatcher);
+    scene.userData.shadowCatcher = shadowCatcher;
   }
 
   const root = new THREE.Group(); scene.add(root);
@@ -582,11 +719,78 @@ function boot() {
   }
 
   /* ── 纸卷：N 张纸沿路径叠压，逐页绕路径微旋 ── */
-  const N = 320, TOTAL = N;
+  const N = 420, TOTAL = N;
   const DATA = makeData(N);
-  const PW = 2.5, PH = 1.8, PD = 0.045;
-  const GEO = new THREE.BoxGeometry(PW, PH, PD);
-  const MAT = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.86, metalness: 0 });
+  const PW = 2.38, PH = 1.7, PD = 0.03;
+  const GEO_SINGLE = new THREE.BoxGeometry(PW, PH, PD);   // 抽出用（不带实例属性）
+  const GEO = GEO_SINGLE.clone();                          // 阵列用
+  GEO.setAttribute("aTile", new THREE.InstancedBufferAttribute(new Float32Array(N * 2), 2));
+
+  /* 纸的材质：图集印刷 + 纤维颗粒 + 边缘压暗 + 一点 sheen（纸的绒光） */
+  const ATLAS = paperAtlas(DATA);
+  const MAT = new THREE.MeshPhysicalMaterial({
+    map: ATLAS,
+    color: 0xffffff,
+    roughness: 0.93,
+    metalness: 0,
+    sheen: 0.55,
+    sheenRoughness: 0.85,
+    sheenColor: new THREE.Color(0xfff2df),
+  });
+  MAT.onBeforeCompile = (sh) => {
+    sh.uniforms.uBlank = { value: new THREE.Vector2(BLANK_TILE_UV[0] + 0.031, BLANK_TILE_UV[1] + 0.031) };
+    sh.vertexShader = sh.vertexShader
+      .replace("#include <common>", `#include <common>
+        attribute vec2 aTile;
+        varying vec2 vTile;
+        varying vec2 vSheetUv;
+        varying vec3 vNormalObj;
+        varying vec3 vLocal;
+        varying vec3 vViewN;
+        varying vec3 vViewDir;`)
+      .replace("#include <begin_vertex>", `#include <begin_vertex>
+        vTile = aTile;
+        vSheetUv = uv;
+        vNormalObj = normal;
+        vLocal = position;
+        vViewN = normalize(normalMatrix * normal);
+        vec4 mvPos = modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+        vViewDir = normalize(-mvPos.xyz);`);
+    sh.fragmentShader = sh.fragmentShader
+      .replace("#include <common>", `#include <common>
+        uniform vec2 uBlank;
+        varying vec2 vTile;
+        varying vec2 vSheetUv;
+        varying vec3 vNormalObj;
+        varying vec3 vLocal;
+        varying vec3 vViewN;
+        varying vec3 vViewDir;
+        float rlHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`)
+      .replace("#include <map_fragment>", `
+        float isFace = step(0.5, abs(vNormalObj.z));            // ±Z 面才是"纸面"
+        vec2 suv = vNormalObj.z > 0.0
+          ? vec2(vSheetUv.x, vSheetUv.y)                       // 正面
+          : vec2(1.0 - vSheetUv.x, vSheetUv.y);                // 背面：水平镜像，字不倒
+        vec2 auv = isFace > 0.5 ? vTile + suv * ${ATLAS_TILE_UV.toFixed(6)} : uBlank;
+        vec4 paperTexel = texture2D(map, auv);
+        // 墨色向纸色混淡 22%：远看是浅灰的密排字，而不是一片黑线
+        vec3 paperBase = vec3(0.958, 0.949, 0.918);
+        paperTexel.rgb = mix(paperBase, paperTexel.rgb, 0.95);
+        diffuseColor *= paperTexel;
+        // 纸纤维：极细的颗粒，近看才有
+        float fiber = rlHash(floor(vLocal.xy * 300.0));
+        diffuseColor.rgb *= 0.972 + fiber * 0.056;
+        // 纸边内侧压暗 → 每张纸有厚度、有独立的轮廓
+        float ex = smoothstep(0.80, 1.0, abs(vLocal.x) / ${(PW / 2).toFixed(3)});
+        float ey = smoothstep(0.80, 1.0, abs(vLocal.y) / ${(PH / 2).toFixed(3)});
+        diffuseColor.rgb *= 1.0 - 0.12 * max(ex, ey);
+        // 背面（-Z）略暗：正反可分辨
+        diffuseColor.rgb *= mix(1.0, 0.965, step(vLocal.z, 0.0));
+        // 边缘菲涅尔：逆光时纸边发亮（纸张的绒边感）
+        float fres = pow(1.0 - abs(dot(normalize(vViewN), normalize(vViewDir))), 2.6);
+        diffuseColor.rgb += fres * vec3(0.085, 0.078, 0.062);
+      `);
+  };
 
   const mesh = new THREE.InstancedMesh(GEO, MAT, N);
   mesh.castShadow = true; mesh.receiveShadow = true;
@@ -613,7 +817,17 @@ function boot() {
     const q = new THREE.Quaternion().setFromUnitVectors(zAxis, new THREE.Vector3(tg.x, tg.y, 0));
     // 逐页绕自身法线微旋 → 卷起的层理
     q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, i * 0.024));
+    q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, (hash(i * 7.3) - 0.5) * 0.05));
     const scale = 1 + (hash(i * 3.1) - 0.5) * 0.03;
+
+    /* 版式分配：约 32% 是空白纸，其余取 15 块印刷版式之一 */
+    const r = hash(i * 12.7);
+    const tile = r < 0.10 ? 15 : Math.floor(hash(i * 5.3) * 15);
+    GEO.attributes.aTile.setXY(
+      i,
+      (tile % ATLAS_TILES) * ATLAS_TILE_UV,
+      1 - (Math.floor(tile / ATLAS_TILES) + 1) * ATLAS_TILE_UV
+    );
     const basePos = new THREE.Vector3(p.x, p.y, (hash(i * 5.7) - 0.5) * 0.05);
     pages.push({
       i, data: DATA[i], basePos, quat: q, scale,
@@ -641,6 +855,7 @@ function boot() {
     }
     mesh.instanceColor.needsUpdate = true;
   }
+  GEO.attributes.aTile.needsUpdate = true;
 
   /* ± 环内标志：三维挤出（有厚度、有倒角、投阴影、可绕看） */
   const glyphs = new THREE.Group();
@@ -822,7 +1037,7 @@ function boot() {
 
     const face = new THREE.MeshStandardMaterial({ map: sheetTexture(pg.data, pg.i + 1), roughness: 0.94 });
     const edge = new THREE.MeshStandardMaterial({ color: 0xefe9db, roughness: 0.95, transparent: true });
-    const m = new THREE.Mesh(GEO, [edge, edge, edge, edge, face, edge]);
+    const m = new THREE.Mesh(GEO_SINGLE, [edge, edge, edge, edge, face, edge]);
     m.position.copy(pg.basePos);
     m.quaternion.copy(pg.quat);
     m.scale.setScalar(pg.scale);
@@ -902,6 +1117,17 @@ function boot() {
       res({ kind, peak: +peak.toFixed(4), dbfs: +(20 * Math.log10(peak || 1e-6)).toFixed(1), rms: +Math.sqrt(sq / Math.max(1, n)).toFixed(4) });
     }, 650);
   });
+
+  /* 调试：渲染开销（draw calls / 三角形） */
+  window._rlPerf = () => ({
+    calls: renderer.info.render.calls,
+    tris: renderer.info.render.triangles,
+    programs: renderer.info.programs.length,
+    textures: renderer.info.memory.textures,
+  });
+
+  /* 调试：导出图集，便于检查印刷版式 */
+  window._rlAtlas = () => ATLAS.image.toDataURL("image/png");
 
   /* 调试：看某张纸的局部轴在世界里的方向（验证横波方向） */
   window._rlAxes = (i = 0) => {
