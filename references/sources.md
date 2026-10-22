@@ -53,6 +53,19 @@
 - Arwes：arwes.dev（github.com/arwes/arwes）设计动画音效准则——装配/拆解转场、bleeps 声音管理（同声去重/重放重启）、编排器 parallel/sequence/stagger、Titillium Web+Electrolize；设计准则原文见 github.com/iwestlin/arwes/tree/master/guidelines
 - SkillMD：Sci-Fi Interface Design（skillmd.com/skills/thedixitjain/sci-fi-interface）——CSS 角标括号实现示例
 
+## 二·六、官方站点实测（0.17.0 新增，第一手）
+
+不是二手分析文，是 2026-10-22 抓线上 CSS / 渲染截图读出的事实，全部数据见 `official-pages.md`。
+
+| 站点 | 地址 | 拿到的 |
+|---|---|---|
+| 明日方舟官网 | https://ak.hypergryph.com/ | 唯一高亮青 `#18d1ff`（42 次）、黑阶 `#000/#121212/#1d1f20/#242424`、字族 `SourceHanSans-{Bold,Medium,Regular,Heavy}` + `Bender-{Bold,Regular}` + `Oswald-Medium` + `Novecentosanswide-{UltraBold,Bold,DemiBold,Medium}`、字阶 12→112px、字距 `-.05em`、时值 `.3/.6/1s`、装载屏 chrome、双语导航、巨型字裁切、纯色块压影像、页码 `00/05`、右侧白色功能条、音量显式开关 |
+| 泰拉记事社 | https://comic.hypergryph.com/terra-historicus/ | 纸 `#f7f7f7`、黑阶 `#212121/#2a2a2a/#313131/#434343`、朱红 `#b0243b`(12 次)/`#cd1a37`、警示黄 `#fff000`、遮罩四档、字族 `SourceHanSansCN-*` + `Geometos` + `Gilroy-ExtraBold`、`cubic-bezier(.22,.58,.12,.98)`、桌面透视纸、旋转 READ MORE 印章、章节胶囊网格、模糊背景+前景纸卡 |
+| 鹰角网络 | https://www.hypergryph.com/ | 硬角黑卡片 + 白字网格模块、二维码与信息块并置、`Noto Sans SC` + `SourceHanSans` |
+| 罗德岛源石记事——莱茵生命 | https://comic.hypergryph.com/terra-historicus/comic/1421 | 莱茵生命官方漫画（正史向），详情页版式：模糊封面背景 + 白细框 + 角标 + 标题下固定长度分隔线 + 唯一朱红 CTA |
+
+采不到的：`monster-siren.hypergryph.com` 在该网络下 `ERR_CONNECTION_CLOSED`；孤星活动微站（`ak.hypergryph.com/activity/*`）已下线 404。
+
 ## 三、开源注明建议（模板）
 
 ```

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>莱茵生命 · 官方母题样板 / OFFICIAL PATTERN BOARD</title>
+<style>
+:root{
+  --paper:#f7f7f7;
+  --sheet:#fff;
+  --ink:#151513;
+  --ink-2:#3c3c36;
+  --mute:#7d7a72;
+  --hair:rgba(21,21,19,.20);
+  --hair-2:rgba(21,21,19,.10);
+  --orange:#e9521c;
+  --crimson:#b0243b;
+  --cyan:#18d1ff;
+  --black:#000;
+  --panel:#1d1f20;
+  --panel-2:#242424;
+  --w:1180px;
+  --mar:56px;
+  --f-disp:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --f-sans:"Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --f-mono:"JetBrains Mono","SF Mono","Cascadia Mono",Consolas,monospace;
+  --f-wide:"Oswald","Novecento Sans Wide","Arial Narrow",var(--f-disp);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--f-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  padding-bottom:120px;
+}
+body::before{ /* 桌面纹理：极淡横向墨线 */
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(180deg,rgba(21,21,19,.018) 0 1px,transparent 1px 8px);
+  mix-blend-mode:multiply;
+}
+.wrap{width:var(--w);max-width:calc(100% - 2*var(--mar));margin:0 auto;position:relative;z-index:1}
+
+/* ---------- 顶栏：双语导航 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;background:rgba(247,247,247,.94);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--hair);
+}
+.topbar .in{width:var(--w);max-width:calc(100% - 2*var(--mar));margin:0 auto;height:62px;display:flex;align-items:center;gap:32px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{font:700 15px/1 var(--f-disp);letter-spacing:.22em}
+.brand span{font:500 8.5px/1 var(--f-mono);letter-spacing:.26em;color:var(--mute)}
+.nav{display:flex;gap:28px;margin-left:auto}
+.nav a{text-decoration:none;color:var(--ink);display:block;padding-bottom:5px;border-bottom:2px solid transparent}
+.nav a em{display:block;font:700 11px/1 var(--f-disp);letter-spacing:2px;text-transform:uppercase;font-style:normal}
+.nav a i{display:block;font:400 9px/1 var(--f-sans);color:var(--mute);margin-top:4px;font-style:normal}
+.nav a.on{border-bottom-color:var(--cyan);color:#0a7fa0}
+.nav a.on i{color:#0a7fa0}
+.pgind{margin-left:28px;text-align:right;border-left:1px solid var(--hair);padding-left:22px}
+.pgind .n{font:600 20px/1 var(--f-wide);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.pgind .n s{text-decoration:none;color:var(--mute);font-size:10px;margin:0 3px}
+.pgind .t{font:600 8px/1 var(--f-mono);letter-spacing:.24em;color:var(--mute);margin-top:4px}
+
+/* ---------- 首屏 ---------- */
+.hero{position:relative;overflow:hidden;background:#0a0a0a;color:#fff;height:520px;margin-bottom:64px}
+.hero .type{
+  position:absolute;left:-3%;bottom:-14%;font:700 300px/0.78 var(--f-disp);
+  letter-spacing:-.06em;color:rgba(255,255,255,.10);white-space:nowrap;user-select:none;
+}
+.hero .type2{
+  position:absolute;left:-1.2%;bottom:-12%;font:700 300px/0.78 var(--f-disp);
+  letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.18);
+  white-space:nowrap;user-select:none;
+}
+.hero .block{position:absolute;left:6%;top:12%;width:330px;height:190px;background:var(--cyan);mix-blend-mode:normal;opacity:.92}
+.hero .block em{position:absolute;left:18px;bottom:14px;font:600 9px/1.5 var(--f-mono);letter-spacing:.2em;color:#04222b;font-style:normal}
+.hero .art{position:absolute;inset:0;background:
+  radial-gradient(60% 80% at 68% 40%,rgba(120,180,210,.35),transparent 60%),
+  radial-gradient(40% 60% at 40% 70%,rgba(80,60,120,.35),transparent 65%),
+  linear-gradient(120deg,#141416 0%,#1d2326 45%,#0c0c0e 100%);}
+.hero .art::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 6px);opacity:.5}
+.hero .cap{position:absolute;left:var(--mar);bottom:44px;z-index:3}
+.hero .cap h1{font:700 54px/1 var(--f-sans);letter-spacing:-.03em;margin-bottom:14px}
+.hero .cap p{font:400 12px/1.9 var(--f-sans);color:rgba(255,255,255,.62);max-width:520px}
+.hero .cap .meta{margin-top:18px;font:600 8.5px/1 var(--f-mono);letter-spacing:.22em;color:var(--cyan)}
+.hero .idx{position:absolute;right:var(--mar);top:40px;z-index:3;text-align:right}
+.hero .idx .big{font:600 76px/1 var(--f-wide);color:var(--cyan);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.hero .idx .sm{font:600 9px/1 var(--f-mono);letter-spacing:.24em;color:rgba(255,255,255,.6);margin-top:6px}
+
+/* ---------- 版面 ---------- */
+.sec{display:grid;grid-template-columns:88px 1fr;gap:24px;padding:34px 0;border-top:1px solid var(--hair)}
+.sec:first-of-type{border-top:none}
+.sec .no{font:600 11px/1 var(--f-mono);letter-spacing:.16em;color:var(--crimson);padding-top:6px}
+.sec .no s{display:block;text-decoration:none;color:var(--mute);font-size:8px;letter-spacing:.24em;margin-top:8px}
+.sec h2{font:700 22px/1.2 var(--f-sans);letter-spacing:-.01em;margin-bottom:8px}
+.sec h2 em{font:600 9px/1 var(--f-mono);letter-spacing:.2em;color:var(--mute);font-style:normal;margin-left:12px;text-transform:uppercase}
+.sec .sub{font:400 12px/1.95 var(--sans,var(--f-sans));color:var(--ink-2);max-width:640px}
+.sec .sub b{font-weight:600}
+.sec .src{font:400 9px/1.7 var(--f-mono);letter-spacing:.06em;color:var(--mute);margin-top:10px}
+.frame{margin-top:20px;background:var(--sheet);border:1px solid var(--hair-2);box-shadow:0 18px 40px rgba(21,21,19,.06);position:relative}
+
+/* 01 装载屏 */
+.boot{background:#232323;height:300px;position:relative;color:#fff;padding:0}
+.boot .rail{position:absolute;left:0;right:0;height:1px;background:rgba(255,255,255,.22)}
+.boot .rail.t{top:34px}.boot .rail.b{bottom:34px}
+.boot .tick{position:absolute;width:1px;height:9px;background:rgba(255,255,255,.35)}
+.boot .grid-v{position:absolute;top:34px;bottom:34px;width:1px;background:rgba(255,255,255,.07)}
+.boot .logo{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);text-align:center}
+.boot .logo b{font:700 26px/1 var(--f-sans);letter-spacing:.5em;padding-left:.5em;display:block}
+.boot .bar{width:120px;height:2px;background:rgba(255,255,255,.16);margin:12px auto 0;position:relative;overflow:hidden}
+.boot .bar i{position:absolute;left:0;top:0;height:100%;width:38%;background:#fff;animation:sweep 2.4s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes sweep{0%{transform:translateX(-110%)}60%{transform:translateX(260%)}100%{transform:translateX(260%)}}
+.boot .bl{position:absolute;left:18px;bottom:12px;font:500 8px/1 var(--f-mono);letter-spacing:.18em;color:rgba(255,255,255,.55)}
+.boot .bc{position:absolute;left:18px;bottom:30px;font:500 8px/1 var(--f-mono);letter-spacing:.14em;color:rgba(255,255,255,.8)}
+.boot .br{position:absolute;right:18px;bottom:30px;font:500 8px/1 var(--f-mono);letter-spacing:.14em;color:rgba(255,255,255,.55)}
+.boot .br s{text-decoration:none;color:var(--cyan);margin:0 6px}
+
+/* 03 巨型字裁切 */
+.crop{height:260px;background:#101012;overflow:hidden;position:relative}
+.crop .a{position:absolute;left:-2%;top:-6%;font:700 230px/.8 var(--f-disp);letter-spacing:-.07em;color:#fff;opacity:.92;white-space:nowrap}
+.crop .b{position:absolute;left:1.5%;top:2%;font:700 230px/.8 var(--f-disp);letter-spacing:-.07em;color:transparent;-webkit-text-stroke:1.5px rgba(24,209,255,.5);white-space:nowrap}
+.crop .n{position:absolute;right:22px;bottom:18px;font:500 8.5px/1 var(--f-mono);letter-spacing:.2em;color:rgba(255,255,255,.5)}
+
+/* 04 纯色块压影像 */
+.over{height:250px;position:relative;background:linear-gradient(135deg,#2b2f33,#141618 60%,#242a2e);overflow:hidden}
+.over::after{content:"";position:absolute;inset:0;background:radial-gradient(45% 60% at 70% 35%,rgba(200,170,120,.28),transparent 70%)}
+.over .blk{position:absolute;left:0;top:0;width:38%;height:100%;background:var(--cyan);opacity:.9}
+.over .blk span{position:absolute;left:16px;bottom:14px;font:600 8.5px/1.6 var(--f-mono);letter-spacing:.18em;color:#063039}
+.over .txt{position:absolute;left:44%;bottom:26px;color:#fff}
+.over .txt b{display:block;font:700 26px/1.15 var(--f-sans);letter-spacing:-.02em}
+.over .txt i{display:block;font:600 8.5px/1 var(--f-mono);letter-spacing:.24em;margin-top:10px;color:rgba(255,255,255,.55);font-style:normal}
+
+/* 05 模糊背景 + 前景纸卡 */
+.stack{height:300px;position:relative;background:#2a2c2e;overflow:hidden}
+.stack .bg{position:absolute;inset:-30px;background:
+  radial-gradient(50% 60% at 30% 40%,rgba(190,120,90,.45),transparent 65%),
+  radial-gradient(40% 50% at 70% 60%,rgba(90,130,160,.4),transparent 65%),
+  #1a1c1e;filter:blur(26px) brightness(.62)}
+.stack .card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:56%;background:#f4f1e9;border:1px solid rgba(255,255,255,.5);padding:8px;box-shadow:0 24px 50px rgba(0,0,0,.45)}
+.stack .card .ph{height:120px;background:linear-gradient(120deg,#cfc8b8,#e6e1d4 55%,#bdb5a4);position:relative}
+.stack .card .ph::after{content:"COVER / 1421";position:absolute;left:10px;bottom:8px;font:600 8px/1 var(--f-mono);letter-spacing:.2em;color:rgba(21,21,19,.5)}
+.stack .card .cap{display:flex;justify-content:space-between;align-items:center;padding:8px 4px 2px}
+.stack .card .cap b{font:600 10px/1 var(--f-mono);letter-spacing:.14em}
+.stack .card .cap s{text-decoration:none;font:500 8px/1 var(--f-mono);color:var(--mute)}
+.stack .corner{position:absolute;width:10px;height:10px;border:1px solid rgba(255,255,255,.8)}
+.stack .c1{left:22%;top:26%;border-right:0;border-bottom:0}
+.stack .c2{right:22%;top:26%;border-left:0;border-bottom:0}
+.stack .c3{left:22%;bottom:22%;border-right:0;border-top:0}
+.stack .c4{right:22%;bottom:22%;border-left:0;border-top:0}
+
+/* 06 固定长度分隔线 */
+.rule{padding:26px 28px}
+.rule h3{font:700 30px/1.15 var(--f-sans);letter-spacing:-.02em}
+.rule .line{width:320px;height:1px;background:var(--ink);margin-top:14px;position:relative}
+.rule .line::after{content:"";position:absolute;right:-6px;top:-3px;width:6px;height:6px;background:var(--crimson)}
+.rule p{margin-top:14px;font:400 11px/1.9 var(--f-sans);color:var(--ink-2);max-width:420px}
+
+/* 07 章节胶囊网格 */
+.chaps{padding:24px 28px 28px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chap{display:flex;align-items:center;gap:10px;border:1px solid rgba(21,21,19,.32);padding:9px 10px;background:transparent;transition:background .3s,border-color .3s}
+.chap:hover{background:rgba(176,36,59,.05);border-color:var(--crimson)}
+.chap s{text-decoration:none;font:600 9px/1 var(--f-mono);color:var(--mute);letter-spacing:.1em;min-width:44px}
+.chap b{font:500 11px/1.2 var(--f-sans);letter-spacing:.02em}
+.chap .dot{margin-left:auto;width:6px;height:6px;background:var(--crimson);opacity:.85}
+
+/* 08 唯一 CTA */
+.cta{padding:30px 28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.btn{display:inline-block;background:var(--crimson);color:#fff;font:600 11px/1 var(--f-sans);letter-spacing:.12em;padding:13px 26px;text-decoration:none;transition:background .3s}
+.btn:hover{background:var(--crimson-deep)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(21,21,19,.4);padding:12px 24px}
+.note{font:400 10px/1.8 var(--f-mono);color:var(--mute);letter-spacing:.04em}
+
+/* 09 索引卡竖排露边 */
+.rails{display:flex;height:270px;background:#1c1e20;overflow:hidden;padding:18px 26px 18px 18px;gap:0;align-items:flex-start;justify-content:flex-end;position:relative}
+.rails .lbl{position:absolute;left:22px;top:22px;font:600 8.5px/1.9 var(--f-mono);letter-spacing:.2em;color:rgba(255,255,255,.42)}
+.railc{position:relative;width:104px;height:100%;background:#eae6da;margin-right:-64px;border:1px solid rgba(0,0,0,.25);box-shadow:-8px 0 18px rgba(0,0,0,.35);transition:transform .3s cubic-bezier(.22,.58,.12,.98),margin-right .3s;padding:8px}
+.railc:hover{transform:translateX(-14px);margin-right:-40px}
+.railc .th{height:56px;background:linear-gradient(135deg,#b9b09c,#d6cfbf);margin-bottom:8px}
+.railc b{display:block;font:600 9px/1.4 var(--f-mono);letter-spacing:.1em}
+.railc i{display:block;font:500 8px/1.5 var(--f-mono);color:#6d6a62;font-style:normal;margin-top:4px}
+.railc:nth-child(2n) .th{background:linear-gradient(135deg,#a8a294,#cbc4b2)}
+
+/* 10 桌面透视纸 */
+.desk{height:320px;background:
+  linear-gradient(160deg,#c9c3b3,#b6b0a0 60%,#a9a393);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.desk .sheet{
+  width:56%;height:200px;background:#f6f3eb;
+  transform:perspective(1200px) rotateX(7deg) rotate(-7deg);
+  box-shadow:0 34px 60px rgba(0,0,0,.38),0 4px 10px rgba(0,0,0,.18);
+  position:relative;padding:18px 20px;
+}
+.desk .sheet::before{content:"RHODES ISLAND PERSONNEL / 机密";position:absolute;left:20px;top:12px;font:600 8px/1 var(--f-mono);letter-spacing:.22em;color:rgba(21,21,19,.45)}
+.desk .sheet .stamp{position:absolute;right:16px;top:16px;border:2px solid var(--crimson);color:var(--crimson);font:700 10px/1 var(--f-sans);letter-spacing:.16em;padding:6px 8px;transform:rotate(-11deg);opacity:.85}
+.desk .sheet .ln{position:absolute;left:20px;right:20px;height:1px;background:rgba(21,21,19,.14)}
+.desk .sheet .par{position:absolute;left:20px;right:20px;background:repeating-linear-gradient(180deg,rgba(21,21,19,.22) 0 1px,transparent 1px 7px);opacity:.55}
+.desk .clip{position:absolute;left:calc(50% - 168px);top:44px;width:16px;height:44px;border:2px solid #8e8a7e;border-radius:8px;transform:rotate(-7deg);box-shadow:0 4px 8px rgba(0,0,0,.3)}
+
+/* 11 页码 */
+.pager{display:flex;align-items:flex-end;gap:16px;padding:30px 28px;border-top:1px solid var(--hair-2)}
+.pager .big{font:600 92px/.82 var(--f-wide);letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:.8}
+.pager .sep{font:500 18px/1 var(--f-mono);color:var(--mute);padding-bottom:8px}
+.pager .tot{font:500 22px/1 var(--f-wide);color:var(--mute);padding-bottom:6px;font-variant-numeric:tabular-nums}
+.pager .nm{margin-left:auto;text-align:right;padding-bottom:4px}
+.pager .nm b{display:block;font:700 10px/1 var(--f-disp);letter-spacing:.2em}
+.pager .nm s{text-decoration:none;display:block;font:500 8px/1 var(--f-mono);letter-spacing:.22em;color:var(--mute);margin-top:6px}
+
+/* 12 白色功能条 */
+.fbar{background:#1c1e20;padding:26px;display:flex;justify-content:flex-end;position:relative}
+.fbar .lbl{position:absolute;left:26px;top:26px;font:600 8.5px/1.9 var(--f-mono);letter-spacing:.2em;color:rgba(255,255,255,.42)}
+.fbar .col{width:230px;display:flex;flex-direction:column}
+.fbar a{display:flex;align-items:center;gap:10px;background:#fff;color:#111;text-decoration:none;font:500 11px/1 var(--f-sans);height:34px;padding:0 10px;border-bottom:1px solid rgba(0,0,0,.12);transition:background .3s}
+.fbar a:last-child{border-bottom:none}
+.fbar a:hover{background:#e9f8ff}
+.fbar a i{width:16px;height:16px;border:1px solid #111;display:block;flex:0 0 16px;position:relative;font-style:normal}
+.fbar a i::after{content:"";position:absolute;inset:4px;background:#111}
+.fbar a s{text-decoration:none;margin-left:auto;font:500 8px/1 var(--f-mono);color:#6d6a62;letter-spacing:.1em}
+
+/* 页脚 */
+.foot{margin-top:56px;border-top:1px solid var(--hair);padding-top:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.foot p{font:400 9px/1.8 var(--f-mono);letter-spacing:.06em;color:var(--mute);max-width:720px}
+.foot b{font:600 9px/1 var(--f-mono);letter-spacing:.2em;color:var(--ink)}
+
+/* 网格叠加 */
+.gridov{position:fixed;inset:0;z-index:99;pointer-events:none;display:none;
+  background-image:linear-gradient(90deg,rgba(176,36,59,.16) 1px,transparent 1px),linear-gradient(180deg,rgba(24,209,255,.14) 1px,transparent 1px);
+  background-size:calc(var(--w)/12) 100%,100% 8px}
+.gridov.on{display:block}
+.hint{position:fixed;right:16px;bottom:14px;z-index:100;font:500 9px/1 var(--f-mono);letter-spacing:.12em;color:var(--mute);background:rgba(255,255,255,.85);border:1px solid var(--hair-2);padding:8px 10px}
+@media (max-width:900px){
+  .sec{grid-template-columns:1fr;gap:10px}
+  .hero{height:420px}.hero .type,.hero .type2{font-size:180px}
+  .chaps{grid-template-columns:1fr}
+  .desk .sheet{width:76%}
+}
+</style>
+</head>
+<body>
+<div class="gridov" id="gridov"></div>
+<div class="hint">G — GRID / 12 栏 × 8px 基线</div>
+
+<header class="topbar">
+  <div class="in">
+    <div class="brand"><b>RHINE LAB</b><span>PATTERN BOARD 0.17</span></div>
+    <nav class="nav">
+      <a href="#m01" class="on"><em>Chrome</em><i>装载</i></a>
+      <a href="#m03"><em>Type</em><i>字裁切</i></a>
+      <a href="#m07"><em>Index</em><i>索引</i></a>
+      <a href="#m10"><em>Paper</em><i>纸面</i></a>
+    </nav>
+    <div class="pgind"><div class="n">01<s>/</s>12</div><div class="t">HOMEPAGE</div></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="art"></div>
+  <div class="type">OFFICIAL</div>
+  <div class="type2">OFFICIAL</div>
+  <div class="block"><em>MEASURED 2026.10<br>FROM HYPERGRYPH LIVE CSS</em></div>
+  <div class="idx"><div class="big">12</div><div class="sm">MOTIFS / 母题</div></div>
+  <div class="cap">
+    <h1>官方母题样板</h1>
+    <p>从 ak.hypergryph.com、泰拉记事社、鹰角网络三个线上站点逐条量出来的 12 个版式母题。这里是可运行的对照样板——判定「像不像官方」时，先跟这一页比。</p>
+    <div class="meta">PL.01—12 &nbsp;/&nbsp; RHINE LAB EDITORIAL SYSTEM</div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <!-- 01 -->
+  <section class="sec" id="m01">
+    <div class="no">01<s>CHROME</s></div>
+    <div>
+      <h2>装载屏 chrome<em>Loading Chrome</em></h2>
+      <div class="sub">一条 1px 发丝线横贯上下，四角短刻度，中央字标 + 一条随进度延伸的细线；左下角版权、底部左右两端的命令行。整屏只有一处动（细线扫过）。</div>
+      <div class="src">SOURCE: ak.hypergryph.com 首屏（装载约 10s 后进入主页）</div>
+      <div class="frame">
+        <div class="boot">
+          <div class="rail t"></div><div class="rail b"></div>
+          <div class="grid-v" style="left:18%"></div><div class="grid-v" style="left:36%"></div>
+          <div class="grid-v" style="left:64%"></div><div class="grid-v" style="left:82%"></div>
+          <div class="tick" style="left:0;top:34px"></div><div class="tick" style="right:0;top:34px"></div>
+          <div class="logo"><b>莱茵生命</b><div class="bar"><i></i></div></div>
+          <div class="bc">&gt;&gt; LOADING — 38%</div>
+          <div class="bl">© HYPERGRYPH</div>
+          <div class="br">RHINE&nbsp;LAB<s>///</s>ak.hypergryph.com</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="sec" id="m02">
+    <div class="no">02<s>NAV</s></div>
+    <div>
+      <h2>双语导航<em>Bilingual Nav</em></h2>
+      <div class="sub">英文全大写 11px / 字距 2px / 700，中文 9px 紧贴其下、颜色降到 60% 灰；当前项变高亮色并加 2px 下划线（长度等于英文词宽）。本页顶栏即此母题。</div>
+      <div class="src">SOURCE: ak.hypergryph.com 顶栏（active = #18d1ff + underline）</div>
+      <div class="frame" style="padding:22px 26px;display:flex;gap:34px;align-items:flex-end;flex-wrap:wrap">
+        <div><em style="display:block;font:700 11px/1 var(--f-disp);letter-spacing:2px;font-style:normal;border-bottom:2px solid var(--cyan);padding-bottom:5px;color:#0a7fa0">INFORMATION</em><i style="display:block;font:400 9px/1 var(--f-sans);color:#0a7fa0;margin-top:4px;font-style:normal">情报</i></div>
+        <div><em style="display:block;font:700 11px/1 var(--f-disp);letter-spacing:2px;font-style:normal;padding-bottom:5px">OPERATOR</em><i style="display:block;font:400 9px/1 var(--f-sans);color:var(--mute);margin-top:4px;font-style:normal">干员</i></div>
+        <div><em style="display:block;font:700 11px/1 var(--f-disp);letter-spacing:2px;font-style:normal;padding-bottom:5px">WORLD</em><i style="display:block;font:400 9px/1 var(--f-sans);color:var(--mute);margin-top:4px;font-style:normal">设定</i></div>
+        <div><em style="display:block;font:700 11px/1 var(--f-disp);letter-spacing:2px;font-style:normal;padding-bottom:5px">MEDIA</em><i style="display:block;font:400 9px/1 var(--f-sans);color:var(--mute);margin-top:4px;font-style:normal">参演万象</i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="sec" id="m03">
+    <div class="no">03<s>TYPE</s></div>
+    <div>
+      <h2>巨型字裁切<em>Bleeding Type</em></h2>
+      <div class="sub">英文词标做到 200px 以上、按视口宽计算，让它出血到画面外；再叠一层描边或错位 40–60px 的第二层，制造套印感。字号与位置由视口决定，不由内容决定。</div>
+      <div class="src">SOURCE: ak.hypergryph.com hero「ARKNIGHTS」+ 半透明色块</div>
+      <div class="frame">
+        <div class="crop">
+          <div class="a">RHINE</div>
+          <div class="b">RHINE</div>
+          <div class="n">230PX / LETTER-SPACING −0.07EM / BLEED −2%</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="sec" id="m04">
+    <div class="no">04<s>BLOCK</s></div>
+    <div>
+      <h2>纯色几何块压影像<em>Solid Block Over Art</em></h2>
+      <div class="sub">硬边矩形、无圆角、无渐变、无阴影，一块高饱和色直接压在插画/照片上，覆盖 15–30% 画面。这是官方最大胆的一招，<b>一页只能用一次</b>。</div>
+      <div class="src">SOURCE: ak.hypergryph.com hero 左上青色块（#18d1ff）</div>
+      <div class="frame">
+        <div class="over">
+          <div class="blk"><span>CALIBRATION<br>BLOCK / 38% W</span></div>
+          <div class="txt"><b>真理之影<br>映于特里蒙上空</b><i>LONE TRAIL — 1098</i></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="sec" id="m05">
+    <div class="no">05<s>CARD</s></div>
+    <div>
+      <h2>模糊背景 + 前景纸卡<em>Scrim + Sheet</em></h2>
+      <div class="sub">背景取当前内容的封面做 <b>blur(26px) brightness(.62)</b>，前景是清晰纸卡：外加 1px 半透明白框与四角短角标，卡下方一条 caption 条放编号与页数。</div>
+      <div class="src">SOURCE: terra-historicus 漫画详情页</div>
+      <div class="frame">
+        <div class="stack">
+          <div class="bg"></div>
+          <div class="card"><div class="ph"></div><div class="cap"><b>RHINE LAB / 1421</b><s>20 CHAPTERS</s></div></div>
+          <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="sec" id="m06">
+    <div class="no">06<s>RULE</s></div>
+    <div>
+      <h2>固定长度分隔线<em>Fixed Rule</em></h2>
+      <div class="sub">标题之下一条 1px 实线，长度固定（320px），<b>不随标题长度变化</b>；末端可加 6px 方块。它在视觉上把标题和正文切开，同时充当"归档横线"。</div>
+      <div class="src">SOURCE: terra-historicus 详情页标题下横线</div>
+      <div class="frame"><div class="rule">
+        <h3>罗德岛源石记事<br>莱茵生命</h3>
+        <div class="line"></div>
+        <p>伊芙利特在罗德岛上遇到了一位不速之客。她的出现让赫默与塞雷娅各自从她身上看到了过去的影子——回忆由此开始。</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="sec" id="m07">
+    <div class="no">07<s>INDEX</s></div>
+    <div>
+      <h2>章节胶囊网格<em>Chapter Capsules</em></h2>
+      <div class="sub">1px 描边 + 无圆角、2 列等宽、内边距 9px 10px；编号在左（等宽 9px、弱化），标题右接，未读用一枚 6px 实心方块。比点线目录更耐扫读。</div>
+      <div class="src">SOURCE: terra-historicus 章节目录（番外/正文混排）</div>
+      <div class="frame"><div class="chaps">
+        <div class="chap"><s>FINAL</s><b>过往荆棘，誓约不灭</b><span class="dot"></span></div>
+        <div class="chap"><s>EX.03</s><b>Silence</b><span class="dot"></span></div>
+        <div class="chap"><s>EX.02</s><b>愿望</b></div>
+        <div class="chap"><s>09</s><b>黎明之前</b></div>
+        <div class="chap"><s>08</s><b>曲终人散</b></div>
+        <div class="chap"><s>07</s><b>尽我所能</b></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="sec" id="m08">
+    <div class="no">08<s>CTA</s></div>
+    <div>
+      <h2>唯一实心 CTA<em>Single Solid CTA</em></h2>
+      <div class="sub">整页只有一个实心按钮（朱红），其余全部描边或纯文字。无圆角、字距 .12em、高 40px。第二按钮必须是 ghost，不能也是实心。</div>
+      <div class="src">SOURCE: terra-historicus「开始阅读」（#b0243b）</div>
+      <div class="frame"><div class="cta">
+        <a class="btn" href="#m08">开始阅读</a>
+        <a class="btn ghost" href="#m08">加入收藏</a>
+        <span class="note">实心 ×1 &nbsp;·&nbsp; ghost ×N</span>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 09 -->
+  <section class="sec" id="m09">
+    <div class="no">09<s>RAIL</s></div>
+    <div>
+      <h2>索引卡竖排露边<em>Card Rail</em></h2>
+      <div class="sub">右缘一列卡片垂直堆叠，每张只露出 40px；露出部分是缩略条 + 编号 + 两行小字。悬停整张左移 14px——这是「卷宗抽屉」的界面化。</div>
+      <div class="src">SOURCE: terra-historicus 右侧作品卡列</div>
+      <div class="frame"><div class="rails">
+        <div class="lbl">WORKS / 20<br>抽屉 · 露边 40PX</div>
+        <div class="railc"><div class="th"></div><b>1421</b><i>莱茵生命</i></div>
+        <div class="railc"><div class="th"></div><b>1402</b><i>黑钢</i></div>
+        <div class="railc"><div class="th"></div><b>1388</b><i>A1 预备组</i></div>
+        <div class="railc"><div class="th"></div><b>1371</b><i>123 罗德岛</i></div>
+        <div class="railc"><div class="th"></div><b>1350</b><i>罗德厨房</i></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="sec" id="m10">
+    <div class="no">10<s>DESK</s></div>
+    <div>
+      <h2>桌面透视纸<em>Sheet On Desk</em></h2>
+      <div class="sub">纸张 <b>rotate(−7deg) + rotateX(7deg)</b> 躺在桌面上，投影 <b>0 34px 60px</b>；纸上压着长尾夹，右上角一枚旋转 −11° 的朱红印章。与 3D 悬浮阵列是两种并存的"纸"。</div>
+      <div class="src">SOURCE: terra-historicus 首页（纸躺桌面 + 红色印章）</div>
+      <div class="frame"><div class="desk">
+        <div class="sheet">
+          <div class="stamp">已 归 档</div>
+          <div class="clip"></div>
+          <div class="par" style="top:96px;height:56px"></div>
+          <div class="ln" style="top:80px"></div>
+          <div class="ln" style="bottom:26px"></div>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="sec" id="m11">
+    <div class="no">11<s>PAGER</s></div>
+    <div>
+      <h2>页码指示<em>Page Indicator</em></h2>
+      <div class="sub">大数字用宽体字 92px（tabular-nums），斜杠与总数降到灰字，段落名在右下 10px / 字距 .2em。数字的体量与正文形成 8:1 对比。</div>
+      <div class="src">SOURCE: ak.hypergryph.com「00 / 05 HOMEPAGE」</div>
+      <div class="frame"><div class="pager">
+        <div class="big">03</div><div class="sep">/</div><div class="tot">12</div>
+        <div class="nm"><b>PAPER &amp; STAMP</b><s>档案模式 / ARCHIVE MODE</s></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section class="sec" id="m12">
+    <div class="no">12<s>BAR</s></div>
+    <div>
+      <h2>白色功能条<em>White Function Bar</em></h2>
+      <div class="sub">白底黑字、无圆角、行高 34px、行间 1px 灰线；图标固定 16px 居左，右侧放一个极小的代号。整条不加阴影，靠对比度而非浮层。</div>
+      <div class="src">SOURCE: ak.hypergryph.com 右侧下载/入口条</div>
+      <div class="frame"><div class="fbar">
+        <div class="lbl">DOWNLOADS / 入口<br>白色 · 硬角 · 34PX 行高</div>
+        <div class="col">
+        <a href="#m12"><i></i>PC 下载<s>WIN</s></a>
+        <a href="#m12"><i></i>App Store<s>IOS</s></a>
+        <a href="#m12"><i></i>Android<s>APK</s></a>
+        <a href="#m12"><i></i>官方社区<s>SKL</s></a>
+        <a href="#m12"><i></i>支付中心<s>PAY</s></a>
+      </div></div></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <p>本页为风格研究样板，非官方页面。《明日方舟》《莱茵生命》及相关标志 © Hypergryph / 鹰角网络。色值、字阶、时值取自 2026-10-22 线上 CSS 实测，详见 <b>references/official-pages.md</b>。<br>字号以 1440 视口校准；网格 1180 / 边距 56 / 12 栏 / 8px 基线。</p>
+    <b>RHINE LAB<br>PATTERN BOARD 0.17</b>
+  </div>
+</div>
+
+<script>
+(function(){
+  var g = document.getElementById('gridov');
+  addEventListener('keydown', function(e){
+    if (e.key === 'g' || e.key === 'G') { g.classList.toggle('on'); }
+  });
+  // 顶栏导航随滚动高亮
+  var links = [].slice.call(document.querySelectorAll('.nav a'));
+  var secs = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if (en.isIntersecting) {
+        var i = secs.indexOf(en.target);
+        if (i > -1) links.forEach(function(l,j){ l.classList.toggle('on', j === i); });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  secs.forEach(function(s){ if (s) io.observe(s); });
+})();
+</script>
+</body>
+</html>

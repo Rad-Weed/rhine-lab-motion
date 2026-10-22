@@ -6,7 +6,7 @@
 
 *Science-fiction archive-terminal aesthetics for the web — paper white, ink black, warning orange.*
 
-[![Version](https://img.shields.io/badge/version-0.16.1-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
+[![Version](https://img.shields.io/badge/version-0.17.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
 
 一套蒸馏自官方 PV、开源同人项目与电影级 FUI 方法论的**完整设计语言**：
 编辑设计系统 · 设计 token · 12+ 动效模式 · ∞ 立体档案卷 · 21 种合成音效 · 终端登录开场。
@@ -32,6 +32,7 @@
 | **档案册（旗舰）** / Dossier (flagship) | https://rad-weed.github.io/rhine-lab-motion/assets/starter/index.html |
 | 动效手册 / Motion lab | https://rad-weed.github.io/rhine-lab-motion/assets/starter/motion-lab.html |
 | **∞ 档案卷（3D）** / Archive roll | https://rad-weed.github.io/rhine-lab-motion/assets/starter/scene3d.html |
+| **官方母题样板 / Pattern board** | https://rad-weed.github.io/rhine-lab-motion/assets/starter/pattern-board.html |
 
 ## 🖼 三个演示 / Three demos
 
@@ -178,10 +179,11 @@ rhine-lab-motion/
 ## 📋 版本 / Versions
 
 遵循 `0.x.0` 语义：新功能进位 x，小修进位末位。
-SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.16.1**.
+SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.17.0**.
 
 | 版本 | 变更 / Changes |
 |---|---|
+| **0.17.0** | **官方站点实测 + 母题样板**：直接量线上 CSS（`ak.hypergryph.com` / `terra-historicus` / `hypergryph.com`）——①唯一高亮青 `#18d1ff`、纸档朱红 `#b0243b`，确立「橙=运行态 / 朱红=归档态 / 青=站点模式」三色纪律；②官方字族分工（思源黑体 + Bender/Oswald/Novecento Wide/Geometos）与官方字阶 12→112px、显示级字距 `−.05em`；③官方时值 `.3/.4/.6/1s` 与 `visibility` 同绑技巧；④12 个可落地母题（装载屏 chrome / 双语导航 / 巨型字裁切 / 纯色块压影像 / 模糊背景+前景纸卡 / 固定长度分隔线 / 章节胶囊 / 唯一 CTA / 索引卡露边 / 桌面透视纸 / 页码指示 / 白色功能条）；⑤新增 `references/official-pages.md` 与可运行样板 `assets/starter/pattern-board.html`；⑥内核新增第 9 条「一页一色，两套模式」 |
 | **0.16.1** | 性能修复（A/B 实测定位）：①移除全屏 `mix-blend-mode` 颗粒层（占 ~17% 帧时间），改为烘进背景贴图；②像素比上限 2.0→1.75，新增 **HIGH/MID/LOW 三档**（像素比 1.75/1.25/1.0、阴影 2048/1024/512、sheen 递减、阴影隔 1/2/3 帧更新），按 **Q** 切换、掉帧自动降档；③阴影 4096→2048 + 手动节流；④加 `powerPreference: high-performance`；⑤HUD 实时显示 FPS 与当前档位。同环境实测 8.8 → 22 fps（软件渲染），真实 GPU 上 60fps 有余量 |
 | 0.16.0 | 质感升级（画质优先）：①**每张纸都有印刷**——4×4 印刷图集（部门签/橙色编号/标题/表格/条码/已阅章 + 空白纸），逐实例 UV 偏移 + 自定义着色器，正反两面都可读；②**纸张材质**——sheen 绒光、纤维颗粒、纸边内侧压暗、逆光菲涅尔边光；③**光影**——4096 PCFSoft 自阴影打出层间暗缝、双暖色轮廓光、地面接触阴影；④密度 320→**420 张**（更细密的丝带）；实测 9 draw calls / 5.2k 三角形 |
 | 0.15.3 | 声音与波形修正：①音效改为**颗粒化纸声**（上千个高通脉冲组成的 crackle 颗粒底 + 峰值归一化 + 压缩总线），不再是扫频噪声的呼呼声；电平重标 rustle −29 / extract −20 / insert −23 / stamp −23 dBFS②波浪改为**横波**——位移垂直于纸带（≈ 世界 Z 起伏），不再是沿路径挤压的纵波；③默认动态加强：双频横波 + 纸页绕法线微扭，幅度 0.175/0.105；④**± 始终正对相机**（不限幅，绕到背面也正面朝你，保留 0.34 rad 内倾露厚度） |
