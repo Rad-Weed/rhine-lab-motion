@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RHINE LAB — ∞ 档案卷 / ARCHIVE ROLL</title>
-<meta name="description" content="240 张档案纸沿 ∞ 卷成一卷立体纸卷：靠近鼓起波浪，点击抽出一页，再点展开内容。非官方同人作品。">
+<meta name="description" content="320 张档案纸沿 ∞ 卷成一卷立体纸卷：靠近鼓起波浪，点击抽出一页，再点展开内容。非官方同人作品。">
 <style>
 :root{
   --paper:#e6e2d6; --sheet:#f6f3eb; --ink:#151513; --ink-2:#3c3c36; --mute:#7d7a72;
@@ -26,6 +26,16 @@ body{
 #c.dragging{cursor:grabbing}
 #c.pointing{cursor:pointer}
 .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.40;background-image:var(--noise);mix-blend-mode:multiply}
+/* 四角裁切标记：把视口当成一块印版 */
+.crop{position:fixed;inset:16px;z-index:3;pointer-events:none}
+.crop i{position:absolute;width:26px;height:26px;border:0 solid rgba(21,21,19,.42)}
+.crop .tl{top:0;left:0;border-top-width:1px;border-left-width:1px}
+.crop .tr{top:0;right:0;border-top-width:1px;border-right-width:1px}
+.crop .bl{bottom:0;left:0;border-bottom-width:1px;border-left-width:1px}
+.crop .br{bottom:0;right:0;border-bottom-width:1px;border-right-width:1px}
+.crop::before,.crop::after{content:"";position:absolute;background:rgba(21,21,19,.22)}
+.crop::before{left:50%;top:0;width:1px;height:9px;transform:translateX(-50%)}
+.crop::after{left:50%;bottom:0;width:1px;height:9px;transform:translateX(-50%)}
 
 .hud{position:fixed;z-index:5;font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase}
 .hud-top{left:34px;top:28px;max-width:54vw}
@@ -118,6 +128,7 @@ body{
 
 <canvas id="c"></canvas>
 <div class="grain"></div>
+<div class="crop" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
 
 <header class="hud hud-top">
   <div class="mark"><b>RHINE LAB</b><i>∞</i></div>
@@ -179,7 +190,7 @@ body{
 <script type="module">
 /* ══════════════════════════════════════════════════════════════
    RHINE LAB — ∞ ARCHIVE ROLL
-   240 张纸页沿双纽线层层叠压、逐页绕路径微旋 → 一卷 ∞ 纸卷
+   320 张纸页沿双纽线层层叠压、逐页绕路径微旋 → 一卷 ∞ 纸卷
    ══════════════════════════════════════════════════════════════ */
 
 const $ = (s) => document.querySelector(s);
@@ -194,47 +205,85 @@ catch (e) {
 }
 if (!THREE) { $("#loading").classList.add("off"); $("#fallback").classList.add("on"); }
 
-/* ── 音效 ─────────────────────────────────────────────────── */
+/* ── 音效：纸质档案的声音（缓起包络 + 压缩总线，绝不"放炮"） ── */
 let AC = null, audioOn = false;
+let MASTER = null, NOISE = null;
+
 function ac() {
   if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
   if (AC.state === "suspended") AC.resume();
+  if (!MASTER) {
+    // 总线：压缩器兜住峰值，master 再收一档 → 任何音都不会炸
+    const comp = AC.createDynamicsCompressor();
+    comp.threshold.value = -22; comp.knee.value = 26; comp.ratio.value = 4;
+    comp.attack.value = 0.004; comp.release.value = 0.25;
+    MASTER = AC.createGain(); MASTER.gain.value = 0.5;
+    MASTER.connect(comp).connect(AC.destination);
+
+    // 一次性生成"纸噪声"：白噪经三级低通化 → 接近纸张摩擦的粉噪，去掉刺耳高频
+    const len = Math.floor(AC.sampleRate * 1.0);
+    NOISE = AC.createBuffer(1, len, AC.sampleRate);
+    const d = NOISE.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      b0 = 0.99765 * b0 + w * 0.0990460;
+      b1 = 0.96300 * b1 + w * 0.2965164;
+      b2 = 0.57000 * b2 + w * 1.0526913;
+      d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.16;
+    }
+  }
   return AC;
 }
+
+/* 缓起缓落：attack 至少 5ms，永远不会出现瞬态冲击 */
+function env(g, t, peak, attack, dur) {
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(peak, t + Math.max(0.004, attack));
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+}
+
 function sfx(kind) {
   if (!audioOn) return;
   try {
     const ctx = ac(), t = ctx.currentTime;
-    const master = (window._m ||= (() => { const g = ctx.createGain(); g.gain.value = 1; g.connect(ctx.destination); return g; })());
-    if (kind === "paper" || kind === "extract" || kind === "insert") {
-      const dur = kind === "paper" ? 0.32 : 0.3;
-      const len = Math.ceil(ctx.sampleRate * dur);
-      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-      const d = buf.getChannelData(0);
-      let last = 0;
-      for (let i = 0; i < len; i++) { last = last * 0.4 + (Math.random() * 2 - 1) * 0.6; d[i] = last; }
-      const src = ctx.createBufferSource(); src.buffer = buf;
-      const bp = ctx.createBiquadFilter(); bp.type = "lowpass";
-      const up = kind === "extract";
-      bp.frequency.setValueAtTime(up ? 700 : 2600, t);
-      bp.frequency.exponentialRampToValueAtTime(up ? 3200 : 700, t + dur);
+
+    const noise = (dur, f0, f1, peak, type, q, attack) => {
+      const src = ctx.createBufferSource(); src.buffer = NOISE;
+      const flt = ctx.createBiquadFilter();
+      flt.type = type || "bandpass";
+      flt.Q.value = q || 1.1;
+      flt.frequency.setValueAtTime(f0, t);
+      if (f1 && f1 !== f0) flt.frequency.exponentialRampToValueAtTime(f1, t + dur);
       const g = ctx.createGain();
-      g.gain.setValueAtTime(kind === "paper" ? 0.15 : 0.19, t);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      src.connect(bp).connect(g).connect(master);
-      src.start(t); src.stop(t + dur);
-      return;
-    }
-    const tone = (f, dur, type, gain) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = type; o.frequency.setValueAtTime(f, t);
-      g.gain.setValueAtTime(gain, t);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.02);
+      env(g, t, peak, attack, dur);
+      src.connect(flt).connect(g).connect(MASTER);
+      src.start(t, Math.random() * 0.45); src.stop(t + dur + 0.02);
     };
-    if (kind === "beep") tone(1200, 0.07, "sine", 0.17);
-    if (kind === "stamp") { tone(140, 0.12, "sine", 0.28); setTimeout(() => { try { tone(96, 0.1, "sine", 0.2); } catch (e) {} }, 45); }
-    if (kind === "close") tone(420, 0.09, "square", 0.11);
+    const tone = (f0, f1, dur, type, peak, attack) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || "sine";
+      o.frequency.setValueAtTime(f0, t);
+      if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      env(g, t, peak, attack, dur);
+      o.connect(g).connect(MASTER); o.start(t); o.stop(t + dur + 0.03);
+    };
+
+    if (kind === "rustle") {              // 悬停：纸边轻擦（高频窄带，极轻）
+      noise(0.13, 2800, 3600, 0.30, "bandpass", 1.8, 0.022);
+    } else if (kind === "extract") {      // 抽出：纸从卷里滑出，气流上行
+      noise(0.34, 600, 2800, 0.55, "bandpass", 0.9, 0.035);
+      tone(1240, 1580, 0.09, "sine", 0.03, 0.012);
+    } else if (kind === "insert") {       // 归位：滑回，气流下行
+      noise(0.3, 2900, 700, 0.45, "bandpass", 0.9, 0.025);
+    } else if (kind === "beep") {         // 确认：单音，短
+      tone(1318.5, 1318.5, 0.07, "sine", 0.10, 0.006);
+    } else if (kind === "stamp") {        // 盖章：软闷的一声，不是炮
+      tone(132, 96, 0.13, "sine", 0.10, 0.01);
+      noise(0.1, 520, 240, 0.12, "lowpass", 0.7, 0.006);
+    } else if (kind === "close") {        // 收起
+      tone(560, 420, 0.09, "triangle", 0.08, 0.01);
+    }
   } catch (e) {}
 }
 
@@ -311,12 +360,129 @@ function sheetTexture(d, seed) {
   t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
   return t;
 }
-function glyphTexture(ch) {
-  const c = document.createElement("canvas"); c.width = 256; c.height = 256;
-  const x = c.getContext("2d"); x.fillStyle = "#151513";
-  if (ch === "+") { x.fillRect(100, 24, 56, 208); x.fillRect(24, 100, 208, 56); }
-  else { x.fillRect(24, 104, 208, 48); }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+/* ── ± 标志：真三维挤出几何（带倒角与厚度），不是贴图 ────── */
+function glyphGeometry(ch, size, depth) {
+  const L = size / 2, w = size * 0.145;
+  const sh = new THREE.Shape();
+  if (ch === "+") {
+    sh.moveTo(-w, -L); sh.lineTo(w, -L); sh.lineTo(w, -w); sh.lineTo(L, -w);
+    sh.lineTo(L, w);   sh.lineTo(w, w);   sh.lineTo(w, L);   sh.lineTo(-w, L);
+    sh.lineTo(-w, w);  sh.lineTo(-L, w);  sh.lineTo(-L, -w); sh.lineTo(-w, -w);
+    sh.closePath();
+  } else {
+    sh.moveTo(-L, -w); sh.lineTo(L, -w); sh.lineTo(L, w); sh.lineTo(-L, w);
+    sh.closePath();
+  }
+  const geo = new THREE.ExtrudeGeometry(sh, {
+    depth,
+    bevelEnabled: true,
+    bevelThickness: depth * 0.3,
+    bevelSize: size * 0.014,
+    bevelSegments: 2,
+    curveSegments: 1,
+  });
+  geo.center();
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/* ── 背景：纸面穹顶（45° 网点 / 刻度尺 / 套准靶 / 暗角） ───── */
+function backdropTexture() {
+  const W = 2048, H = 1024;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d");
+
+  const grad = x.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "#f6f2e8");
+  grad.addColorStop(0.5, "#eee9dd");
+  grad.addColorStop(1, "#d6cfbf");
+  x.fillStyle = grad; x.fillRect(0, 0, W, H);
+
+  // 网点：错行排布模拟 45° 网屏，越靠下越密（像渐层印刷）
+  const cell = 9, r0 = cell * 0.40;
+  for (let gy = 0, row = 0; gy < H; gy += cell, row++) {
+    const off = row % 2 ? cell * 0.5 : 0;
+    const dens = Math.min(1, 0.35 + (gy / H) * 0.9);
+    for (let gx = -cell; gx < W + cell; gx += cell) {
+      const r = r0 * dens * (0.8 + Math.random() * 0.45);
+      x.fillStyle = "rgba(21,21,19,0.030)";
+      x.beginPath(); x.arc(gx + off, gy, r, 0, Math.PI * 2); x.fill();
+    }
+  }
+
+  // 印版边框 + 边缘刻度（把整屏读成一块版，而不是空场）
+  const ins = { x: W * 0.035, y: H * 0.07 };
+  x.save();
+  x.strokeStyle = "rgba(21,21,19,0.075)";
+  x.lineWidth = 3;
+  x.strokeRect(ins.x, ins.y, W - ins.x * 2, H - ins.y * 2);
+  x.lineWidth = 2;
+  x.strokeStyle = "rgba(21,21,19,0.05)";
+  for (let i = 0; i <= 96; i++) {                      // 上/下边缘刻度
+    const px = ins.x + (i / 96) * (W - ins.x * 2);
+    const len = i % 8 === 0 ? 26 : 12;
+    x.beginPath(); x.moveTo(px, ins.y); x.lineTo(px, ins.y + len); x.stroke();
+    x.beginPath(); x.moveTo(px, H - ins.y); x.lineTo(px, H - ins.y - len); x.stroke();
+  }
+  for (let i = 0; i <= 40; i++) {                      // 左/右边缘刻度
+    const py = ins.y + (i / 40) * (H - ins.y * 2);
+    const len = i % 5 === 0 ? 20 : 9;
+    x.beginPath(); x.moveTo(ins.x, py); x.lineTo(ins.x + len, py); x.stroke();
+    x.beginPath(); x.moveTo(W - ins.x, py); x.lineTo(W - ins.x - len, py); x.stroke();
+  }
+  x.restore();
+
+  // 套准靶：其中一枚用专色橙（莱茵的"唯一强调色"）
+  const reg = (cx, cy, col, rad) => {
+    x.strokeStyle = col; x.lineWidth = 2;
+    x.beginPath(); x.arc(cx, cy, rad, 0, Math.PI * 2); x.stroke();
+    x.beginPath(); x.arc(cx, cy, rad * 0.45, 0, Math.PI * 2); x.stroke();
+    x.beginPath();
+    x.moveTo(cx - rad * 1.9, cy); x.lineTo(cx - rad * 1.15, cy);
+    x.moveTo(cx + rad * 1.15, cy); x.lineTo(cx + rad * 1.9, cy);
+    x.moveTo(cx, cy - rad * 1.9); x.lineTo(cx, cy - rad * 1.15);
+    x.moveTo(cx, cy + rad * 1.15); x.lineTo(cx, cy + rad * 1.9);
+    x.stroke();
+  };
+  reg(W * 0.085, H * 0.2, "rgba(21,21,19,0.20)", 24);
+  reg(W * 0.915, H * 0.2, "rgba(21,21,19,0.20)", 24);
+  reg(W * 0.085, H * 0.8, "rgba(233,82,28,0.30)", 27);
+  reg(W * 0.915, H * 0.8, "rgba(21,21,19,0.20)", 24);
+
+  // 暗角
+  const vig = x.createRadialGradient(W * 0.5, H * 0.46, H * 0.2, W * 0.5, H * 0.5, H * 0.9);
+  vig.addColorStop(0, "rgba(21,21,19,0)");
+  vig.addColorStop(1, "rgba(21,21,19,0.18)");
+  x.fillStyle = vig; x.fillRect(0, 0, W, H);
+
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  return t;
+}
+
+/* ── 地面：会向四周淡出的测绘网格 ───────────────────────────── */
+function groundTexture() {
+  const S = 1024;
+  const c = document.createElement("canvas"); c.width = c.height = S;
+  const x = c.getContext("2d");
+  const n = 8, step = S / n;
+  x.lineWidth = 2;
+  for (let i = 0; i <= n; i++) {
+    const p = i * step;
+    x.strokeStyle = i % 8 === 0 ? "rgba(21,21,19,0.34)" : "rgba(21,21,19,0.14)";
+    x.beginPath(); x.moveTo(p, 0); x.lineTo(p, S); x.stroke();
+    x.beginPath(); x.moveTo(0, p); x.lineTo(S, p); x.stroke();
+  }
+  x.strokeStyle = "rgba(233,82,28,0.20)"; x.lineWidth = 2;
+  x.beginPath(); x.moveTo(S / 2 - 26, S / 2); x.lineTo(S / 2 + 26, S / 2); x.stroke();
+  x.beginPath(); x.moveTo(S / 2, S / 2 - 26); x.lineTo(S / 2, S / 2 + 26); x.stroke();
+
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(14, 14);           // 平铺 → 网格在世界尺度上均匀
+  t.anisotropy = 8;
   return t;
 }
 
@@ -351,6 +517,21 @@ function boot() {
   scene.add(key);
   const fill = new THREE.DirectionalLight(0xf2f5fa, 0.6); fill.position.set(-16, -8, 12); scene.add(fill);
   const rim = new THREE.DirectionalLight(0xffffff, 0.5); rim.position.set(-6, 4, -18); scene.add(rim);
+
+  /* ── 背景：纸面穹顶 + 地面测绘网格（"档案大厅"而不是空场） ── */
+  {
+    const bg = backdropTexture();
+    scene.background = bg;             // 平面铺满：网点/水印/套准保持正确比例                 // 整屏纸面贴图：网点/水印/套准都在，且无球面接缝
+
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(900, 900),
+      new THREE.MeshBasicMaterial({ map: groundTexture(), transparent: true, opacity: 0.3, depthWrite: false })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -15.5;
+    scene.add(ground);
+    scene.userData.ground = ground;
+  }
 
   const root = new THREE.Group(); scene.add(root);
 
@@ -411,18 +592,37 @@ function boot() {
   }
   mesh.instanceMatrix.needsUpdate = true;
 
-  /* ± 环内符号 */
+  /* 每张纸的纸色微差：绝大多数是纸白，少量偏暖、极少数带橙（对应部门标签） */
   {
+    const col = new THREE.Color();
+    for (let i = 0; i < N; i++) {
+      const r = hash(i * 9.7);
+      if (r > 0.975) col.setRGB(1.0, 0.905, 0.855);        // 极少数：暖橙纸
+      else {
+        const v = 0.962 + hash(i * 4.3) * 0.038;           // 纸白微差
+        col.setRGB(v, v * (0.995 - hash(i * 2.1) * 0.012), v * (0.985 - hash(i * 6.9) * 0.02));
+      }
+      mesh.setColorAt(i, col);
+    }
+    mesh.instanceColor.needsUpdate = true;
+  }
+
+  /* ± 环内标志：三维挤出（有厚度、有倒角、投阴影、可绕看） */
+  const glyphs = new THREE.Group();
+  {
+    const matFace = new THREE.MeshStandardMaterial({ color: 0x151513, roughness: 0.5, metalness: 0.1 });
+    const matSide = new THREE.MeshStandardMaterial({ color: 0x0c0c0b, roughness: 0.62, metalness: 0.14 });
     const mk = (ch, px) => {
-      const m = new THREE.Mesh(
-        new THREE.PlaneGeometry(3.0, 3.0),
-        new THREE.MeshBasicMaterial({ map: glyphTexture(ch), transparent: true, opacity: 0.92 })
-      );
-      m.position.set(px, 0.1, -3.2);
-      root.add(m);
+      const m = new THREE.Mesh(glyphGeometry(ch, 4.0, 0.68), [matFace, matSide]);
+      m.position.set(px, 0.05, -2.5);
+      m.rotation.y = -0.26 * Math.sign(px);   // 微侧，露出厚度
+      m.castShadow = true; m.receiveShadow = true;
+      glyphs.add(m);
+      return m;
     };
-    mk("+", -8.6);
-    mk("-", 8.6);
+    mk("+", -8.84);   // 左瓣面心
+    mk("-", 8.84);    // 右瓣面心
+    root.add(glyphs);
   }
 
   /* 尘埃 */
@@ -510,7 +710,12 @@ function boot() {
       cam.vp += (e.movementY || 0) * 0.0026;
     }
     const h = hitPage();
-    if (h !== hovered) { hovered = h; canvas.classList.toggle("pointing", !!h); if (h) sfx("paper"); }
+    if (h !== hovered) {
+      hovered = h;
+      canvas.classList.toggle("pointing", !!h);
+      const now = performance.now();
+      if (h && now - lastRustle > 200) { lastRustle = now; sfx("rustle"); }
+    }
     setTip(hovered, e.clientX, e.clientY);
     const wp = worldPoint();
     if (wp) wavePt.copy(wp);
@@ -526,8 +731,10 @@ function boot() {
   }, { passive: false });
 
   /* 抽出 / 归位 / 面板 */
-  let outMesh = null, outFrom = null, outT = 0;
+  let outMesh = null, outFrom = null, outT = 0, lastRustle = 0;
+  const returning = [];                    // 正在飞回原位的旧纸页
   const vDir = new THREE.Vector3(), vRight = new THREE.Vector3(), vTarget = new THREE.Vector3();
+  const vScale = new THREE.Vector3();
   function extractPose() {
     camera.getWorldDirection(vDir);
     vRight.crossVectors(vDir, camera.up).normalize();
@@ -537,7 +744,39 @@ function boot() {
     p.y += 0.2;
     return p;
   }
+  function restoreInstance(pg) {
+    tmpM.compose(pg.basePos, pg.quat, vScale.set(pg.scale, pg.scale, 1));
+    mesh.setMatrixAt(pg.i, tmpM);
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+  function disposeSheet(m) {
+    if (!m) return;
+    root.remove(m);
+    (m.userData.mats || []).forEach((mm) => { if (mm.map) mm.map.dispose(); mm.dispose(); });
+  }
+  function cancelReturn(pg) {
+    const k = returning.findIndex((r) => r.pg === pg);
+    if (k >= 0) { disposeSheet(returning[k].mesh); returning.splice(k, 1); }
+  }
+  /* 飞回原位：0.3s 内插值回槽位，落位后恢复实例矩阵 */
+  function sendBack(pg, m, quiet) {
+    if (!m) { restoreInstance(pg); return; }
+    returning.push({
+      pg, mesh: m,
+      from: m.position.clone(), to: pg.basePos.clone(),
+      qFrom: m.quaternion.clone(), qTo: pg.quat.clone(),
+      sFrom: m.scale.x, t: 0,
+    });
+    if (!quiet) sfx("insert");
+  }
   function select(pg) {
+    if (selected === pg) return;
+    if (selected) {                         // ★ 打开新档案时，上一张自动放回
+      const prev = selected, pm = outMesh;
+      selected = null; outMesh = null;
+      sendBack(prev, pm, true);
+    }
+    cancelReturn(pg);
     selected = pg;
     $("#hudsel").textContent = pg.data.no;
     tmpM.makeScale(0, 0, 0);
@@ -553,24 +792,18 @@ function boot() {
     m.userData.mats = [edge, face];
     root.add(m);
     outMesh = m; outFrom = m.position.clone(); outT = 0;
-    sfx("extract"); setTimeout(() => sfx("beep"), 120);
+    sfx("extract");
+    setTimeout(() => { if (selected === pg) sfx("beep"); }, 170);
     tip.classList.remove("on");
   }
-  function fileBack() {
+  function fileBack(quiet) {
     if (!selected) return;
-    const pg = selected;
-    if (outMesh) {
-      root.remove(outMesh);
-      outMesh.userData.mats.forEach((mm) => { if (mm.map) mm.map.dispose(); mm.dispose(); });
-      outMesh = null;
-    }
-    tmpM.compose(pg.basePos, pg.quat, new THREE.Vector3(pg.scale, pg.scale, 1));
-    mesh.setMatrixAt(pg.i, tmpM);
-    mesh.instanceMatrix.needsUpdate = true;
-    selected = null;
+    const pg = selected, m = outMesh;
+    selected = null; outMesh = null;
     $("#hudsel").textContent = "—";
-    sfx("insert");
+    sendBack(pg, m, quiet);
   }
+
   function openPanel() {
     if (!selected) return;
     const d = selected.data;
@@ -601,6 +834,43 @@ function boot() {
   $("#p-print").addEventListener("click", () => sfx("stamp"));
   addEventListener("keydown", (e) => {
     if (e.code === "Escape") { panelOpen ? closePanel() : fileBack(); }
+  });
+
+  /* 调试：测量某个音效的实际电平（判断"放炮/听不见"） */
+  window._rlAudioLevel = (kind) => new Promise((res) => {
+    audioOn = true; const ctx = ac();
+    const an = ctx.createAnalyser(); an.fftSize = 2048;
+    MASTER.connect(an);
+    const buf = new Float32Array(an.fftSize);
+    let peak = 0, sq = 0, n = 0;
+    const iv = setInterval(() => {
+      an.getFloatTimeDomainData(buf);
+      for (let i = 0; i < buf.length; i++) { const v = Math.abs(buf[i]); if (v > peak) peak = v; sq += buf[i] * buf[i]; n++; }
+    }, 16);
+    sfx(kind);
+    setTimeout(() => {
+      clearInterval(iv); MASTER.disconnect(an);
+      res({ kind, peak: +peak.toFixed(4), dbfs: +(20 * Math.log10(peak || 1e-6)).toFixed(1), rms: +Math.sqrt(sq / Math.max(1, n)).toFixed(4) });
+    }, 650);
+  });
+
+  /* 调试：按像素坐标做一次命中测试 */
+  window._rlHit = (px, py) => {
+    const r = canvas.getBoundingClientRect();
+    ndc.x = ((px - r.left) / r.width) * 2 - 1;
+    ndc.y = -((py - r.top) / r.height) * 2 + 1;
+    const h = hitPage();
+    return h ? (h.data.no + " @" + px + "," + py) : null;
+  };
+
+  /* 调试钩子（便于自动化验证：当前选中 / 抽出物 / 飞回队列） */
+  window._rlState = () => ({
+    sel: selected ? selected.data.no : null,
+    out: !!outMesh,
+    back: returning.length,
+    glyphs: glyphs.children.length,
+    sheets: root.children.filter((o) => o.isMesh && o.userData.mats).length,
+    pages: pages.length,
   });
 
   function drawBarcode(code) {
@@ -637,6 +907,8 @@ function boot() {
     root.rotation.x = -0.02 + Math.sin(tAcc * 0.22) * 0.01;
     root.rotation.y = -0.05 + Math.sin(tAcc * 0.17) * 0.018;
     root.position.y = Math.sin(tAcc * 0.5) * 0.1;
+    glyphs.rotation.y = Math.sin(tAcc * 0.24) * 0.07;
+    glyphs.position.y = Math.sin(tAcc * 0.4 + 1.1) * 0.08;
 
     let dirty = false;
     for (const pg of pages) {
@@ -658,6 +930,17 @@ function boot() {
     }
     if (dirty) mesh.instanceMatrix.needsUpdate = true;
 
+    /* 旧纸页飞回原位 */
+    for (let k = returning.length - 1; k >= 0; k--) {
+      const r = returning[k];
+      r.t = Math.min(1, r.t + dt * 3.6);
+      const e = 1 - Math.pow(1 - r.t, 3);
+      r.mesh.position.lerpVectors(r.from, r.to, e);
+      r.mesh.quaternion.slerpQuaternions(r.qFrom, r.qTo, e);
+      r.mesh.scale.setScalar(r.sFrom + (r.pg.scale - r.sFrom) * e);
+      if (r.t >= 1) { disposeSheet(r.mesh); restoreInstance(r.pg); returning.splice(k, 1); }
+    }
+
     if (outMesh && selected) {
       outT = Math.min(1, outT + dt * 2.2);
       const e = 1 - Math.pow(1 - outT, 3);
@@ -667,7 +950,10 @@ function boot() {
       outMesh.scale.setScalar(selected.scale * (1 + 0.55 * e));
     }
 
-    if (scene.userData.dust) scene.userData.dust.rotation.z = tAcc * 0.006;
+    if (scene.userData.dust) {
+      scene.userData.dust.rotation.z = tAcc * 0.006;
+      scene.userData.dust.position.y = Math.sin(tAcc * 0.14) * 0.5;
+    }
     renderer.render(scene, camera);
     if (firstFrame) { firstFrame = false; window._rlBooted = true; $("#loading").classList.add("off"); }
   }

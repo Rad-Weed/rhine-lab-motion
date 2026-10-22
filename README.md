@@ -6,7 +6,7 @@
 
 *Science-fiction archive-terminal aesthetics for the web — paper white, ink black, warning orange.*
 
-[![Version](https://img.shields.io/badge/version-0.15.0-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
+[![Version](https://img.shields.io/badge/version-0.15.1-orange)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green)]() [![Made for WorkBuddy](https://img.shields.io/badge/made%20for-WorkBuddy-blue)]()
 
 一套蒸馏自官方 PV、开源同人项目与电影级 FUI 方法论的**完整设计语言**：
 编辑设计系统 · 设计 token · 12+ 动效模式 · ∞ 立体档案卷 · 21 种合成音效 · 终端登录开场。
@@ -178,11 +178,12 @@ rhine-lab-motion/
 ## 📋 版本 / Versions
 
 遵循 `0.x.0` 语义：新功能进位 x，小修进位末位。
-SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.15.0**.
+SemVer-ish `0.x.0`: minor bump for features, patch for fixes. Current: **0.15.1**.
 
 | 版本 | 变更 / Changes |
 |---|---|
-| **0.15.0** | **3D 重构为 ∞ 档案卷**：320 张纸页沿双纽线等弧长层层叠压、每页与路径垂直并逐页微旋，实例化单次绘制 + 自阴影；修 `slerpQuaternions` 与"抽出页命中"两处真 bug |
+| **0.15.1** | 3D 页修四处：①音效重做为**纸质音效**（缓起包络 5–35ms + 压缩总线 + 全量重标，峰值 −22~−30 dBFS，不再是噪声爆响）②点开另一张档案时**上一张自动飞回原位**（0.3s 插值 + 复位实例，无残留、无泄漏）③**± 改为三维挤出几何**（倒角/厚度/投影，对齐两瓣面心 ±8.84）④背景场景化：印版边框 + 边缘刻度 + 四角套准靶 + 45° 网点 + 地面测绘网格 + CSS 裁切标记 |
+| 0.15.0 | **3D 重构为 ∞ 档案卷**：320 张纸页沿双纽线等弧长层层叠压、每页与路径垂直并逐页微旋，实例化单次绘制 + 自阴影；修 `slerpQuaternions` 与"抽出页命中"两处真 bug |
 | 0.14.4 | 堆叠轴改为竖向（每站 5 层）——后被 0.15.0 取代 |
 | 0.14.3 | 3D 改为立体纸壳雕塑（56 站点 × 3 层径向外扇 + 环内 ±） |
 | 0.14.2 | 3D 首版重构：72 张纸页等弧长排成 ∞ 标志（解决参数均匀 ≠ 视觉均匀） |
