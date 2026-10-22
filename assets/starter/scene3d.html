@@ -205,41 +205,56 @@ catch (e) {
 }
 if (!THREE) { $("#loading").classList.add("off"); $("#fallback").classList.add("on"); }
 
-/* ── 音效：纸质档案的声音（缓起包络 + 压缩总线，绝不"放炮"） ── */
+/* ── 音效：颗粒化纸声（crackle grains），不是噪声扫频 ──
+   纸的声音本质是大量微小的"噼啪"颗粒，不是白噪声。
+   所以：预生成一张由上千个高通脉冲组成的颗粒底，再用窄带通塑形。 */
 let AC = null, audioOn = false;
-let MASTER = null, NOISE = null;
+let MASTER = null, CRACKLE = null, CRACKLE_SPARSE = null;
+
+/* 生成颗粒噪声：density = 每秒颗粒数 */
+function makeCrackle(dur, density) {
+  const len = Math.floor(AC.sampleRate * dur);
+  const buf = AC.createBuffer(1, len, AC.sampleRate);
+  const d = buf.getChannelData(0);
+  const grains = Math.max(1, Math.round(density * dur));
+  for (let g = 0; g < grains; g++) {
+    const at = Math.floor(Math.random() * Math.max(1, len - 400));
+    const glen = 40 + Math.floor(Math.random() * 240);      // 0.9–6.3ms 的单颗粒
+    const amp = Math.pow(Math.random(), 2.0) * 0.55;
+    let prev = 0;
+    for (let i = 0; i < glen; i++) {
+      const w = Math.random() * 2 - 1;
+      const hp = w - prev; prev = w;                        // 微分 → 高通，"沙沙"的纸纤维感
+      d[at + i] += hp * amp * Math.exp(-i / (glen * 0.3));
+    }
+  }
+  // 峰值归一化：保证每次播放的响度一致（否则随机起点会让音量忽大忽小）
+  let peak = 0;
+  for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(d[i]));
+  const k = 0.9 / (peak || 1);
+  for (let i = 0; i < len; i++) d[i] *= k;
+  return buf;
+}
 
 function ac() {
   if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
   if (AC.state === "suspended") AC.resume();
   if (!MASTER) {
-    // 总线：压缩器兜住峰值，master 再收一档 → 任何音都不会炸
     const comp = AC.createDynamicsCompressor();
-    comp.threshold.value = -22; comp.knee.value = 26; comp.ratio.value = 4;
-    comp.attack.value = 0.004; comp.release.value = 0.25;
+    comp.threshold.value = -18; comp.knee.value = 30; comp.ratio.value = 3;
+    comp.attack.value = 0.006; comp.release.value = 0.28;
     MASTER = AC.createGain(); MASTER.gain.value = 0.5;
     MASTER.connect(comp).connect(AC.destination);
-
-    // 一次性生成"纸噪声"：白噪经三级低通化 → 接近纸张摩擦的粉噪，去掉刺耳高频
-    const len = Math.floor(AC.sampleRate * 1.0);
-    NOISE = AC.createBuffer(1, len, AC.sampleRate);
-    const d = NOISE.getChannelData(0);
-    let b0 = 0, b1 = 0, b2 = 0;
-    for (let i = 0; i < len; i++) {
-      const w = Math.random() * 2 - 1;
-      b0 = 0.99765 * b0 + w * 0.0990460;
-      b1 = 0.96300 * b1 + w * 0.2965164;
-      b2 = 0.57000 * b2 + w * 1.0526913;
-      d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.16;
-    }
+    CRACKLE = makeCrackle(1.6, 2600);        // 密颗粒：抽/归位
+    CRACKLE_SPARSE = makeCrackle(0.8, 70);   // 疏颗粒：悬停轻响
   }
   return AC;
 }
 
-/* 缓起缓落：attack 至少 5ms，永远不会出现瞬态冲击 */
+/* 缓起缓落：绝不出现瞬态冲击 */
 function env(g, t, peak, attack, dur) {
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.linearRampToValueAtTime(peak, t + Math.max(0.004, attack));
+  g.gain.linearRampToValueAtTime(peak, t + Math.max(0.005, attack));
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
 }
 
@@ -248,17 +263,20 @@ function sfx(kind) {
   try {
     const ctx = ac(), t = ctx.currentTime;
 
-    const noise = (dur, f0, f1, peak, type, q, attack) => {
-      const src = ctx.createBufferSource(); src.buffer = NOISE;
-      const flt = ctx.createBiquadFilter();
-      flt.type = type || "bandpass";
-      flt.Q.value = q || 1.1;
-      flt.frequency.setValueAtTime(f0, t);
-      if (f1 && f1 !== f0) flt.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    /* 颗粒声：buf 选择 + 带通塑形 + 缓慢扫频（很轻，只做"气息"） */
+    const grain = (dur, f0, f1, peak, q, attack, sparse, type) => {
+      const src = ctx.createBufferSource();
+      src.buffer = sparse ? CRACKLE_SPARSE : CRACKLE;
+      const bp = ctx.createBiquadFilter();
+      bp.type = type || "highpass";
+      bp.Q.value = q || 0.7;
+      bp.frequency.setValueAtTime(f0, t);
+      if (f1 !== f0) bp.frequency.exponentialRampToValueAtTime(f1, t + dur);
       const g = ctx.createGain();
       env(g, t, peak, attack, dur);
-      src.connect(flt).connect(g).connect(MASTER);
-      src.start(t, Math.random() * 0.45); src.stop(t + dur + 0.02);
+      src.connect(bp).connect(g).connect(MASTER);
+      src.start(t, Math.random() * 0.4);
+      src.stop(t + dur + 0.02);
     };
     const tone = (f0, f1, dur, type, peak, attack) => {
       const o = ctx.createOscillator(), g = ctx.createGain();
@@ -266,23 +284,26 @@ function sfx(kind) {
       o.frequency.setValueAtTime(f0, t);
       if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
       env(g, t, peak, attack, dur);
-      o.connect(g).connect(MASTER); o.start(t); o.stop(t + dur + 0.03);
+      o.connect(g).connect(MASTER);
+      o.start(t); o.stop(t + dur + 0.03);
     };
 
-    if (kind === "rustle") {              // 悬停：纸边轻擦（高频窄带，极轻）
-      noise(0.13, 2800, 3600, 0.30, "bandpass", 1.8, 0.022);
-    } else if (kind === "extract") {      // 抽出：纸从卷里滑出，气流上行
-      noise(0.34, 600, 2800, 0.55, "bandpass", 0.9, 0.035);
-      tone(1240, 1580, 0.09, "sine", 0.03, 0.012);
-    } else if (kind === "insert") {       // 归位：滑回，气流下行
-      noise(0.3, 2900, 700, 0.45, "bandpass", 0.9, 0.025);
-    } else if (kind === "beep") {         // 确认：单音，短
-      tone(1318.5, 1318.5, 0.07, "sine", 0.10, 0.006);
-    } else if (kind === "stamp") {        // 盖章：软闷的一声，不是炮
-      tone(132, 96, 0.13, "sine", 0.10, 0.01);
-      noise(0.1, 520, 240, 0.12, "lowpass", 0.7, 0.006);
-    } else if (kind === "close") {        // 收起
-      tone(560, 420, 0.09, "triangle", 0.08, 0.01);
+    if (kind === "rustle") {          // 悬停：纸角被指尖碰到的一小声
+      grain(0.06, 2400, 2000, 0.28, 0.9, 0.004, true);
+      tone(2100, 1750, 0.03, "sine", 0.04, 0.003);
+    } else if (kind === "extract") {  // 抽出：纸从卷里被抽走，颗粒由疏到密
+      grain(0.42, 650, 2400, 0.32, 0.7, 0.055);
+      tone(1046, 1568, 0.13, "sine", 0.05, 0.02);   // 一声很轻的上行，给动作一个"确认"
+    } else if (kind === "insert") {   // 归位：滑回，颗粒由密到疏
+      grain(0.36, 2600, 700, 0.23, 0.7, 0.03);
+      tone(988, 740, 0.12, "sine", 0.04, 0.02);
+    } else if (kind === "beep") {     // 确认
+      tone(1318.5, 1318.5, 0.075, "sine", 0.09, 0.006);
+    } else if (kind === "stamp") {    // 盖章：一声闷，加一点点纸的沙
+      tone(110, 82, 0.12, "sine", 0.12, 0.012);
+      grain(0.12, 620, 380, 0.17, 0.6, 0.006);
+    } else if (kind === "close") {
+      tone(523, 392, 0.1, "triangle", 0.07, 0.012);
     }
   } catch (e) {}
 }
@@ -577,7 +598,10 @@ function boot() {
   const vNormal = new THREE.Vector3();
   const vCam = new THREE.Vector3();
   const vToCam = new THREE.Vector3();
+  const vUp = new THREE.Vector3();
   const qTmp = new THREE.Quaternion();
+  const qTwist = new THREE.Quaternion();
+  const AXIS_Z = new THREE.Vector3(0, 0, 1);
   const look = new THREE.Object3D();       // 仅用于算"朝向相机"的四元数
   const zAxis = new THREE.Vector3(0, 0, 1);
 
@@ -626,7 +650,8 @@ function boot() {
     const mk = (ch, px) => {
       const m = new THREE.Mesh(glyphGeometry(ch, 4.0, 0.68), [matFace, matSide]);
       m.position.set(px, 0.05, -2.5);
-      m.userData.baseYaw = -0.2 * Math.sign(px);   // 静止姿态：微侧露出厚度
+      m.userData.cant = -0.34 * Math.sign(px);     // 朝环内微倾：始终能看见厚度
+      m.userData.baseYaw = m.userData.cant;
       m.rotation.y = m.userData.baseYaw;
       m.castShadow = true; m.receiveShadow = true;
       glyphs.add(m);
@@ -878,6 +903,15 @@ function boot() {
     }, 650);
   });
 
+  /* 调试：看某张纸的局部轴在世界里的方向（验证横波方向） */
+  window._rlAxes = (i = 0) => {
+    const q = pages[i].quat;
+    return {
+      normal: new THREE.Vector3(0, 0, 1).applyQuaternion(q).toArray().map((v) => +v.toFixed(2)),
+      up: new THREE.Vector3(0, 1, 0).applyQuaternion(q).toArray().map((v) => +v.toFixed(2)),
+    };
+  };
+
   /* 调试：按像素坐标做一次命中测试 */
   window._rlHit = (px, py) => {
     const r = canvas.getBoundingClientRect();
@@ -937,14 +971,15 @@ function boot() {
     glyphs.rotation.y = Math.sin(tAcc * 0.24) * 0.04;
     glyphs.position.y = Math.sin(tAcc * 0.4 + 1.1) * 0.08;
 
-    /* ± 在 ±60° 内转向相机：始终大体正对，又保留侧转的厚度 */
+    /* ± 始终面向相机：不限幅，正反面都成立（挤出体是实心的，背面也是一枚完整的 ±）。
+       只保留一个很小的固定内倾，让厚度和侧面在正面观看时仍可见。 */
     for (const g of glyphs.children) {
       const want = Math.atan2(vCam.x - g.position.x, vCam.z - g.position.z);
-      const base = g.userData.baseYaw;
-      let dY = want - base;
-      dY = Math.atan2(Math.sin(dY), Math.cos(dY));          // 归一化到 ±π
-      const clamped = base + Math.max(-1.05, Math.min(1.05, dY));
-      g.rotation.y += (clamped - g.rotation.y) * Math.min(1, dt * 3.6);
+      const target = want + g.userData.cant;
+      // 沿最短路径平滑跟随（不跳变，绕到背面时会自然翻过来）
+      let dY = target - g.rotation.y;
+      dY = Math.atan2(Math.sin(dY), Math.cos(dY));
+      g.rotation.y += dY * Math.min(1, dt * 2.8);
     }
 
     /* 相机在 root 局部坐标系里的位置：悬停抽出、± 朝向都用它 */
@@ -976,25 +1011,32 @@ function boot() {
       }
       pg.kick *= Math.exp(-dt * 3.1);
 
-      /* 4. 阵列自身的默认行波：沿路径行进的微浪（永远在动，但不抢戏） */
-      const idle = Math.sin(tAcc * 1.15 - pg.i * 0.085) * 0.052 * idleAmp;
+      /* 4. 阵列自身的默认动态：横波 + 双频呼吸（永远在动） */
+      const idle = (Math.sin(tAcc * 1.02 - pg.i * 0.1) * 0.175
+                  + Math.sin(tAcc * 0.58 - pg.i * 0.045 + 1.7) * 0.105) * idleAmp;
 
-      vNormal.set(0, 0, 1).applyQuaternion(pg.quat);
+      vNormal.set(0, 0, 1).applyQuaternion(pg.quat);     // 路径切线方向
+      vUp.set(0, 1, 0).applyQuaternion(pg.quat);         // 垂直于纸带（≈ 世界 Z）
       vAxis.set(1, 0, 0).applyQuaternion(pg.quat);
 
       vToCam.copy(vCam).sub(pg.basePos);
       const dl = vToCam.length() || 1;
       vToCam.multiplyScalar(1 / dl);                     // 指向相机的单位向量
 
-      const push = pg.wave * 0.24 + pg.kick * 0.75 + idle;
-      const s = pg.scale * (1 + pg.wave * 0.06 + pg.hover * 0.075 + pg.kick * 0.035);
+      /* 横波：位移垂直于纸带（起伏），只在纵向上留极小分量，避免完全僵硬 */
+      const trans = pg.wave * 0.62 + pg.kick * 1.15 + idle;
+      const longi = pg.wave * 0.06 + pg.kick * 0.12;
+      const s = pg.scale * (1 + pg.wave * 0.05 + pg.hover * 0.075 + pg.kick * 0.02);
       tmpP.copy(pg.basePos)
-        .addScaledVector(vNormal, push)
-        .addScaledVector(vToCam, pg.hover * 2.2)         // 悬停：朝镜头抽出一段
-        .addScaledVector(vAxis, pg.wave * 0.1);
+        .addScaledVector(vUp, trans)
+        .addScaledVector(vNormal, longi)
+        .addScaledVector(vToCam, pg.hover * 2.2);        // 悬停：朝镜头抽出一段
+
+      /* 纸页绕自身法线微扭（像被气流带动的纸角），叠在默认动态上 */
+      const twist = Math.sin(tAcc * 1.25 - pg.i * 0.093) * 0.045 * idleAmp;
+      qTmp.copy(pg.quat).multiply(qTwist.setFromAxisAngle(AXIS_Z, twist));
 
       /* 悬停时纸面转向镜头（像把一张纸从卷里抽出来看） */
-      qTmp.copy(pg.quat);
       if (pg.hover > 0.01) {
         look.position.copy(tmpP);
         look.lookAt(vCam);
